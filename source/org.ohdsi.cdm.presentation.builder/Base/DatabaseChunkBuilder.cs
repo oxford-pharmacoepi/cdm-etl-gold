@@ -47,7 +47,7 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                     Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);
                     throw result.Value;
                 }
-
+                Debug.WriteLine("_chunkId=" + _chunkId);
                 Logger.Write(_chunkId, LogMessageTypes.Info,
                     $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
 

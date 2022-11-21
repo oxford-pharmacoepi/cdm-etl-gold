@@ -59,19 +59,28 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
                     var q = string.Format(sql, ChunkId);
 
-                    using (var cdm = sourceEngine.GetCommand(q, sourceConnection))
+                    Debug.WriteLine("sourceQueryDefinitions=" + sourceQueryDefinitions);
+                    Debug.WriteLine("query=" + q);
+
+                    foreach (var subQuery in q.Split(new[] { "GO" + "\r\n", "GO" + "\n" },
+                        StringSplitOptions.RemoveEmptyEntries))
                     {
-                        cdm.CommandTimeout = 30000;
-                        using (var reader =
-                            sourceEngine.ReadChunkData(sourceConnection, cdm, qd, ChunkId,
-                                Prefix))
+                        using (var cdm = sourceEngine.GetCommand(subQuery, sourceConnection))
                         {
-                            while (reader.Read())
+                            Debug.WriteLine("subQuery=" + subQuery);
+                            cdm.CommandTimeout = 30000;
+                            using (var reader =
+                                sourceEngine.ReadChunkData(sourceConnection, cdm, qd, ChunkId,
+                                    Prefix))
                             {
-                                PopulateData(qd, reader);
+                                while (reader.Read())
+                                {
+                                    PopulateData(qd, reader);
+                                }
                             }
                         }
                     }
+                    
                 }
 
                 timer.Stop();
@@ -107,14 +116,12 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
             PersonBuilders.Clear();
             PersonBuilders = null;
+
             Console.WriteLine($"Building CDM chunkId={ChunkId} - complete");
         }
 
         public void Save(CdmVersions cdm, string destinationConnectionString, IDatabaseEngine destinationEngine, string sourceSchema, string destinationSchema)
         {
-            Console.WriteLine($"Saving chunkId={ChunkId} ...");
-            Console.WriteLine("DestinationConnectionString=" + destinationConnectionString);
-
             if (ChunkData.Persons.Count == 0)
             {
                 ChunkData.Clean();

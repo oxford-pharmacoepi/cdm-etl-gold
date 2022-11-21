@@ -6,6 +6,7 @@ using org.ohdsi.cdm.framework.common.Omop;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.common.Base
@@ -23,6 +24,9 @@ namespace org.ohdsi.cdm.framework.common.Base
 
         public ChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt)
         {
+            Debug.WriteLine("ChunkPart");
+            Debug.WriteLine("chunkId=" + chunkId);
+
             ChunkId = chunkId;
             CreatePersonBuilder = createPersonBuilder;
             Prefix = prefix;
@@ -51,6 +55,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             AddEntity(queryDefinition, queryDefinition.Measurement, reader, recordGuid, "Measurement");
             AddEntity(queryDefinition, queryDefinition.DeviceExposure, reader, recordGuid, "DeviceExposure");
             AddEntity(queryDefinition, queryDefinition.Note, reader, recordGuid, "Note");
+            
         }
 
 
@@ -169,6 +174,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                     Console.WriteLine("Error");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Debug.WriteLine(e.Message);
                     throw;
                 }
             }

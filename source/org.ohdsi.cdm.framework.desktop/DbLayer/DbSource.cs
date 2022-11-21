@@ -2,8 +2,10 @@
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.Odbc;
+using System.Diagnostics;
 using System.IO;
 
 namespace org.ohdsi.cdm.framework.desktop.DbLayer
@@ -68,9 +70,15 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         public IEnumerable<IDataReader> GetPersonKeys(string batchScript, long batches, int batchSize)
         {
             batchScript = batchScript.Replace("{sc}", _schemaName);
+
+            Debug.WriteLine("batches=" + batches);
+
             var sql = batches > 0
                 ? string.Format(batchScript, "TOP " + batches * batchSize)
                 : string.Format(batchScript, "");
+
+            Debug.WriteLine("string.Format(batchScript, \"TOP \" + batches * batchSize)=" + string.Format(batchScript, "TOP " + batches * batchSize));
+            Debug.WriteLine("sql=" + sql);
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             using (var c = new OdbcCommand(sql, connection) { CommandTimeout = 0 })
             {

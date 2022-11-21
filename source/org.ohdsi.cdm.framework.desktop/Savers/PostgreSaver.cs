@@ -1,16 +1,19 @@
-﻿using Npgsql;
+﻿using MySqlConnector;
+using Npgsql;
 using NpgsqlTypes;
 using org.ohdsi.cdm.framework.common.Enums;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Data.Odbc;
+using System.Diagnostics;
 
 namespace org.ohdsi.cdm.framework.desktop.Savers
 {
     public class PostgreSaver : Saver
     {
         private NpgsqlConnection _connection;
+        private NpgsqlTransaction _transaction;
 
         public override ISaver Create(string connectionString, CdmVersions cdmVersion, string sourceSchema, string destinationSchema)
         {
@@ -20,13 +23,13 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
             var odbc = new OdbcConnectionStringBuilder(connectionString);
 
-            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};SslMode=Require;Trust Server Certificate=true";
+            //var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};SslMode=Require;Trust Server Certificate=true";
+            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password}";
 
             var npgsqlConnectionString = connectionStringTemplate.Replace("{server}", odbc["server"].ToString())
                 .Replace("{database}", odbc["database"].ToString()).Replace("{username}", odbc["uid"].ToString())
                 .Replace("{password}", odbc["pwd"].ToString());
 
-            Console.WriteLine("npgsqlConnectionString=" + npgsqlConnectionString);
             _connection = SqlConnectionHelper.OpenNpgsqlConnection(npgsqlConnectionString);
 
             return this;
@@ -58,6 +61,8 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             }
 
             var q = $"COPY {tableName} ({string.Join(",", fields)}) from STDIN (FORMAT BINARY)";
+
+            Debug.WriteLine("q=" + q);
 
             using (var inStream = _connection.BeginBinaryImport(q))
             {
@@ -127,17 +132,17 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
         public override void Commit()
         {
-            //_transaction.Commit();
+            _transaction.Commit();
         }
 
         public override void Rollback()
         {
-            //_transaction.Rollback();
+            _transaction.Rollback();
         }
 
         public override void Dispose()
         {
-            //_transaction.Dispose();
+            _transaction.Dispose();
             _connection.Dispose();
         }
     }

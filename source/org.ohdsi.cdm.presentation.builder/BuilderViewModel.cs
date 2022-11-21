@@ -3,6 +3,7 @@ using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.presentation.builder.Controllers;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -233,6 +234,48 @@ namespace org.ohdsi.cdm.presentation.builder
                     _settingUnlocked = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SettingUnlocked"));
                 }
+            }
+        }
+
+
+        //
+        public bool DataCleaningStarted
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.DataCleaningStarted;
+            }
+        }
+
+        public bool DataCleaningWorking => DataCleaningStarted && _buildingController.CurrentState == BuilderState.Running;
+
+        public bool DataCleaningDone
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return !DataCleaningSkipped && Settings.Current.Building.BuildingState.DataCleaningDone;
+            }
+        }
+
+        public bool DataCleaningSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.DataCleaningStart,
+                                              Settings.Current.Building.BuildingState.DataCleaningEnd);
+
+        public string DataCleaningInfo
+        {
+            get
+            {
+                if (DataCleaningSkipped)
+                    return "skipped";
+
+                if (DataCleaningDone)
+                {
+                    return Settings.Current.Building.BuildingState.DataCleaningStart.Value.Subtract(
+                        Settings.Current.Building.BuildingState.DataCleaningEnd.Value).ToReadableString();
+                }
+
+                return string.Empty;
             }
         }
 
@@ -585,6 +628,8 @@ namespace org.ohdsi.cdm.presentation.builder
 
         #region Commands
 
+        public ICommand DataCleaningCommand => new DelegateCommand(DataCleaningStep);
+
         public ICommand StartBuildingCommand => new DelegateCommand(Build);
 
         public ICommand SetBuildingCommand => new DelegateCommand(SetBuilding);
@@ -606,6 +651,10 @@ namespace org.ohdsi.cdm.presentation.builder
         public ICommand FillPostBuildTableCommand => new DelegateCommand(FillPostBuildTable);
 
         public ICommand ResetDbCreationStepCommand => new DelegateCommand(ResetDbCreationStep);
+
+        public ICommand SkipDataCleaningStepCommand => new DelegateCommand(SkipDataCleaningStep);
+
+        public ICommand ResetDataCleaningStepCommand => new DelegateCommand(ResetDataCleaningStep);
 
         public ICommand SkipChunksCreationStepCommand => new DelegateCommand(SkipChunksCreationStep);
 
@@ -678,6 +727,11 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
+        private void DataCleaningStep()
+        {
+            _buildingController?.DataCleaningStep();
+        }
+
         private void CreateTablesStep()
         {
             _buildingController?.CreateTablesStep();
@@ -716,6 +770,25 @@ namespace org.ohdsi.cdm.presentation.builder
             {
                 _buildingController.ResetChunksCreationStep();
             }
+        }
+
+        private void ResetDataCleaningStep()
+        {
+            if (_buildingController == null) return;
+            if (!DataCleaningDone) return;
+            if (DataCleaningSkipped) return;
+
+            _buildingController.ResetDataCleaningStep();
+            
+        }
+
+
+        private void SkipDataCleaningStep()
+        {
+            if (_buildingController == null) return;
+            if (DataCleaningDone) return;
+
+            _buildingController.SkipDataCleaningStep();
         }
 
         private void SkipChunksCreationStep()
@@ -980,6 +1053,11 @@ namespace org.ohdsi.cdm.presentation.builder
 
             if (PropertyChanged != null)
             {
+                PropertyChanged(this, new PropertyChangedEventArgs("DataCleaningStarted"));
+                PropertyChanged(this, new PropertyChangedEventArgs("DataCleaningWorking"));
+                PropertyChanged(this, new PropertyChangedEventArgs("DataCleaningDone"));
+                PropertyChanged(this, new PropertyChangedEventArgs("DataCleaningInfo"));
+
                 PropertyChanged(this, new PropertyChangedEventArgs("DestinationStarted"));
                 PropertyChanged(this, new PropertyChangedEventArgs("DestinationWorking"));
                 PropertyChanged(this, new PropertyChangedEventArgs("DestinationCreated"));
@@ -1051,6 +1129,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         private void ResetAll()
         {
+            //TO-DO: Reset DataCleaning
             ResetDbCreationStep();
             ResetChunksCreationStep(true);
             ResetLookupCreationStep(true);
@@ -1106,9 +1185,21 @@ namespace org.ohdsi.cdm.presentation.builder
         {
             if (_buildingController == null) return;
 
-            _timer.Stop();
-            _buildingController.Refresh();
-            _timer.Start();
+            if (Settings.Current.Building.BuildingState.BuildingComplete)
+            {
+                _timer.Stop();
+                Debug.WriteLine("Data has been mapped.");
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Data has been mapped. ====================");
+
+            }
+            else
+            {
+                _timer.Stop();
+                _buildingController.Refresh();
+                _timer.Start();
+            }
         }
+
     }
 }

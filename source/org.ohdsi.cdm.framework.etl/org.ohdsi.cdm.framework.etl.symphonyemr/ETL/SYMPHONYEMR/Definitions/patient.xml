@@ -22,7 +22,7 @@
     CASE ecntr_typ_desc
     WHEN 'Inpatient' THEN 9201
     ELSE 9202
-    END VISIT_CONCEPT_ID
+    END AS VISIT_CONCEPT_ID
     FROM {sc}.patient p
     JOIN {sc}._chunks ch ON ch.ChunkId = {0} AND p.patient_id = ch.PERSON_ID
     JOIN {sc}.encounter e ON e.patient_id  = p.patient_id

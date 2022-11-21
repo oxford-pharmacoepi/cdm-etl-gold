@@ -8,13 +8,16 @@ using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using org.ohdsi.cdm.presentation.builder.Base;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 
 
 namespace org.ohdsi.cdm.presentation.builder.Controllers
@@ -28,6 +31,20 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         #endregion
 
         #region Properties
+        private const string INX_FOR_DATA_CLEAN_CREATED = "DataCleaningIndexesCreated";
+        private const string PROC_CREATED = "ProcedureCreated";
+        private const string IDX_FOR_MAPPING_CREATED = "MappingIndexesCreated";
+        private const string DATA_CLEAN_DONE = "DataCleaningIsDone";
+
+        private string[] sourceTables = {  "patient",
+                                            "consultation",
+                                            "clinical",
+                                            "additional",
+                                            "referral",
+                                            "immunisation",
+                                            "test",
+                                            "therapy"
+                                        };
 
         public BuilderState CurrentState { get; set; }
         public int CompleteChunksCount => Settings.Current.Building.CompletedChunkIds.Count;
@@ -64,15 +81,189 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             }
         }
 
+        //TO-DO: 1. Create source tables structures
+        //       2. Load source data
+
+        public List<Action> CreateActionList(DbCleaning dbCleaning) {
+            var actions = new List<Action>();
+
+            foreach (string tableName in sourceTables)
+            {
+                if (tableName != sourceTables[0]) {
+                    actions.Add(
+                        () => {
+                            if (!Settings.Current.Building.DataCleaningSteps.Contains(tableName))
+                            {
+                                Debug.WriteLine("Data Cleaning in " + tableName + " started");
+                                Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " started");
+
+                                string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
+                                dbCleaning.ExecuteQuery(query);
+                                Settings.Current.Building.DataCleaningSteps.Add(tableName);
+
+                                Debug.WriteLine("Data Cleaning in " + tableName + " ended");
+                                Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " ended");
+                            }
+
+                        }
+                    );
+                }
+            }
+
+            Debug.WriteLine("Number of actions=" + actions.Count);
+
+            return actions;
+        }
+
+        public void DataCleaning()
+        {
+            PerformAction(() =>
+            {
+                var timer = new Stopwatch();
+                timer.Start();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Data Cleaning Started ====================");
+
+                var dbCleaning = new DbCleaning(Settings.Current.Building.SourceConnectionString, Settings.Current.Building.SourceSchema);
+                var actions = CreateActionList(dbCleaning);
+
+                //1. Add indexes for data cleaning in the source tables
+                if (Settings.Current.Building.DataCleaningSteps.Contains(INX_FOR_DATA_CLEAN_CREATED))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, $"Indexes for Data Cleaning are already created");
+                }
+                else {
+                    dbCleaning.ExecuteQuery(Settings.Current.CreateDataCleaningIndexesScript);
+                    Settings.Current.Building.DataCleaningSteps.Add(INX_FOR_DATA_CLEAN_CREATED);
+
+                    Logger.Write(null, LogMessageTypes.Info, $"Indexes for Data Cleaning are created");
+                }
+
+
+                //2. Create functions and store procedure in db 
+                if (Settings.Current.Building.DataCleaningSteps.Contains(PROC_CREATED))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning Procedures already created");
+                }
+                else {
+                    dbCleaning.CreateProcedure(Settings.Current.DataCleaningScript);
+                    Settings.Current.Building.DataCleaningSteps.Add(PROC_CREATED);
+
+                    Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning Procedures created");
+                }
+                
+                //3. Perform Data Cleaning
+                //Patient MUST clean first!!!
+                if (Settings.Current.Building.DataCleaningSteps.Contains(PROC_CREATED) && 
+                    !Settings.Current.Building.DataCleaningSteps.Contains(sourceTables[0]))
+                {
+                    Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " started");
+                    Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + sourceTables[0] + " started");
+
+                    string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", sourceTables[0]);
+                    dbCleaning.ExecuteQuery(query);
+                    Settings.Current.Building.DataCleaningSteps.Add(sourceTables[0]);
+
+                    Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " ended");
+                    Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + sourceTables[0] + " ended");
+                }
+
+                
+                if(Settings.Current.Building.DataCleaningSteps.Contains(PROC_CREATED) &&
+                    Settings.Current.Building.DataCleaningSteps.Contains(sourceTables[0]))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, sourceTables[0] + $" is clean");
+
+                    //Parallel Run
+                    Parallel.ForEach(actions, action => action());
+                    Settings.Current.Building.DataCleaningSteps.Add(DATA_CLEAN_DONE);
+
+                    Debug.WriteLine("Data Cleaning in all tables ended");
+                    Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in all tables ended");
+
+                }
+                
+                /*
+                // Clean table one by one
+                foreach (string tableName in sourceTables) {
+ 
+                    if (!Settings.Current.Building.DataCleaningSteps.Contains(tableName))
+                    {
+                        Debug.WriteLine("Data Cleaning in " + tableName + "started");
+                        Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " started");
+
+                        string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
+                        dbCleaning.ExecuteQuery(query);
+                        //dbCleaning.DataCleaning(tableName);
+                        Settings.Current.Building.DataCleaningSteps.Add(tableName);
+                        
+                        Debug.WriteLine("Data Cleaning in " + tableName + "ended");
+                        Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " ended");
+
+                    }
+                    Logger.Write(null, LogMessageTypes.Info, tableName + $" is clean");
+                }
+                */
+                
+                //4. Add indexes for Mapping in the source tables
+                if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) && 
+                    !Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED))
+                {
+
+                    Debug.WriteLine("Create Mapping indexes started");
+                    Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes started");
+
+                    dbCleaning.ExecuteQuery(Settings.Current.CreateMappingIndexesScript);
+                    Settings.Current.Building.DataCleaningSteps.Add(IDX_FOR_MAPPING_CREATED);
+                    Logger.Write(null, LogMessageTypes.Info, IDX_FOR_MAPPING_CREATED);
+
+                    Debug.WriteLine("Create Mapping indexes ended");
+                    Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes ended");
+                }
+                
+                timer.Stop();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Data Cleaning Ended - {timer.ElapsedMilliseconds} ms ====================");
+            });
+        }
+        /*
+        public void CreateCdmIndexes()
+        {
+            PerformAction(() =>
+            {
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Indexes in CDM tables Started ====================");
+
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
+                   Settings.Current.Building.CdmSchema);
+
+                dbDestination.CreateIndexes(Settings.Current.CreateCdmIndexesScript);
+
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Indexes in CDM tables Ended ====================");
+            });
+
+        }
+        */
+
         public void CreateDestination()
         {
             PerformAction(() =>
             {
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Destination Started ====================");
+
                 var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
                     Settings.Current.Building.CdmSchema);
 
                 dbDestination.CreateDatabase(Settings.Current.CreateCdmDatabaseScript);
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmTablesScript);
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Destination Ended ====================");
             });
         }
 
@@ -130,6 +321,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             {
                 var timer = new Stopwatch();
                 timer.Start();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Lookup Started ====================");
+
                 vocabulary.Fill(true, false);
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
@@ -187,6 +382,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 careSiteConcepts = null;
                 providerConcepts = null;
                 GC.Collect();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Lookup Ended ====================");
             });
         }
 
@@ -238,8 +436,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             PerformAction(() =>
             {
+
                 if (Settings.Current.Building.ChunksCount == 0)
                 {
+                    Debug.WriteLine("Settings.Current.Building.ChunksCount == 0 --> need to drop _chunk");
                     Settings.Current.Building.ChunksCount = _chunkController.CreateChunks();
                 }
 
@@ -285,6 +485,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     CurrentState = BuilderState.Stopped;
                 });
 
+                /*
                 if(Settings.Current.OnlyEvenChunks)
                     Logger.Write(null, LogMessageTypes.Info, "Only even chunk ids will be processed on this machine");
 
@@ -293,8 +494,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 if(Settings.Current.ChunksTo > 0)
                     Logger.Write(null, LogMessageTypes.Info, $"ChunkIds from {Settings.Current.ChunksFrom} to {Settings.Current.ChunksTo} will be converted");
+                */
 
-                Parallel.For(0, Settings.Current.Building.ChunksCount,
+                Debug.WriteLine("End Task Run");
+
+
+                Parallel.For(1, Settings.Current.Building.ChunksCount,
                     new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
                       {
                           if (CurrentState != BuilderState.Running)
@@ -302,6 +507,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                           if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
                           {
+                              /*
                               if(IsOdd(chunkId))
                               {
                                   if (Settings.Current.OnlyEvenChunks)
@@ -324,12 +530,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                   Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
                                   return;
                               }
-
+                              
                               if (chunkId > Settings.Current.ChunksTo)
                               {
                                   Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
                                   return;
                               }
+                              */
 
                               var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
 
@@ -350,6 +557,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                               {
                                   Thread.Sleep(1000);
                               }
+
                           }
                       });
 

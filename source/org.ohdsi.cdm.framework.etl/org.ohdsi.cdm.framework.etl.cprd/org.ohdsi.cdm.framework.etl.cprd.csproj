@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,16 +8,16 @@
     <None Remove="Batch.sql" />
     <None Remove="CdmSource.sql" />
     <None Remove="CohortDefinition.sql" />
-    <None Remove="ETL\CPRD\Definitions\Additional.xml" />
-    <None Remove="ETL\CPRD\Definitions\Clinical.xml" />
-    <None Remove="ETL\CPRD\Definitions\Immunisation.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Clinical_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Immunisation_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\L_CARE_SITE.xml" />
     <None Remove="ETL\CPRD\Definitions\L_LOCATION.xml" />
     <None Remove="ETL\CPRD\Definitions\L_PROVIDER.xml" />
-    <None Remove="ETL\CPRD\Definitions\Patient.xml" />
-    <None Remove="ETL\CPRD\Definitions\Referral.xml" />
-    <None Remove="ETL\CPRD\Definitions\Test.xml" />
-    <None Remove="ETL\CPRD\Definitions\Therapy.xml" />
+    <None Remove="ETL\CPRD\Definitions\Patient_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Referral_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Test_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Therapy_Postgres.xml" />
     <None Remove="ETL\CPRD\Lookups\Additional.sql" />
     <None Remove="ETL\CPRD\Lookups\Drug.sql" />
     <None Remove="ETL\CPRD\Lookups\Read_Code.sql" />
@@ -37,13 +37,13 @@
     <Content Include="ETL\CPRD\CohortDefinition.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Additional.xml">
+    <Content Include="ETL\CPRD\Definitions\Additional_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Clinical.xml">
+    <Content Include="ETL\CPRD\Definitions\Clinical_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Immunisation.xml">
+    <Content Include="ETL\CPRD\Definitions\Immunisation_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\CPRD\Definitions\L_CARE_SITE.xml">
@@ -55,16 +55,16 @@
     <Content Include="ETL\CPRD\Definitions\L_PROVIDER.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Patient.xml">
+    <Content Include="ETL\CPRD\Definitions\Patient_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Referral.xml">
+    <Content Include="ETL\CPRD\Definitions\Referral_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Test.xml">
+    <Content Include="ETL\CPRD\Definitions\Test_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Therapy.xml">
+    <Content Include="ETL\CPRD\Definitions\Therapy_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\CPRD\Lookups\Additional.sql">

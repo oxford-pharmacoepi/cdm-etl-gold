@@ -6,6 +6,7 @@ using org.ohdsi.cdm.framework.desktop.Databases;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -43,6 +44,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public string VocabPswd { get; set; }
 
         public List<int> CompletedChunkIds { get; set; }
+
+        public List<string> DataCleaningSteps { get; set; }
 
         public int ChunksCount { get; set; }
 
@@ -157,6 +160,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public BuildingSettings()
         {
+            DataCleaningSteps = new List<string>();
             CompletedChunkIds = new List<int>();
             BuildingState = new Building();
             ChunksCount = 0;
@@ -174,11 +178,14 @@ namespace org.ohdsi.cdm.presentation.builder
             IPersonBuilder instantiatedObject = Activator.CreateInstance(objectType) as IPersonBuilder;
             VendorFolder = instantiatedObject.GetFolder();
 
+            Debug.WriteLine("run Batch.sql");
             var batch = "Batch.sql";
             if (File.Exists(Path.Combine(VendorFolder, batch)))
             {
                 BatchScript = File.ReadAllText(Path.Combine(VendorFolder, batch));
             }
+
+            Debug.WriteLine("BatchScript=" + BatchScript);
 
             var folder = Path.Combine(VendorFolder, "Definitions");
             if (Directory.Exists(folder))

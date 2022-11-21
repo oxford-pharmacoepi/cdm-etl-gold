@@ -1,4 +1,6 @@
-﻿using System;
+﻿using org.ohdsi.cdm.framework.desktop.Enums;
+using org.ohdsi.cdm.presentation.builder.Controllers;
+using System;
 using System.Xml.Serialization;
 
 namespace org.ohdsi.cdm.presentation.builder
@@ -7,6 +9,8 @@ namespace org.ohdsi.cdm.presentation.builder
     {
         #region Properties
 
+        public DateTime? DataCleaningStart { get; set; }
+        public DateTime? DataCleaningEnd { get; set; }
         public DateTime? CreateDestinationDbStart { get; set; }
         public DateTime? CreateDestinationDbEnd { get; set; }
         public DateTime? CreateChunksStart { get; set; }
@@ -21,6 +25,32 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? CreateIndexesEnd { get; set; }
         public DateTime? PostprocessStart { get; set; }
         public DateTime? PostprocessEnd { get; set; }
+
+        [XmlIgnore]
+        public bool DataCleaningStarted
+        {
+            get
+            {
+                if (DataCleaningDone)
+                    return false;
+
+                if (!DataCleaningStart.HasValue)
+                    return false;
+                return DataCleaningStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool DataCleaningDone
+        {
+            get
+            {
+                if (!DataCleaningEnd.HasValue)
+                    return false;
+
+                return DataCleaningEnd.Value != DateTime.MinValue;
+            }
+        }
 
         [XmlIgnore]
         public bool DestinationStarted

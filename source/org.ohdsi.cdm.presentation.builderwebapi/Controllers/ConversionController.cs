@@ -76,6 +76,8 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
             return successful;
         }
 
+        
+
         public void Start()
         {
             if (CreateDestination())
@@ -83,6 +85,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
                 CreateLookup();
                 Build();
             }
+            
         }
 
         public void CreateLookup()

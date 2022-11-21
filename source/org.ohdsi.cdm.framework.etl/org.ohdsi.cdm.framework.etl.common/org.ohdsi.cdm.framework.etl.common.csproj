@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -38,6 +38,9 @@
     <None Remove="ETL\Common\Scripts\Postgre\CreateDestination.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\CreateIndexesChunkTable.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\DropChunkTable.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleaningIndexes.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\02_DataCleaning.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql" />
@@ -142,6 +145,15 @@
     <Content Include="ETL\Common\Scripts\MSSQL\DropChunkTable.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleaningIndexes.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\02_DataCleaning.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -223,7 +235,7 @@
     <Content Include="ETL\Common\Scripts\Postgre\DropChunkTable.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql">
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql">
