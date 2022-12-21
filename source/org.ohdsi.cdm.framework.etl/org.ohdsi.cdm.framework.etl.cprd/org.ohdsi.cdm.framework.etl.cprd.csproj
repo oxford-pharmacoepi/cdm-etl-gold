@@ -13,7 +13,7 @@
     <None Remove="ETL\CPRD\Definitions\Immunisation_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\L_CARE_SITE.xml" />
     <None Remove="ETL\CPRD\Definitions\L_LOCATION.xml" />
-    <None Remove="ETL\CPRD\Definitions\L_PROVIDER.xml" />
+    <None Remove="ETL\CPRD\Definitions\L_PROVIDER_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Patient_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Referral_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Test_Postgres.xml" />
@@ -52,7 +52,7 @@
     <Content Include="ETL\CPRD\Definitions\L_LOCATION.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\L_PROVIDER.xml">
+    <Content Include="ETL\CPRD\Definitions\L_PROVIDER_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\CPRD\Definitions\Patient_Postgres.xml">

@@ -4,6 +4,7 @@ using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.common.PregnancyAlgorithm;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.etl.premier
@@ -398,6 +399,8 @@ namespace org.ohdsi.cdm.framework.etl.premier
         /// <returns>Person entity</returns>
         public override KeyValuePair<Person, Attrition> BuildPerson(List<Person> records)
         {
+            Debug.WriteLine("records.Count=" + records.Count);
+
             if (records == null || records.Count == 0)
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnacceptablePatientQuality);
 

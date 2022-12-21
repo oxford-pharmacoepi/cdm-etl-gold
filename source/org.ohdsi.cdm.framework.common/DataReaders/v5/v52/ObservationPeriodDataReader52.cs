@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v52
 
         public int FieldCount
         {
-            get { return 7; }
+            get { return 6; }
+            //get { return 7; }
         }
 
         // is this called only because the datatype specific methods are not implemented?  
@@ -35,8 +36,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v52
 
             switch (i)
             {
-                case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 1:
                     return _enumerator.Current.PersonId;
                 case 2:
@@ -59,8 +60,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v52
         {
             switch (i)
             {
-                case 0:
-                    return "Id";
+                //case 0:
+                //    return "Id";
                 case 1:
                     return "PersonId";
                 case 2:

@@ -1,22 +1,17 @@
-﻿using org.ohdsi.cdm.framework.common.Builder;
-using org.ohdsi.cdm.framework.common.Omop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 
-namespace org.ohdsi.cdm.framework.common.DataReaders.v6
+namespace org.ohdsi.cdm.framework.desktop.DataReaders
 {
-    public class ObservationPeriodDataReader : IDataReader
+    public class _ChunkDataReader : IDataReader
     {
-        private readonly IEnumerator<ObservationPeriod> _enumerator;
-        private readonly KeyMasterOffsetManager _offset;
+        private readonly IEnumerator<ChunkRecord> _enumerator;
 
         // A custom DataReader is implemented to prevent the need for the HashSet to be transformed to a DataTable for loading by SqlBulkCopy
-        public ObservationPeriodDataReader(List<ObservationPeriod> batch, KeyMasterOffsetManager o)
+        public ChunkDataReader(List<ChunkRecord> batch)
         {
-            _enumerator = batch?.GetEnumerator();
-            _offset = o;
+            _enumerator = batch.GetEnumerator();
         }
 
         public bool Read()
@@ -26,41 +21,23 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public int FieldCount
         {
-            get { return 5; }
+            get { return 3; }
         }
 
-        // is this called only because the datatype specific methods are not implemented?  
-        // probably performance to be gained by not passing object back?
         public object GetValue(int i)
         {
+            if (_enumerator.Current == null) return null;
 
             switch (i)
             {
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
+                    return _enumerator.Current.Id;
+
                 case 1:
                     return _enumerator.Current.PersonId;
+
                 case 2:
-                    return _enumerator.Current.StartDate;
-                case 3:
-                    return _enumerator.Current.EndDate;
-                case 4:
-                    return _enumerator.Current.TypeConceptId;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public string GetName(int i)
-        {
-            switch (i)
-            {
-                case 0: return "observation_period_id";
-                case 1: return "person_id";
-                case 2: return "observation_period_start_date";
-                case 3: return "observation_period_end_date";
-                case 4: return "period_type_concept_id";
+                    return _enumerator.Current.PersonSource;
 
                 default:
                     throw new NotImplementedException();
@@ -68,7 +45,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
         }
 
         #region implementationn not required for SqlBulkCopy
-
         public bool NextResult()
         {
             throw new NotImplementedException();
@@ -106,12 +82,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public bool GetBoolean(int i)
         {
-            return (bool)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public byte GetByte(int i)
         {
-            return (byte)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
@@ -121,7 +97,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public char GetChar(int i)
         {
-            return (char)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
@@ -134,6 +110,24 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
             throw new NotImplementedException();
         }
 
+        public string GetName(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return "chunkid";
+
+                case 1:
+                    return "person_id";
+
+                case 2:
+                    return "person_source_value";
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         public string GetDataTypeName(int i)
         {
             throw new NotImplementedException();
@@ -141,17 +135,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public DateTime GetDateTime(int i)
         {
-            return (DateTime)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public decimal GetDecimal(int i)
         {
-            return (decimal)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public double GetDouble(int i)
         {
-            return Convert.ToDouble(GetValue(i));
+            throw new NotImplementedException();
         }
 
         public Type GetFieldType(int i)
@@ -159,15 +153,13 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
             switch (i)
             {
                 case 0:
-                    return typeof(long);
+                    return typeof(int);
+
                 case 1:
                     return typeof(long);
+
                 case 2:
-                    return typeof(DateTime);
-                case 3:
-                    return typeof(DateTime);
-                case 4:
-                    return typeof(int?);
+                    return typeof(string);
 
                 default:
                     throw new NotImplementedException();
@@ -176,27 +168,27 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public float GetFloat(int i)
         {
-            return (float)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public Guid GetGuid(int i)
         {
-            return (Guid)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public short GetInt16(int i)
         {
-            return (short)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public int GetInt32(int i)
         {
-            return (int)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public long GetInt64(int i)
         {
-            return Convert.ToInt64(GetValue(i));
+            throw new NotImplementedException();
         }
 
         public int GetOrdinal(string name)
@@ -206,7 +198,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public string GetString(int i)
         {
-            return (string)GetValue(i);
+            throw new NotImplementedException();
         }
 
         public int GetValues(object[] values)
@@ -223,7 +215,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 
         public bool IsDBNull(int i)
         {
-            return GetValue(i) == null;
+            throw new NotImplementedException();
         }
 
         public object this[string name]
@@ -235,7 +227,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
         {
             get { throw new NotImplementedException(); }
         }
-
         #endregion
     }
 }

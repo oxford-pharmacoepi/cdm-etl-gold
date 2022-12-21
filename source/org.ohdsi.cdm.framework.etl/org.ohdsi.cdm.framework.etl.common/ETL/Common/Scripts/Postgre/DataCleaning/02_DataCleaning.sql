@@ -11,6 +11,7 @@ DECLARE
 	dropTableSql varchar;
 	createTableSql varchar;
 	insertSql varchar;
+	deletesql varchar;
 	temp varchar;
 BEGIN
 
@@ -65,8 +66,6 @@ BEGIN
 		EXECUTE deleteSql;
 	
 	END IF;
-
-	select fn_DeleteRedundantInSource(in_TableName) into temp;	
 
 	-- For consultation, clinical, referral, immunisation, test, therapy, remove eventdate is NULL
 	IF(in_TableName IN ('consultation', 'clinical', 'referral', 'immunisation', 'test', 'therapy')) THEN		

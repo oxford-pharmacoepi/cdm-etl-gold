@@ -1,19 +1,20 @@
 ﻿<QueryDefinition>
   <Query>
     With ch AS(
-				select person_id, temp_person_id
+				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
 			
 	)
-	select  
+	select distinct 
 		a.patid,
 		a.staffid,
 		a.issueseq,
 		a.eventdate,
 		product.gemscriptcode,
 		round(case when a.qty &lt; 0 then null else a.qty end, 0) qty,
-		concat(ch.temp_person_id,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99))::numeric as visit_occurrence_id,	
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
 		a.consid,
 		d.dosage_text,
 		coalesce(a.numpacks, 0) numpacks,	

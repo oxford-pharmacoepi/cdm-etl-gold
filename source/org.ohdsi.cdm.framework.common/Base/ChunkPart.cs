@@ -24,9 +24,6 @@ namespace org.ohdsi.cdm.framework.common.Base
 
         public ChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt)
         {
-            Debug.WriteLine("ChunkPart");
-            Debug.WriteLine("chunkId=" + chunkId);
-
             ChunkId = chunkId;
             CreatePersonBuilder = createPersonBuilder;
             Prefix = prefix;
@@ -42,8 +39,43 @@ namespace org.ohdsi.cdm.framework.common.Base
         {
             var recordGuid = Guid.NewGuid();
 
+            if(queryDefinition.Persons != null) {
+                AddEntity(queryDefinition, queryDefinition.Persons, reader, recordGuid, "Persons");
+            }
+
+            if(queryDefinition.Death != null) {
+                AddEntity(queryDefinition, queryDefinition.Death, reader, recordGuid, "Death");
+            }
+
+
+            if(queryDefinition.VisitOccurrence != null)
+            {
+                AddEntity(queryDefinition, queryDefinition.VisitOccurrence, reader, recordGuid, "VisitOccurrence");
+            }
+
+            if (queryDefinition.Observation != null)
+            {
+                AddEntity(queryDefinition, queryDefinition.Observation, reader, recordGuid, "Observation");
+            }
+            if (queryDefinition.ConditionOccurrence != null)
+            {
+                AddEntity(queryDefinition, queryDefinition.ConditionOccurrence, reader, recordGuid, "ConditionOccurrence");
+
+            }
+
+            if (queryDefinition.DrugExposure != null)
+            {
+                AddEntity(queryDefinition, queryDefinition.DrugExposure, reader, recordGuid, "DrugExposure");
+            }
+
+            if (queryDefinition.Measurement != null) {
+                AddEntity(queryDefinition, queryDefinition.Measurement, reader, recordGuid, "Measurement");
+            }
+
+            /*
+
             AddEntity(queryDefinition, queryDefinition.Persons, reader, recordGuid, "Persons");
-            AddEntity(queryDefinition, queryDefinition.PayerPlanPeriods, reader, recordGuid, "PayerPlanPeriods");
+            //AddEntity(queryDefinition, queryDefinition.PayerPlanPeriods, reader, recordGuid, "PayerPlanPeriods");
             AddEntity(queryDefinition, queryDefinition.Death, reader, recordGuid, "Death");
             AddEntity(queryDefinition, queryDefinition.VisitOccurrence, reader, recordGuid, "VisitOccurrence");
             AddEntity(queryDefinition, queryDefinition.VisitDetail, reader, recordGuid, "VisitDetail");
@@ -51,11 +83,11 @@ namespace org.ohdsi.cdm.framework.common.Base
             AddEntity(queryDefinition, queryDefinition.ConditionOccurrence, reader, recordGuid, "ConditionOccurrence");
             AddEntity(queryDefinition, queryDefinition.ProcedureOccurrence, reader, recordGuid, "ProcedureOccurrence");
             AddEntity(queryDefinition, queryDefinition.DrugExposure, reader, recordGuid, "DrugExposure");
-            AddEntity(queryDefinition, queryDefinition.Cohort, reader, recordGuid, "Cohort");
+            //AddEntity(queryDefinition, queryDefinition.Cohort, reader, recordGuid, "Cohort");
             AddEntity(queryDefinition, queryDefinition.Measurement, reader, recordGuid, "Measurement");
             AddEntity(queryDefinition, queryDefinition.DeviceExposure, reader, recordGuid, "DeviceExposure");
-            AddEntity(queryDefinition, queryDefinition.Note, reader, recordGuid, "Note");
-            
+            //AddEntity(queryDefinition, queryDefinition.Note, reader, recordGuid, "Note");
+            */
         }
 
 
@@ -67,6 +99,7 @@ namespace org.ohdsi.cdm.framework.common.Base
         private void AddEntity(QueryDefinition queryDefinition, IEnumerable<EntityDefinition> definitions,
            IDataRecord reader, Guid recordGuid, string definitionName)
         {
+
             if (definitions == null) return;
 
             foreach (var d in queryDefinition.FindDefinition(definitions, reader))
@@ -174,10 +207,10 @@ namespace org.ohdsi.cdm.framework.common.Base
                     Console.WriteLine("Error");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
-                    Debug.WriteLine(e.Message);
                     throw;
                 }
             }
+            
         }
 
         public virtual void Dispose()

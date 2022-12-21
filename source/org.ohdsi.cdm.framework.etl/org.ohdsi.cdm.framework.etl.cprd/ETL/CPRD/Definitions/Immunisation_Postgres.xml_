@@ -1,16 +1,17 @@
 ﻿<QueryDefinition>
   <Query>
   With ch AS(
-				select person_id, temp_person_id
+				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
 			
-	) SELECT distinct  
+	) SELECT distinct 
 		i.eventdate,
 		i.patid,
 		i.staffid,
 		m.read_code,
-		concat(ch.temp_person_id,to_char(i.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(i.patid,to_char(i.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
 		MOD(i.patid, 100000) as care_site_id,
 		case
 			when con.constype = 0 then 'Data Not Entered'

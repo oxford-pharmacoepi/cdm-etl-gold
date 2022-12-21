@@ -60,7 +60,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
                             return _offset.GetId(_enumerator.Current.PersonId,
                                 _enumerator.Current.VisitOccurrenceId.Value);
-
                         return _enumerator.Current.VisitOccurrenceId.Value;
                     }
 
@@ -71,7 +70,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
                             return _offset.GetId(_enumerator.Current.PersonId,
                                 _enumerator.Current.VisitDetailId.Value);
-
                         return _enumerator.Current.VisitDetailId;
                     }
 

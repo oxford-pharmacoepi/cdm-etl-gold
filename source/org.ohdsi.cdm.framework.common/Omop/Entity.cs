@@ -1,6 +1,8 @@
 ﻿using org.ohdsi.cdm.framework.common.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,6 +15,8 @@ namespace org.ohdsi.cdm.framework.common.Omop
 
         public Guid SourceRecordGuid { get; set; }
 
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long PersonId { get; set; }
         public int ConceptId { get; set; }

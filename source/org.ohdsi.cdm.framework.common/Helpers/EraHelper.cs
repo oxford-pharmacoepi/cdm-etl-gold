@@ -97,6 +97,7 @@ namespace org.ohdsi.cdm.framework.common.Helpers
             }
         }
 
+
         private static DateTime GetEndDate(IEntity entity)
         {
             return entity.GetEndDate();

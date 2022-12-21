@@ -1,7 +1,7 @@
 ﻿<QueryDefinition>
   <Query>
 	  With ch AS(
-	  select person_id, temp_person_id
+	  select person_id
 	  from {sc}.chunk_person
 	  where chunk_id = {0}
 
@@ -9,7 +9,8 @@
 	  a.eventdate,
 	  a.patid,
 	  a.staffid,
-	  concat(ch.temp_person_id,to_char(a.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+	  -- concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+	  nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
 	  MOD(a.patid, 100000) as care_site_id,
 	  m.read_code,
 	  case

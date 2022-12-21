@@ -602,17 +602,17 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
 
             var notes = BuildNote(NoteRecords.ToArray(), visitOccurrences, observationPeriods).ToArray();
 
-            List<DateTime?> mins = new List<DateTime?>();
+            List<DateTime?> ms = new List<DateTime?>();
             List<DateTime?> maxs = new List<DateTime?>();
 
-            mins.Add(GetMinDate(drugExposures));
-            mins.Add(GetMinDate(conditionOccurrences));
-            mins.Add(GetMinDate(procedureOccurrences));
-            mins.Add(GetMinDate(observations));
-            mins.Add(GetMinDate(deviceExposure));
-            mins.Add(GetMinDate(measurements));
-            mins.Add(GetMinDate(visitOccurrences.Values));
-            mins.Add(GetMinDate(visitDetails.Values));
+            ms.Add(GetMinDate(drugExposures));
+            ms.Add(GetMinDate(conditionOccurrences));
+            ms.Add(GetMinDate(procedureOccurrences));
+            ms.Add(GetMinDate(observations));
+            ms.Add(GetMinDate(deviceExposure));
+            ms.Add(GetMinDate(measurements));
+            ms.Add(GetMinDate(visitOccurrences.Values));
+            ms.Add(GetMinDate(visitDetails.Values));
 
             maxs.Add(GetMaxDate(drugExposures));
             maxs.Add(GetMaxDate(conditionOccurrences));
@@ -623,7 +623,7 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
             maxs.Add(GetMaxDate(visitOccurrences.Values));
             maxs.Add(GetMaxDate(visitDetails.Values));
 
-            var min = mins.Min();
+            var min = ms.Min();
             var max = maxs.Max();
 
             var observationPeriodsFinal = new List<ObservationPeriod>(1)

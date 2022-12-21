@@ -1,7 +1,7 @@
 ﻿<QueryDefinition>
   <Query>
-	With ch AS(
-				select person_id, temp_person_id
+    With ch AS(
+				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
 			
@@ -16,7 +16,8 @@
 		t.data2 as range_low,
 		t.data3 as range_high,
 		MOD(t.patid, 100000) as care_site_id,
-		concat(ch.temp_person_id,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(t.patid,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
 		con.constype,
 		case
 			when con.constype = 0 then 'Data Not Entered'
@@ -98,7 +99,7 @@
 	order by t.patid
 	GO
 	With ch AS(
-				select person_id, temp_person_id
+				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
 			
@@ -117,7 +118,8 @@
 		t.data5 as range_low,
 		t.data6 as range_high,
 		MOD(t.patid, 100000) as care_site_id,
-		concat(ch.temp_person_id,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(t.patid,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
 		con.constype,
 		case
 			when con.constype = 0 then 'Data Not Entered'

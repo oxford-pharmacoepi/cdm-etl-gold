@@ -2,7 +2,7 @@
 
 namespace org.ohdsi.cdm.framework.desktop
 {
-    public class ChunkRecord
+    public class _ChunkRecord
     {
         public int Id { get; set; }
         public Int64 PersonId { get; set; }

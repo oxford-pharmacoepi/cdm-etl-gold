@@ -36,9 +36,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v6
             {
                 case 0:
                     {
+                        /*
                         return _offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged
                             ? _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id)
                             : _enumerator.Current.Id;
+                        */
+                        return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                     }
                 case 1:
                     return _enumerator.Current.PersonId;

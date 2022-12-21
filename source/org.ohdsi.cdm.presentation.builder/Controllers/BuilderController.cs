@@ -6,6 +6,7 @@ using org.ohdsi.cdm.framework.desktop.Base;
 using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.framework.desktop.Helpers;
+using org.ohdsi.cdm.framework.desktop.Savers;
 using org.ohdsi.cdm.presentation.builder.Base;
 using System;
 using System.Collections;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Markup;
 
 
@@ -97,8 +99,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                 Debug.WriteLine("Data Cleaning in " + tableName + " started");
                                 Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " started");
 
-                                string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
-                                dbCleaning.ExecuteQuery(query);
+                                dbCleaning.DataCleaning(tableName);
                                 Settings.Current.Building.DataCleaningSteps.Add(tableName);
 
                                 Debug.WriteLine("Data Cleaning in " + tableName + " ended");
@@ -161,8 +162,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " started");
                     Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + sourceTables[0] + " started");
 
-                    string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", sourceTables[0]);
-                    dbCleaning.ExecuteQuery(query);
+                    dbCleaning.DataCleaning(sourceTables[0]);
                     Settings.Current.Building.DataCleaningSteps.Add(sourceTables[0]);
 
                     Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " ended");
@@ -207,6 +207,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 */
                 
                 //4. Add indexes for Mapping in the source tables
+                /*
                 if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) && 
                     !Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED))
                 {
@@ -221,6 +222,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Debug.WriteLine("Create Mapping indexes ended");
                     Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes ended");
                 }
+                */
                 
                 timer.Stop();
 
@@ -306,7 +308,61 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateWithoutLookupTablesScript);
         }
+        /*
+        public void MapPatientToPerson(IVocabulary vocabulary) {
 
+            PerformAction(() =>
+            {
+                var timer = new Stopwatch();
+                timer.Start();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Mapping Patient to Person started ====================");
+
+                vocabulary.Fill(false, false);
+                Debug.WriteLine("Voacb loaded");
+                Logger.Write(null, LogMessageTypes.Info, $"Voacb loaded");
+                var personList = new List<Person>();
+                var deathList = new List<Death>();
+
+                var person = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Persons != null);
+                var death = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Death != null);
+
+                if (person != null)
+                {
+                    FillPersonList<Person>(personList, person, person.Persons[0]);
+                    FillPersonList<Death>(deathList, death, death.Death[0]);
+
+                }
+
+
+                Console.WriteLine("Saving Person and Death...");
+                var saver = Settings.Current.Building.DestinationEngine.GetSaver();
+                using (saver.Create(Settings.Current.Building.DestinationConnectionString,
+                    Settings.Current.Building.Cdm,
+                    Settings.Current.Building.SourceSchema,
+                    Settings.Current.Building.CdmSchema))
+                {
+                    saver.SavePerson(Settings.Current.Building.Cdm, personList, deathList);
+                }
+
+                Console.WriteLine("Person are saved ");
+                timer.Stop();
+
+
+                personList.Clear();
+                deathList.Clear();
+                personList = null;
+                deathList = null;
+                GC.Collect();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                   $"==================== Mapping Patient to Person ended ====================");
+
+            });
+
+        }
+        */
         public void ResetVocabularyStep()
         {
             var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
@@ -323,9 +379,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 timer.Start();
 
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Lookup Started ====================");
+                    $"==================== Load vocab ====================");
 
                 vocabulary.Fill(true, false);
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Lookup Started ====================");
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
                 var providerConcepts = new List<Provider>();
@@ -334,7 +392,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var location = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Locations != null);
                 if (location != null)
                 {
-                    FillList<Location>(locationConcepts, location, location.Locations[0]);
+                    FillList<Location>(locationConcepts, location, location.Locations[0], -1);
                 }
 
                 if (locationConcepts.Count == 0)
@@ -345,7 +403,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var careSite = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.CareSites != null);
                 if (careSite != null)
                 {
-                    FillList<CareSite>(careSiteConcepts, careSite, careSite.CareSites[0]);
+                    FillList<CareSite>(careSiteConcepts, careSite, careSite.CareSites[0], -1);
                 }
 
                 if (careSiteConcepts.Count == 0)
@@ -356,7 +414,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var provider = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Providers != null);
                 if (provider != null)
                 {
-                    FillList<Provider>(providerConcepts, provider, provider.Providers[0]);
+                    FillList<Provider>(providerConcepts, provider, provider.Providers[0], -1);
                 }
                 Console.WriteLine("Providers was loaded");
 
@@ -373,7 +431,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Console.WriteLine("Lookups was saved ");
                 timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds} ms");
+                    $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds* 0.000016666666666666667} mins");
 
                 locationConcepts.Clear();
                 careSiteConcepts.Clear();
@@ -388,10 +446,50 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
-        private void FillList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed) where T : IEntity
+
+        private void FillPersonList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed) where T : IEntity
         {
             var sql = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database,
                 qd.GetSql(Settings.Current.Building.Vendor, Settings.Current.Building.SourceSchema), Settings.Current.Building.SourceSchema);
+
+
+            if (string.IsNullOrEmpty(sql)) return;
+
+            using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+            {
+                connection.Open();
+                using (var c = new OdbcCommand(sql, connection))
+                {
+                    c.CommandTimeout = 0;
+                    using (var reader = c.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            
+                            Concept conceptDef = null;
+                            if (ed.Concepts != null && ed.Concepts.Any())
+                                conceptDef = ed.Concepts[0];
+
+                            var concept = (T)ed.GetConcepts(conceptDef, reader, null).ToList()[0];
+
+                            list.Add(concept);
+
+                            if (CurrentState != BuilderState.Running)
+                                break;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void FillList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed, int chunkId) where T : IEntity
+        {
+            var sql = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database,
+                qd.GetSql(Settings.Current.Building.Vendor, Settings.Current.Building.SourceSchema), Settings.Current.Building.SourceSchema);
+
+            sql = string.Format(sql, chunkId);
 
             if (string.IsNullOrEmpty(sql)) return;
 
@@ -401,7 +499,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 connection.Open();
                 using (var c = new OdbcCommand(sql, connection))
                 {
-                    c.CommandTimeout = 30000;
+                    c.CommandTimeout = 0;
                     using (var reader = c.ExecuteReader())
                     {
                         while (reader.Read())
@@ -439,15 +537,25 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 if (Settings.Current.Building.ChunksCount == 0)
                 {
-                    Debug.WriteLine("Settings.Current.Building.ChunksCount == 0 --> need to drop _chunk");
-                    Settings.Current.Building.ChunksCount = _chunkController.CreateChunks();
+                    Logger.Write(null, LogMessageTypes.Info, "==================== Create Chunks started ====================");
+                    //Settings.Current.Building.ChunksCount = _chunkController.CreateChunks();
+                    Settings.Current.Building.ChunksCount = _chunkController.CreateChunk();
+ 
+                    Logger.Write(null, LogMessageTypes.Info, "==================== Create Chunks ended ====================");
+                }
+                else
+                {
+                    Logger.Write(null, LogMessageTypes.Info, "==================== Chunks are already created ====================");
                 }
 
+
+                Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary started ====================");
                 vocabulary.Fill(false, false);
+                Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary ended ====================");
 
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Conversion to CDM was started ====================");
-
+                
                 var save = Task.Run(() =>
                 {
                     while (!saveQueue.IsCompleted)
@@ -463,103 +571,75 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                         }
 
+                        
                         if (data != null)
                         {
                             var timer = new Stopwatch();
                             timer.Start();
+                            
                             data.Save(Settings.Current.Building.Cdm,
                                 Settings.Current.Building.DestinationConnectionString,
                                 Settings.Current.Building.DestinationEngine,
                                 Settings.Current.Building.SourceSchema,
                                 Settings.Current.Building.CdmSchema);
+ 
+                            Debug.WriteLine("Updated " + data.ChunkData.ChunkId + " as completed");
+                            _chunkController.UpdateCompletedChunk(data.ChunkData.ChunkId);
+
                             Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
+
                             timer.Stop();
+                            /*
                             Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
                                 $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+                            */
+                
+                            Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
+                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds* 0.000016666666666666667} mins");
                         }
 
                         if (CurrentState != BuilderState.Running)
                             break;
+                        
                     }
+                
 
                     CurrentState = BuilderState.Stopped;
                 });
 
-                /*
-                if(Settings.Current.OnlyEvenChunks)
-                    Logger.Write(null, LogMessageTypes.Info, "Only even chunk ids will be processed on this machine");
 
-                if (Settings.Current.OnlyOddChunks)
-                    Logger.Write(null, LogMessageTypes.Info, "Only odd chunk ids will be processed on this machine");
+                //List<int> chunkIds = _chunkController.GetNotCompletedChunkId();
+                //    chunkIds.Sort();
 
-                if(Settings.Current.ChunksTo > 0)
-                    Logger.Write(null, LogMessageTypes.Info, $"ChunkIds from {Settings.Current.ChunksFrom} to {Settings.Current.ChunksTo} will be converted");
-                */
+                Parallel.For(1, Settings.Current.Building.ChunksCount+1,
+                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
+                        {
+                            if (CurrentState != BuilderState.Running)
+                                state.Break();
 
-                Debug.WriteLine("End Task Run");
+                            if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
+                            {
+                                var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
 
+                                using (var connection =
+                                new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+                                {
+                                    connection.Open();
+                                    saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
+                                    Settings.Current.Building.SourceSchema,
+                                    Settings.Current.Building.SourceQueryDefinitions,
+                                    connection,
+                                    Settings.Current.Building.Vendor));
+                                }
 
-                Parallel.For(1, Settings.Current.Building.ChunksCount,
-                    new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
-                      {
-                          if (CurrentState != BuilderState.Running)
-                              state.Break();
+                                Settings.Current.Save(false);
 
-                          if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
-                          {
-                              /*
-                              if(IsOdd(chunkId))
-                              {
-                                  if (Settings.Current.OnlyEvenChunks)
-                                  {
-                                      Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
-                                      return;
-                                  }
-                              }
-                              else
-                              {
-                                  if (Settings.Current.OnlyOddChunks)
-                                  {
-                                      Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
-                                      return;
-                                  }
-                              }
-
-                              if(chunkId < Settings.Current.ChunksFrom)
-                              {
-                                  Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
-                                  return;
-                              }
-                              
-                              if (chunkId > Settings.Current.ChunksTo)
-                              {
-                                  Logger.Write(null, LogMessageTypes.Info, $"{chunkId} was skipped");
-                                  return;
-                              }
-                              */
-
-                              var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
-
-                              using (var connection =
-                                  new OdbcConnection(Settings.Current.Building.SourceConnectionString))
-                              {
-                                  connection.Open();
-                                  saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
-                                      Settings.Current.Building.SourceSchema,
-                                      Settings.Current.Building.SourceQueryDefinitions,
-                                      connection,
-                                      Settings.Current.Building.Vendor));
-                              }
-
-                              Settings.Current.Save(false);
-
-                              while (saveQueue.Count > 0)
-                              {
-                                  Thread.Sleep(1000);
-                              }
-
-                          }
-                      });
+                                while (saveQueue.Count > 0)
+                                {
+                                    Thread.Sleep(1000);
+                                }
+                            }
+                        });
 
                 saveQueue.CompleteAdding();
 

@@ -28,30 +28,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             _schemaName = schemaName + "_nok";
         }
 
-        /*public void CreateDataCleaningIndexes(string query) {
-
-            using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
-            {
-                query = query.Replace("{sc}", _sourceSchemaName);
-                query = query.Replace("{SOURCE_NOK_SCHEMA}", _schemaName);
-
-
-                foreach (var subQuery in query.Split(new[] { ";" }, StringSplitOptions.None))
-                {
-                    Debug.WriteLine("query=" + subQuery);
-
-                    using (var command = new OdbcCommand(subQuery, connection))
-                    {
-                        command.CommandTimeout = 0;  //A value of 0 indicates no limit (an attempt to execute a command will wait indefinitely)
-                        command.ExecuteNonQuery();
-                    }
-                }
-
-            }
-
-        }
-        */
-
         public void CreateProcedure(string query)
         {
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
@@ -73,11 +49,13 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 }
             }
         }
-
-        /*
         public void DataCleaning(string tableName) {
 
+                //calling store proc is a single transaction
+
                 string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
+                Debug.WriteLine(query);
+
                 using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
                 {
                     using (var command = new OdbcCommand(query, connection))
@@ -88,8 +66,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 }
  
         }
-        */
-        
 
 
         public void ExecuteQuery(string query) {
@@ -131,6 +107,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
                     transaction.Rollback();
                     Debug.WriteLine("Transaction Rollback");
+                    Debug.WriteLine(e);
                     throw e;
 
                 }

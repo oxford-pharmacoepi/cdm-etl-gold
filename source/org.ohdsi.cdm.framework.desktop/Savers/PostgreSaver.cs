@@ -7,6 +7,7 @@ using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Data.Odbc;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace org.ohdsi.cdm.framework.desktop.Savers
 {
@@ -24,13 +25,14 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             var odbc = new OdbcConnectionStringBuilder(connectionString);
 
             //var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};SslMode=Require;Trust Server Certificate=true";
-            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password}";
+            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};";
 
             var npgsqlConnectionString = connectionStringTemplate.Replace("{server}", odbc["server"].ToString())
                 .Replace("{database}", odbc["database"].ToString()).Replace("{username}", odbc["uid"].ToString())
                 .Replace("{password}", odbc["pwd"].ToString());
 
             _connection = SqlConnectionHelper.OpenNpgsqlConnection(npgsqlConnectionString);
+            _transaction = _connection.BeginTransaction();
 
             return this;
         }

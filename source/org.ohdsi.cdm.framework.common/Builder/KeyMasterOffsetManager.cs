@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 
 namespace org.ohdsi.cdm.framework.common.Builder
@@ -46,9 +48,11 @@ namespace org.ohdsi.cdm.framework.common.Builder
 
         public long GetId(long personId, long id)
         {
-            var personIndex = GetPersonIndex(personId);
+            //var personIndex = GetPersonIndex(personId);
 
-            return _attempt * 1000000000000000000 + _chunkId * 1000000000000000 + _prefix * 1000000000000 + personIndex * 10000000L + id;
+            //return _attempt * 1000000000000000000 + _chunkId * 1000000000000000 + _prefix * 1000000000000 + personIndex * 10000000L + id;
+
+            return (long)Convert.ToDouble(_chunkId + "" + id);  //should be unique
         }
     }
 }

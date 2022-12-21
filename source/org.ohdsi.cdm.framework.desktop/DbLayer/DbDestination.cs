@@ -105,10 +105,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 
             }
 
-            //TO_DO: Create cleaning scheme 
-
-
-
 
             if (!mySql && _schemaName.ToLower().Trim() != "dbo")
             {

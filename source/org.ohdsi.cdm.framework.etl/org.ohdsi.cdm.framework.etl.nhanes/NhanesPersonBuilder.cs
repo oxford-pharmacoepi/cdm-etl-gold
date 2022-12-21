@@ -161,7 +161,7 @@ namespace org.ohdsi.cdm.framework.etl.nhanes
                     {
                         op.Add(new ObservationPeriod
                         {
-                            Id = Offset.GetKeyOffset(record.PersonId).ObservationId,
+                            //Id = Offset.GetKeyOffset(record.PersonId).ObservationId,
                             PersonId = record.PersonId,
                             TypeConceptId = 0,
                             StartDate = new DateTime(year - 1, 1, 1),
@@ -170,7 +170,7 @@ namespace org.ohdsi.cdm.framework.etl.nhanes
 
                         vo.Add(new VisitOccurrence(record)
                         {
-                            Id = Offset.GetKeyOffset(record.PersonId).VisitOccurrenceId,
+                            //Id = Offset.GetKeyOffset(record.PersonId).VisitOccurrenceId,
                             ConceptId = 0,
                             StartDate = new DateTime(year - 1, 1, 1),
                             EndDate = new DateTime(year - 1, 1, 1),

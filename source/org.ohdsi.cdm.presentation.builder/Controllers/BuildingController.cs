@@ -71,12 +71,17 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             if (_builderController.CurrentState == BuilderState.Running)
             {
-                DataCleaning();
-                //CreateDestination();
 
-                //var vocabulary = new Vocabulary();
-                //CreateLookup(vocabulary);
-                //Build(vocabulary);
+                DataCleaning();
+                CreateDestination();
+
+                var vocabulary = new Vocabulary();
+                CreateLookup(vocabulary);
+
+                //Map Patient to Person First before create a chunk
+                //MapPatientToPerson(vocabulary);
+                Build(vocabulary);
+                
                 //CreateCdmIndexes();
             }
         }
@@ -109,6 +114,18 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             _builderController.CreateLookup(vocabulary);
             UpdateDate("CreateLookupEnd");
         }
+        /*
+        private void MapPatientToPerson(IVocabulary vocabulary) {
+
+            if (Settings.Current.Building.BuildingState.LookupCreated && !Settings.Current.Building.BuildingState.MapPatientToPersonDone) {
+
+                UpdateDate("MapPatientToPersonStart");
+                _builderController.MapPatientToPerson(vocabulary);
+                UpdateDate("MapPatientToPersonEnd");
+            }
+
+        }
+        */
 
         private bool Build(IVocabulary vocabulary)
         {
@@ -134,15 +151,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 }
 
                 _builderController.Build(vocabulary);
-
-                Debug.WriteLine("_builderController.CurrentState=" + _builderController.CurrentState);
-
+                
                 if (_builderController.CurrentState != BuilderState.Error)
                 {
-                    Debug.WriteLine("Update allChunksComplete = true");
                     allChunksComplete = true;
                     UpdateDate("BuildingEnd");
                 }
+                
             }
             return allChunksComplete;
         }

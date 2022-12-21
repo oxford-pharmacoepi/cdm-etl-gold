@@ -255,11 +255,8 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                     case "FACT_RELATIONSHIP":
                         {
-                            Debug.WriteLine("FACT_RELATIONSHIP");
-
                             if (chunk.FactRelationships.Count > 0)
                             {
-                                Debug.WriteLine("chunk.FactRelationships.Count > 0");
                                 foreach (var list in SplitList(chunk.FactRelationships))
                                 {
                                     yield return new cdm6.FactRelationshipDataReader(list);
@@ -338,6 +335,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                     case "OBSERVATION":
                         {
+                            Debug.WriteLine("Observations");
                             foreach (var list in SplitList(chunk.Observations))
                             {
                                 if (CdmVersion == CdmVersions.V53)
@@ -473,25 +471,22 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
         public virtual void Write(ChunkData chunk, string table)
         {
-            Debug.WriteLine(chunk.ChunkId + " START - " + table);
             //Logger.Write(chunk.ChunkId, LogMessageTypes.Debug, "START - " + table);
             foreach (var reader in CreateDataReader(chunk, table))
             {
                 Write(chunk.ChunkId, chunk.SubChunkId, reader, table);
             }
             //Logger.Write(chunk.ChunkId, LogMessageTypes.Debug, "END - " + table);
-            Debug.WriteLine(chunk.ChunkId + " END - " + table);
         }
 
         private void SaveSync(ChunkData chunk)
         {
             try
             {
-                Debug.WriteLine("==SaveSync==");
                 //var tasks = new List<Task>();
                 Write(chunk, "PERSON");
                 Write(chunk, "OBSERVATION_PERIOD");
-                Write(chunk, "PAYER_PLAN_PERIOD");
+                //Write(chunk, "PAYER_PLAN_PERIOD");
                 Write(chunk, "DEATH");
                 Write(chunk, "DRUG_EXPOSURE");
                 Write(chunk, "OBSERVATION");
@@ -502,12 +497,12 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 Write(chunk, "CONDITION_ERA");
                 Write(chunk, "DEVICE_EXPOSURE");
                 Write(chunk, "MEASUREMENT");
-                Write(chunk, "COHORT");
+                //Write(chunk, "COHORT");
 
                 Write(chunk, "CONDITION_OCCURRENCE");
 
                 Write(chunk, "COST");
-                Write(chunk, "NOTE");
+                //Write(chunk, "NOTE");
 
                 if (CdmVersion == CdmVersions.V53 || CdmVersion == CdmVersions.V6)
                 {
@@ -515,7 +510,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                     Write(chunk.ChunkId, chunk.SubChunkId, new MetadataDataReader(chunk.Metadata.Values.ToList()), "METADATA_TMP");
                 }
 
-                Write(chunk, "FACT_RELATIONSHIP");  
+                Write(chunk, "FACT_RELATIONSHIP");
 
                 //Task.WaitAll(tasks.ToArray());
 
@@ -524,7 +519,6 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             catch (Exception e)
             {
                 //Logger.WriteError(chunk.ChunkId, e);
-                Debug.WriteLine(chunk.ChunkId + " " +  e);
                 Rollback();
                 //Logger.Write(chunk.ChunkId, LogMessageTypes.Debug, "Rollback - Complete");
                 throw;
@@ -609,7 +603,6 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
         public virtual void Write(int? chunkId, int? subChunkId, IDataReader reader, string tableName)
         {
-            Debug.WriteLine("chunkId=" + chunkId + "?subChunkId=" + subChunkId + "?tableName=" + tableName);
             throw new NotImplementedException();
         }
 
@@ -629,6 +622,5 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
         }
     }
 }
-
 
 

@@ -21,6 +21,7 @@ create index IF NOT EXISTS idx_consultation_constype on {sc}.consultation(consty
 -- create index IF NOT EXISTS idx_clinical_eventdate ON {sc}.clinical(eventdate ASC);				-- created before data cleaning
 create index IF NOT EXISTS idx_clinical_staffid on {sc}.clinical(staffid);		
 create index IF NOT EXISTS idx_clinical_medcode on {sc}.clinical(medcode);	
+create index IF NOT EXISTS idx_clinical_patid_adid on {sc}.clinical(patid, adid);
 
 
 -- Additional 

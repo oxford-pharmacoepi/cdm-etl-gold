@@ -17,6 +17,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? CreateChunksEnd { get; set; }
         public DateTime? CreateLookupStart { get; set; }
         public DateTime? CreateLookupEnd { get; set; }
+        public DateTime? MapPatientToPersonStart { get; set; }
+        public DateTime? MapPatientToPersonEnd { get; set; }
         public DateTime? BuildingStart { get; set; }
         public DateTime? BuildingEnd { get; set; }
         public DateTime? CopyVocabularyStart { get; set; }
@@ -78,6 +80,36 @@ namespace org.ohdsi.cdm.presentation.builder
                 return CreateDestinationDbEnd.Value != DateTime.MinValue;
             }
         }
+
+        [XmlIgnore]
+        public bool MapPatientToPersonStarted
+        {
+            get
+            {
+                if (MapPatientToPersonDone)
+                    return false;
+
+                if (!MapPatientToPersonStart.HasValue)
+                    return false;
+
+                return MapPatientToPersonStart.Value != DateTime.MinValue;
+            }
+
+        }
+
+
+        [XmlIgnore]
+        public bool MapPatientToPersonDone
+        {
+            get
+            {
+                if (!MapPatientToPersonEnd.HasValue)
+                    return false;
+
+                return MapPatientToPersonEnd.Value != DateTime.MinValue;
+            }
+        }
+        
 
         [XmlIgnore]
         public bool ChunksStarted

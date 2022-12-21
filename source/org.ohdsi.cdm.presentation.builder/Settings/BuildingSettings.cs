@@ -178,7 +178,6 @@ namespace org.ohdsi.cdm.presentation.builder
             IPersonBuilder instantiatedObject = Activator.CreateInstance(objectType) as IPersonBuilder;
             VendorFolder = instantiatedObject.GetFolder();
 
-            Debug.WriteLine("run Batch.sql");
             var batch = "Batch.sql";
             if (File.Exists(Path.Combine(VendorFolder, batch)))
             {

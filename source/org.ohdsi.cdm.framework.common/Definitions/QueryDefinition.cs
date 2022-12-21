@@ -232,8 +232,6 @@ namespace org.ohdsi.cdm.framework.common.Definitions
                 Query.Text = Query.Text.Replace("{" + v.Name + "}", v.Value);
             }
 
-            Debug.WriteLine("QueryText=" + Query.Text);
-
             return Query.Text;
         }
 

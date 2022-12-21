@@ -1,10 +1,12 @@
 ﻿using org.ohdsi.cdm.framework.common.Base;
 using org.ohdsi.cdm.framework.common.Builder;
+using org.ohdsi.cdm.framework.common.Enums;
 using org.ohdsi.cdm.framework.common.Helpers;
 using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.common.PregnancyAlgorithm;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.etl.cprd
@@ -63,12 +65,13 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, op).ToArray();
-
+            
+            /*
             var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.Where(pp =>
                     pp.StartDate.Year >= person.YearOfBirth &&
                     pp.EndDate.Value.Year >= person.YearOfBirth &&
                     pp.StartDate.Year <= DateTime.Now.Year).ToArray(), null).ToArray();
-
+            */
             var visitDetails = new Dictionary<long, VisitDetail>();
             var visitDetIds = new List<long>();
             foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
@@ -180,10 +183,24 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             }
 
             // push built entities to ChunkBuilder for further save to CDM database
+            /*
             AddToChunk(person,
                 death,
                 observationPeriods,
                 payerPlanPeriods,
+                Clean(drugExposures, person).ToArray(),
+                Clean(conditionOccurrences, person).ToArray(),
+                Clean(procedureOccurrences, person).ToArray(),
+                Clean(observations, person).ToArray(),
+                Clean(measurements, person).ToArray(),
+                visitOccurrences.Values.ToArray(),
+                visitDetails.Values.ToArray(), null,
+                Clean(deviceExposure, person).ToArray(), null);
+            */
+            AddToChunk(person,
+                death,
+                observationPeriods,
+                null,
                 Clean(drugExposures, person).ToArray(),
                 Clean(conditionOccurrences, person).ToArray(),
                 Clean(procedureOccurrences, person).ToArray(),
@@ -264,6 +281,36 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 }
             }
         }
+        
+        /*
+        private void SetVisitOccurrenceId<T>(IEnumerable<T> inputRecords, IDictionary<long, VisitDetail> vd)
+            where T : class, IEntity
+        {
+            foreach (var e in inputRecords)
+            {
+                if (!e.VisitDetailId.HasValue)
+                    continue;
+
+                var temp_evid = e.PersonId + "" + (e.StartDate != null ? e.StartDate.ToString("yyyyMMdd") : "") + (e.AdditionalFields != null ? e.AdditionalFields.GetValueOrDefault("constyle") : "");
+
+                foreach (var item in vd)
+                {
+
+                    if (item.Value.AdditionalFields != null && item.Value.StartDate != null)
+                    {
+                        var temp_vid = "" + item.Value.PersonId + (item.Value.StartDate.ToString("yyyyMMdd") != null ? item.Value.StartDate.ToString("yyyyMMdd") : "") + (item.Value.AdditionalFields.GetValueOrDefault("constyle") != null ? item.Value.AdditionalFields.GetValueOrDefault("constyle") : "");
+
+                        if (temp_evid == temp_vid)
+                        {
+                            e.VisitOccurrenceId = item.Value.VisitOccurrenceId;
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+        */
 
         public override KeyValuePair<Person, Attrition> BuildPerson(List<Person> records)
         {

@@ -2,6 +2,7 @@
 using org.ohdsi.cdm.framework.common.Extensions;
 using org.ohdsi.cdm.framework.common.Omop;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace org.ohdsi.cdm.framework.common.Builder
 {
@@ -34,22 +35,26 @@ namespace org.ohdsi.cdm.framework.common.Builder
 
         public List<FactRelationship> FactRelationships { get; private set; }
 
+        
         public ChunkData(int chunkId, int subChunkId)
         {
             ChunkId = chunkId;
             SubChunkId = subChunkId;
             Init();
         }
-
+        
         public void AddAttrition(long personId, Attrition attrition)
         {
+            Debug.WriteLine("personId=" + personId + " attrition=" + attrition.ToName());
+            
             if (attrition == Attrition.None)
                 return;
-
+            
             if (!Metadata.ContainsKey(personId))
                 Metadata.Add(personId, null);
 
             Metadata[personId] = new Metadata { PersonId = personId, Name = attrition.ToName() };
+            
         }
 
 
@@ -117,11 +122,11 @@ namespace org.ohdsi.cdm.framework.common.Builder
             Cost.Add(cost);
             return true;
         }
-
         public void AddData(IEntity data, EntityType entityType)
         {
             switch (entityType)
             {
+                
                 case EntityType.Person:
                     {
                         Persons.Add((Person)data);
@@ -133,7 +138,7 @@ namespace org.ohdsi.cdm.framework.common.Builder
                         Deaths.Add((Death)data);
                         break;
                     }
-
+                
                 case EntityType.PayerPlanPeriod:
                     {
                         PayerPlanPeriods.Add((PayerPlanPeriod)data);
@@ -224,5 +229,7 @@ namespace org.ohdsi.cdm.framework.common.Builder
         {
             AddData(data, data.GeEntityType());
         }
+
+
     }
 }

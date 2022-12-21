@@ -66,6 +66,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 10:
                     if (_enumerator.Current.VisitDetailId.HasValue)
                     {
+
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
                             return _offset.GetId(_enumerator.Current.PersonId,
                                 _enumerator.Current.VisitDetailId.Value);

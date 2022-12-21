@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note_nlp
 
 CREATE TABLE IF NOT EXISTS {sc}.observation
 (
-   observation_id                 bigint          NOT NULL,
+   observation_id                 bigint       	  NOT NULL,
    person_id                      bigint          NOT NULL,
    observation_concept_id         integer         NOT NULL,
    observation_date               date            NOT NULL,
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
 
 CREATE TABLE IF NOT EXISTS {sc}.observation_period
 (
-   observation_period_id          bigint    NOT NULL,
+   observation_period_id          bigint 	NOT NULL,
    person_id                      bigint    NOT NULL,
    observation_period_start_date  date      NOT NULL,
    observation_period_end_date    date      NOT NULL,
@@ -433,7 +433,7 @@ CREATE TABLE IF NOT EXISTS {sc}.specimen
 
 CREATE TABLE IF NOT EXISTS {sc}.visit_detail
 (
-   visit_detail_id                 bigint        NOT NULL,
+   visit_detail_id                 bigint     	 NOT NULL,
    person_id                       bigint        NOT NULL,
    visit_detail_concept_id         integer       NOT NULL,
    visit_detail_start_date         date          NOT NULL,
@@ -456,7 +456,7 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
 
 CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
 (
-   visit_occurrence_id            bigint        NOT NULL,
+   visit_occurrence_id            bigint     	NOT NULL,
    person_id                      bigint        NOT NULL,
    visit_concept_id               integer		NOT NULL,
    visit_start_date               date          NOT NULL,

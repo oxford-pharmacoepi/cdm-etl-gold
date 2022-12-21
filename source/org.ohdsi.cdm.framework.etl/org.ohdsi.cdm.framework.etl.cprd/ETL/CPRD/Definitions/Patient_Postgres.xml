@@ -1,10 +1,10 @@
 ﻿<QueryDefinition>
 	<Query>
-			With valid_patient AS(
-				select * 
-				from {sc}.PATIENT
-				join {sc}._chunks ch ON ch.ChunkId = {0} AND patid = ch.PERSON_ID
-			)
+	With ch AS(
+				select person_id
+				from {sc}.chunk_person
+				where chunk_id = {0}	
+	)
 			SELECT DISTINCT
 			a.patid,
 			a.frd,
@@ -14,13 +14,17 @@
 				end YEAR_OF_BIRTH,
 			case
 				when mob &gt; 0 then mob
-				else null
-			end as MONTH_OF_BIRTH,
-			null DAY_OF_BIRTH,
-			coalesce(gender, 0) gender,
-			MOD(a.patid, 100000)  CARE_SITE_ID,
-			case 
-				when a.frd &gt; b.uts then a.frd
+		else null
+		end as MONTH_OF_BIRTH,
+		null DAY_OF_BIRTH,
+		case
+		when gender = 1 then 'M'
+		when gender = 2 then 'F'
+		else null
+		end as gender,
+		MOD(a.patid, 100000)  CARE_SITE_ID,
+		case
+		when a.frd &gt; b.uts then a.frd
 				else b.uts 
 			end as observation_period_start_date,
 			case
@@ -33,13 +37,14 @@
 			toreason,
 			CASE
 				WHEN toreason = 1 and deathdate is not null and deathdate &gt; '1987-01-01' THEN 1
-				ELSE 0
+			ELSE 0
 			END as DIED,
 			null as RACE_CONCEPT_ID,
 			null as RACE_SOURCE_VALUE,
 			accept,
 			44814725 PeriodTypeConceptId
-			from valid_patient a
+			from ch
+			join {sc}.PATIENT a on a.patid = ch.person_id
 			join {sc}.practice b on a.pracid = b.pracid
 	</Query>
 	<Persons>
