@@ -1,10 +1,18 @@
-﻿using org.ohdsi.cdm.framework.common.Extensions;
+﻿using Microsoft.VisualBasic;
+using org.ohdsi.cdm.framework.common.Definitions;
+using org.ohdsi.cdm.framework.common.Extensions;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.Odbc;
+using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
+using Thrift.Protocol;
 
 namespace org.ohdsi.cdm.framework.desktop.DbLayer
 {
@@ -13,24 +21,48 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         private readonly string _connectionString;
         private readonly string _folder;
         private readonly string _schemaName;
+        private readonly int _chunkSize;
+        private readonly string _destinationSchemaName;
 
-        public DbSource(string connectionString, string folder, string schemaName)
+        public DbSource(string connectionString, string folder, string schemaName, int chuckSize, string destinationSchemaName)
         {
             _connectionString = connectionString;
             _folder = folder;
             _schemaName = schemaName;
+            _chunkSize = chuckSize;
+            _destinationSchemaName = destinationSchemaName;
         }
 
-        public void CreateChunkTable()
+        public int CreateChunkTable()
         {
+            int chunkCount = 0;
             DropChunkTable();
             var query = File.ReadAllText(Path.Combine(_folder, "CreateChunkTable.sql"));
             query = query.Replace("{sc}", _schemaName);
-            using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
-            using (var cmd = new OdbcCommand(query, connection) { CommandTimeout = 0 })
-            {
-                cmd.ExecuteNonQuery();
+            query = query.Replace("{CHUNK_SIZE}", _chunkSize.ToString());
+            //query = query.Replace("{TARGET_SCHEMA}", _destinationSchemaName);
+
+            using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString)) {
+
+                foreach (var subQuery in query.Split(new[] { ";" },
+                   StringSplitOptions.RemoveEmptyEntries))
+                {
+                    using (var command = new OdbcCommand(subQuery, connection))
+                    {
+                        Debug.WriteLine("subQuery=" + subQuery);
+                        command.CommandTimeout = 0;
+                        int c = command.ExecuteNonQuery();
+
+                        chunkCount = c;
+
+                        Debug.WriteLine("c=" + c);          //the last sql return the total number of chunk
+                    }
+                }
             }
+
+            Debug.WriteLine("chunkCount=" + chunkCount);
+
+            return chunkCount;
         }
 
         public void DropChunkTable()
@@ -52,7 +84,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
-                foreach (var subQuery in query.Split(new[] { "GO" + "\r\n", "GO" + "\n" },
+                foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" },
                     StringSplitOptions.RemoveEmptyEntries))
                 {
                     using (var command = new OdbcCommand(subQuery, connection))
@@ -68,9 +100,15 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         public IEnumerable<IDataReader> GetPersonKeys(string batchScript, long batches, int batchSize)
         {
             batchScript = batchScript.Replace("{sc}", _schemaName);
+
+            Debug.WriteLine("batches=" + batches);
+
             var sql = batches > 0
                 ? string.Format(batchScript, "TOP " + batches * batchSize)
                 : string.Format(batchScript, "");
+
+            Debug.WriteLine("string.Format(batchScript, \"TOP \" + batches * batchSize)=" + string.Format(batchScript, "TOP " + batches * batchSize));
+            Debug.WriteLine("sql=" + sql);
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             using (var c = new OdbcCommand(sql, connection) { CommandTimeout = 0 })
             {
@@ -114,5 +152,39 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
             return DateTime.MinValue.ToShortDateString();
         }
+
+
+        public List<int> GetNotCompletedChunkId()
+        {
+            List<int> list = new List<int>();
+
+            var sql = "select chunk_id as min_i from {sc}.chunk where completed = 0";
+            sql = sql.Replace("{sc}", _schemaName);
+
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(reader.GetInt32(0));
+            }
+
+            return list;
+        }
+
+        public void UpdateCompletedChunk(int ChunkId) {
+            var sql = $" UPDATE {_schemaName}.chunk SET completed=1 WHERE chunk_id={ChunkId}";
+            Debug.WriteLine("UpdateCompletedChunk sql=" + sql);
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            {
+                //command.CommandTimeout = 0;
+                command.ExecuteNonQuery();
+            }
+        }
+
+       
+
     }
+
 }

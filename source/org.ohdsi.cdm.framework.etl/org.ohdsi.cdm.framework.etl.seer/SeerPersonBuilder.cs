@@ -403,7 +403,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
             {
                 result.Add(new ObservationPeriod
                 {
-                    Id = Offset.GetKeyOffset(personId).ObservationPeriodId,
+                    //Id = Offset.GetKeyOffset(personId).ObservationPeriodId,
                     PersonId = personId,
                     TypeConceptId = 44814725,
                     StartDate = ab.StartDate,
@@ -432,7 +432,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
                         {
                             result.Add(new ObservationPeriod
                             {
-                                Id = Offset.GetKeyOffset(personId).ObservationPeriodId,
+                                //Id = Offset.GetKeyOffset(personId).ObservationPeriodId,
                                 PersonId = personId,
                                 TypeConceptId = 44814725,
                                 StartDate = h.EndDate.Value.AddDays(1),

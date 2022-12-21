@@ -42,8 +42,7 @@ namespace org.ohdsi.cdm.presentation.builder
             Path.Combine(BuilderFolder, "ETL", "Common", "Scripts", Building.DestinationEngine.Database.ToString(), GetCdmVersionFolder(), "TruncateLookup.sql"));
 
         public string CreateCdmTablesScript => File.ReadAllText(
-            Path.Combine(BuilderFolder, "ETL", "Common", "Scripts", Building.DestinationEngine.Database.ToString(),
-                         GetCdmVersionFolder(), "CreateTables.sql"));
+            Path.Combine(BuilderFolder, "ETL", "Common", "Scripts", Building.DestinationEngine.Database.ToString(), GetCdmVersionFolder(), "CreateTables.sql"));
 
         public string CreateCdmDatabaseScript => File.ReadAllText(
             Path.Combine(new[] {
@@ -54,6 +53,48 @@ namespace org.ohdsi.cdm.presentation.builder
                 Building.DestinationEngine.Database.ToString(),
                 "CreateDestination.sql"
             }));
+
+        public string CreateDataCleaningIndexesScript => File.ReadAllText(
+            Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        "DataCleaning",
+                        "01_CreateDataCleaningIndexes.sql"));
+
+        public string DataCleaningScript => File.ReadAllText(
+            Path.Combine(
+                        BuilderFolder, 
+                        "ETL", 
+                        "Common", 
+                        "Scripts", 
+                        Building.SourceEngine.Database.ToString(),
+                        "DataCleaning",
+                        "02_DataCleaning.sql"));
+
+        public string CreateMappingIndexesScript => File.ReadAllText(
+            Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        "DataCleaning",
+                        "03_CreateMappingIndexes.sql"));
+
+        /*
+         public string CreateCdmIndexesScript => File.ReadAllText(
+            Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        GetCdmVersionFolder(),
+                        "CreateIndexes.sql"));
+        */
 
         #endregion
 

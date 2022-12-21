@@ -9,6 +9,7 @@ using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using cdm6 = org.ohdsi.cdm.framework.common.DataReaders.v6;
 
@@ -334,6 +335,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                     case "OBSERVATION":
                         {
+                            Debug.WriteLine("Observations");
                             foreach (var list in SplitList(chunk.Observations))
                             {
                                 if (CdmVersion == CdmVersions.V53)
@@ -484,7 +486,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 //var tasks = new List<Task>();
                 Write(chunk, "PERSON");
                 Write(chunk, "OBSERVATION_PERIOD");
-                Write(chunk, "PAYER_PLAN_PERIOD");
+                //Write(chunk, "PAYER_PLAN_PERIOD");
                 Write(chunk, "DEATH");
                 Write(chunk, "DRUG_EXPOSURE");
                 Write(chunk, "OBSERVATION");
@@ -495,12 +497,12 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 Write(chunk, "CONDITION_ERA");
                 Write(chunk, "DEVICE_EXPOSURE");
                 Write(chunk, "MEASUREMENT");
-                Write(chunk, "COHORT");
+                //Write(chunk, "COHORT");
 
                 Write(chunk, "CONDITION_OCCURRENCE");
 
                 Write(chunk, "COST");
-                Write(chunk, "NOTE");
+                //Write(chunk, "NOTE");
 
                 if (CdmVersion == CdmVersions.V53 || CdmVersion == CdmVersions.V6)
                 {
@@ -620,6 +622,5 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
         }
     }
 }
-
 
 

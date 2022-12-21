@@ -1,0 +1,278 @@
+﻿<QueryDefinition>
+  <Query>
+	With ch AS(
+				select person_id, temp_person_id
+				from {sc}.chunk_person
+				where chunk_id = {0}
+			
+	)
+	select distinct
+		t.patid,
+		t.eventdate,
+		t.staffid,
+		m.read_code,
+		NULL as value_as_number,
+		'' as unit,
+		t.data2 as range_low,
+		t.data3 as range_high,
+		MOD(t.patid, 100000) as care_site_id,
+		concat(ch.temp_person_id,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		con.constype,
+		case
+			when con.constype = 0 then 'Data Not Entered'
+			when con.constype = 1 then 'Clinic'
+			when con.constype = 2 then 'Night visit, Deputising service'
+			when con.constype = 3 then 'Follow-up/routine visit'
+			when con.constype = 4 then 'Night visit, Local rota'
+			when con.constype = 5 then 'Mail from patient'
+			when con.constype = 6 then 'Night visit , practice'
+			when con.constype = 7 then 'Out of hours, Practice'
+			when con.constype = 8 then 'Out of hours, Non Practice'
+			when con.constype = 9 then 'Surgery consultation'
+			when con.constype = 10 then 'Telephone call from a patient'
+			when con.constype = 11 then 'Acute visit'
+			when con.constype = 12 then 'Discharge details'
+			when con.constype = 13 then 'Letter from Outpatients'
+			when con.constype = 14 then 'Repeat Issue'
+			when con.constype = 15 then 'Other'
+			when con.constype = 16 then 'Results recording'
+			when con.constype = 17 then 'Mail to patient'
+			when con.constype = 18 then 'Emergency Consultation'
+			when con.constype = 19 then 'Administration'
+			when con.constype = 20 then 'Casualty Attendance'
+			when con.constype = 21 then 'Telephone call to a patient'
+			when con.constype = 22 then 'Third Party Consultation'
+			when con.constype = 23 then 'Hospital Admission'
+			when con.constype = 24 then 'Children''s Home Visit'
+			when con.constype = 25 then 'Day Case Report'
+			when con.constype = 26 then 'GOS18 Report'
+			when con.constype = 27 then 'Home Visit'
+			when con.constype = 28 then 'Hotel Visit'
+			when con.constype = 29 then 'NHS Direct Report'
+			when con.constype = 30 then 'Nursing Home Visit'
+			when con.constype = 31 then 'Residential Home Visit'
+			when con.constype = 32 then 'Twilight Visit'
+			when con.constype = 33 then 'Triage'
+			when con.constype = 34 then 'Walk-in Centre'
+			when con.constype = 35 then 'Co-op Telephone advice'
+			when con.constype = 36 then 'Co-op Surgery Consultation'
+			when con.constype = 37 then 'Co-op Home Visit'
+			when con.constype = 38 then 'Minor Injury Service'
+			when con.constype = 39 then 'Medicine Management'
+			when con.constype = 40 then 'Community Clinic'
+			when con.constype = 41 then 'Community Nursing Note'
+			when con.constype = 42 then 'Community Nursing Report'
+			when con.constype = 43 then 'Data Transferred from other system'
+			when con.constype = 44 then 'Health Authority Entry'
+			when con.constype = 45 then 'Health Visitor Note'
+			when con.constype = 46 then 'Health Visitor Report'
+			when con.constype = 47 then 'Hospital Inpatient Report'
+			when con.constype = 48 then 'Initial Post Discharge Review'
+			when con.constype = 49 then 'Laboratory Request'
+			when con.constype = 50 then 'Night Visit'
+			when con.constype = 51 then 'Radiology Request'
+			when con.constype = 52 then 'Radiology Result'
+			when con.constype = 53 then 'Referral Letter'
+			when con.constype = 54 then 'Social Services Report'
+			when con.constype = 55 then 'Telephone Consultation'
+			when con.constype = 56 then 'Template Entry'
+			when con.constype = 57 then 'GP to GP communication transaction'
+			when con.constype = 58 then 'Non-consultation medication data'
+			when con.constype = 59 then 'Non-consultation data'
+			when con.constype = 60 then 'ePharmacy message'
+			when con.constype = 61 then 'Extended Hours'
+		end as visit_description,
+		0 as operator_concept_id,
+		case 
+			when t.data1::bigint != 0 then l.text 
+			else '' 
+		end as value_source_value,
+		CONCAT(CONCAT(cast(e.enttype as varchar),'-'), e.description) as source_code,
+		m.desc as medical_description 
+	from ch
+	join {sc}.test t on t.patid = ch.person_id
+	JOIN {sc}.entity e ON t.enttype = e.enttype and e.data_fields = 4
+	join {sc}.consultation con on t.patid = con.patid and t.consid = con.consid
+	JOIN {sc}.medical m ON t.medcode = m.medcode
+	left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 85 /*TQU - Test Qualifier*/
+	order by t.patid
+	GO
+	With ch AS(
+				select person_id, temp_person_id
+				from {sc}.chunk_person
+				where chunk_id = {0}
+			
+	)
+	select distinct
+		t.patid,
+		t.eventdate,
+		t.staffid,
+		m.read_code,
+		t.data2 as value_as_number,
+		case 
+			when t.data3::bigint != 0 then l2.text
+			when e.enttype = 284 and (t.data2 is not null and t.data2::bigint !=0) then 'week' --Enttype (code) 284 refers to gestational age in weeks so the unit is hard coded
+			else '' 
+		end as unit,
+		t.data5 as range_low,
+		t.data6 as range_high,
+		MOD(t.patid, 100000) as care_site_id,
+		concat(ch.temp_person_id,to_char(t.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		con.constype,
+		case
+			when con.constype = 0 then 'Data Not Entered'
+			when con.constype = 1 then 'Clinic'
+			when con.constype = 2 then 'Night visit, Deputising service'
+			when con.constype = 3 then 'Follow-up/routine visit'
+			when con.constype = 4 then 'Night visit, Local rota'
+			when con.constype = 5 then 'Mail from patient'
+			when con.constype = 6 then 'Night visit , practice'
+			when con.constype = 7 then 'Out of hours, Practice'
+			when con.constype = 8 then 'Out of hours, Non Practice'
+			when con.constype = 9 then 'Surgery consultation'
+			when con.constype = 10 then 'Telephone call from a patient'
+			when con.constype = 11 then 'Acute visit'
+			when con.constype = 12 then 'Discharge details'
+			when con.constype = 13 then 'Letter from Outpatients'
+			when con.constype = 14 then 'Repeat Issue'
+			when con.constype = 15 then 'Other'
+			when con.constype = 16 then 'Results recording'
+			when con.constype = 17 then 'Mail to patient'
+			when con.constype = 18 then 'Emergency Consultation'
+			when con.constype = 19 then 'Administration'
+			when con.constype = 20 then 'Casualty Attendance'
+			when con.constype = 21 then 'Telephone call to a patient'
+			when con.constype = 22 then 'Third Party Consultation'
+			when con.constype = 23 then 'Hospital Admission'
+			when con.constype = 24 then 'Children''s Home Visit'
+			when con.constype = 25 then 'Day Case Report'
+			when con.constype = 26 then 'GOS18 Report'
+			when con.constype = 27 then 'Home Visit'
+			when con.constype = 28 then 'Hotel Visit'
+			when con.constype = 29 then 'NHS Direct Report'
+			when con.constype = 30 then 'Nursing Home Visit'
+			when con.constype = 31 then 'Residential Home Visit'
+			when con.constype = 32 then 'Twilight Visit'
+			when con.constype = 33 then 'Triage'
+			when con.constype = 34 then 'Walk-in Centre'
+			when con.constype = 35 then 'Co-op Telephone advice'
+			when con.constype = 36 then 'Co-op Surgery Consultation'
+			when con.constype = 37 then 'Co-op Home Visit'
+			when con.constype = 38 then 'Minor Injury Service'
+			when con.constype = 39 then 'Medicine Management'
+			when con.constype = 40 then 'Community Clinic'
+			when con.constype = 41 then 'Community Nursing Note'
+			when con.constype = 42 then 'Community Nursing Report'
+			when con.constype = 43 then 'Data Transferred from other system'
+			when con.constype = 44 then 'Health Authority Entry'
+			when con.constype = 45 then 'Health Visitor Note'
+			when con.constype = 46 then 'Health Visitor Report'
+			when con.constype = 47 then 'Hospital Inpatient Report'
+			when con.constype = 48 then 'Initial Post Discharge Review'
+			when con.constype = 49 then 'Laboratory Request'
+			when con.constype = 50 then 'Night Visit'
+			when con.constype = 51 then 'Radiology Request'
+			when con.constype = 52 then 'Radiology Result'
+			when con.constype = 53 then 'Referral Letter'
+			when con.constype = 54 then 'Social Services Report'
+			when con.constype = 55 then 'Telephone Consultation'
+			when con.constype = 56 then 'Template Entry'
+			when con.constype = 57 then 'GP to GP communication transaction'
+			when con.constype = 58 then 'Non-consultation medication data'
+			when con.constype = 59 then 'Non-consultation data'
+			when con.constype = 60 then 'ePharmacy message'
+			when con.constype = 61 then 'Extended Hours'
+		end as visit_description,
+		case 
+			when t.data1::bigint != 0 and l.text = '=' then 4172703
+			when t.data1::bigint != 0 and l.text = '&gt;' then 4172704
+			when t.data1::bigint != 0 and l.text = '&lt;=' then 4171754
+			when t.data1::bigint != 0 and l.text = '&gt;=' then 4171755
+			when t.data1::bigint != 0 and l.text = '&lt;' then 4171756
+			when t.data1::bigint != 0 and l.text = '~' then 0
+			when t.data1::bigint != 0 and l.text = 'Data Not Entered' then 0
+			else 0 
+		end as operator_concept_id,
+		case 
+			when t.data4::bigint != 0 then l3.text 
+			else '' 
+		end as value_source_value,
+		CONCAT(CONCAT(cast(e.enttype as varchar),'-'), e.description) as source_code,
+		m.desc as medical_description
+	from ch
+	join {sc}.test t on t.patid = ch.person_id
+	JOIN {sc}.entity e ON t.enttype = e.enttype and e.data_fields in (7,8)
+	join {sc}.consultation con on t.patid = con.patid and t.consid = con.consid
+	JOIN {sc}.medical m ON t.medcode = m.medcode
+
+	left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 56 /*OPR - Operator*/
+	left JOIN {sc}.lookup l2 ON t.data3 = l2.code::text AND l2.lookup_type_id = 83 /*SUM - Specimen Unit of Measure*/
+	left JOIN {sc}.lookup l3 ON t.data4 = l2.code::text AND l3.lookup_type_id = 85 /*TQU - Test Qualifier*/
+	order by t.patid
+  </Query>
+  <Measurement>
+    <MeasurementDefinition>
+      <PersonId>patid</PersonId>
+	  <VisitDetailId>visit_occurrence_id</VisitDetailId>
+      <StartDate>eventdate</StartDate>
+      <ProviderId>staffid</ProviderId>
+      <ValueSourceValue>value_source_value</ValueSourceValue>
+      <ValueAsNumber>value_as_number</ValueAsNumber>
+      <RangeLow>range_low</RangeLow>
+      <RangeHigh>range_high</RangeHigh>
+      <OperatorConceptId>operator_concept_id</OperatorConceptId>
+      <Concepts>
+        <Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>Test_Ent</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="source_code" defaultTypeId="44818702" sourceKey="read_code"/> 
+          </Fields>
+        </Concept>
+        <Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>Units</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="unit" defaultTypeId="0" />
+          </Fields>
+        </Concept>
+        <Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>ValueAsConceptId</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="value_source_value" defaultTypeId="0" />
+          </Fields>
+        </Concept>
+      </Concepts>
+    </MeasurementDefinition>
+  </Measurement>
+  <VisitOccurrence>
+    <VisitOccurrenceDefinition>
+	  <Id>visit_occurrence_id</Id>
+      <PersonId>patid</PersonId>
+      <StartDate>eventdate</StartDate>
+      <EndDate>eventdate</EndDate>
+      <CareSiteId>care_site_id</CareSiteId>
+      <ProviderId>staffid</ProviderId>
+      <AdditionalFields>
+        <string>constype</string>
+      </AdditionalFields>
+      <Concepts>
+        <Concept>
+          <Fields>
+            <Field defaultConceptId="9202" sourceKey="visit_description" defaultTypeId="44818518"/>
+          </Fields>
+        </Concept>
+      </Concepts>
+    </VisitOccurrenceDefinition>
+  </VisitOccurrence>
+</QueryDefinition>

@@ -1,0 +1,1238 @@
+﻿<QueryDefinition>
+	<Query>
+		With ch AS(
+		select person_id
+		from {sc}.chunk_person
+		where chunk_id = {0}
+
+		), w_additional AS(
+		select a.patid, a.adid, a.enttype, a.data1
+		from {sc}.additional a
+		join ch on a.patid=ch.person_id
+
+		), ac AS(
+		select DISTINCT
+		a.patid, a.enttype, a.data1,
+		c.staffid, c.consid, c.eventdate
+		from {sc}.clinical c
+		join w_additional a on c.patid = a.patid and c.adid = a.adid
+
+		), w_entity AS (
+		select t1.enttype, t1.category, t1.description, t1.data1, t1.data1_lkup, t1.data_fields
+		from {sc}.entity as t1
+		left join (SELECT * FROM (VALUES (72), (116), (372), (78)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+		where t2._enttype is null
+		and t1.data_fields > 0
+			
+		), w_entity_m AS (
+		select *
+		from w_entity as t
+		where t.data1_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+		select *
+		from w_entity as t
+		where t.data1_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+		select *
+		from w_entity as t1
+		left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data1_lkup)) AS t2 on t1.data1_lkup = t2._data1_lkup
+		where t2._data1_lkup is null
+			
+		), w_lookup AS(
+		select lu.code, lu.text, lt.name
+		from {sc}.lookup lu
+		join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+
+		)
+		select
+		ac.patid,
+		ac.eventdate, 
+		ac.staffid,
+		m.read_code as value_as_string,
+		null as value_as_number,
+		case
+		when e.data1_lkup = 'dd/mm/yyyy' then ac.data1
+		end as value_as_date,
+		case
+		when ac.enttype in (13,488) then 'kg' --enttype 13 is weight, enttype 488 is weight loss
+		when ac.enttype = 476 then 'cm' --enttype 476 is waist circumference
+		when ac.enttype in (119,61,60,120) then 'week' --These enttypes relate to weeks gestation of fetus
+		when ac.enttype = 14 then 'm' --enttype 14 is height
+		else '' --These units have to be hard coded as they do not have a unit lookup
+		end as unit_source_value,
+		MOD(ac.patid, 100000) as care_site_id,
+		con.constype,
+		-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+		'' as qualifier_source_value,
+		null as qualifier_concept_id,
+		e.data1 as data,
+		concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data1)  as source_value
+		from ac
+		join w_entity_m e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
+
+		left join {sc}.medical m on m.medcode::text = ac.data1 
+
+		UNION
+		
+		select
+		ac.patid,
+		ac.eventdate, 
+		ac.staffid,
+		p.gemscriptcode as value_as_string,
+		null as value_as_number,
+		case
+		when e.data1_lkup = 'dd/mm/yyyy' then ac.data1
+		end as value_as_date,
+		case
+		when ac.enttype in (13,488) then 'kg' --enttype 13 is weight, enttype 488 is weight loss
+		when ac.enttype = 476 then 'cm' --enttype 476 is waist circumference
+		when ac.enttype in (119,61,60,120) then 'week' --These enttypes relate to weeks gestation of fetus
+		when ac.enttype = 14 then 'm' --enttype 14 is height
+		else '' --These units have to be hard coded as they do not have a unit lookup
+		end as unit_source_value,
+		MOD(ac.patid, 100000) as care_site_id,
+		con.constype,
+		-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+		'' as qualifier_source_value,
+		null as qualifier_concept_id,
+		e.data1 as data,
+		concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data1)  as source_value
+		from ac
+		join w_entity_p e on e.enttype = ac.enttype 
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
+		left join {sc}.product p on p.prodcode::text = ac.data1
+	
+		UNION
+		
+		select
+		ac.patid,
+		ac.eventdate, 
+		ac.staffid,
+		ll.text as value_as_string,
+		ac.data1 as value_as_number,
+		case
+		when e.data1_lkup = 'dd/mm/yyyy' then ac.data1
+		end as value_as_date,
+		case
+		when ac.enttype in (13,488) then 'kg' --enttype 13 is weight, enttype 488 is weight loss
+		when ac.enttype = 476 then 'cm' --enttype 476 is waist circumference
+		when ac.enttype in (119,61,60,120) then 'week' --These enttypes relate to weeks gestation of fetus
+		when ac.enttype = 14 then 'm' --enttype 14 is height
+		else '' --These units have to be hard coded as they do not have a unit lookup
+		end as unit_source_value,
+		MOD(ac.patid, 100000) as care_site_id,
+		con.constype,
+		-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+		'' as qualifier_source_value,
+		null as qualifier_concept_id,
+		e.data1 as data,
+		concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data1)  as source_value
+		from ac
+		join w_entity_oth e on e.enttype = ac.enttype 
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
+
+		left join w_lookup ll on ll.code::text = ac.data1 and ll.name = e.data1_lkup
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data2 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data2,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+				
+		), w_entity AS (	
+			select t1.enttype, t1.category, t1.description, t1.data2, t1.data2_lkup, t1.data_fields
+			from {sc}.entity as t1
+			left join (SELECT * FROM (VALUES (72), (116), (78), (60), (119), (120)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+			where t2._enttype is null
+			and t1.data_fields > 1 
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data2_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data2_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data2_lkup)) AS t2 on t1.data2_lkup = t2._data2_lkup
+			where t2._data2_lkup is null
+		
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data2_lkup = 'dd/mm/yyyy' then ac.data2
+			end as value_as_date,
+			case 
+				when ac.enttype = 52 then 'hour' --enttype 52 is sleep pattern and this is asking average hours of sleep
+				when ac.enttype = 69 then 'week' --enttype 69 is weeks post-natal
+				when ac.enttype = 150 then 'day' --enttype 150 is days post-natal
+				else ''
+			end as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data2 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data2)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+												
+		left join {sc}.medical m on m.medcode::text = ac.data2
+
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data2_lkup = 'dd/mm/yyyy' then ac.data2
+			end as value_as_date,
+			case 
+				when ac.enttype = 52 then 'hour' --enttype 52 is sleep pattern and this is asking average hours of sleep
+				when ac.enttype = 69 then 'week' --enttype 69 is weeks post-natal
+				when ac.enttype = 150 then 'day' --enttype 150 is days post-natal
+				else ''
+			end as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data2 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data2)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join {sc}.product p on p.prodcode::text = ac.data2
+
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data2 as value_as_number,
+			case 
+				when e.data2_lkup = 'dd/mm/yyyy' then ac.data2
+			end as value_as_date,
+			case 
+				when ac.enttype = 52 then 'hour' --enttype 52 is sleep pattern and this is asking average hours of sleep
+				when ac.enttype = 69 then 'week' --enttype 69 is weeks post-natal
+				when ac.enttype = 150 then 'day' --enttype 150 is days post-natal
+				else ''
+			end as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data2 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data2)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data2 and ll.name = e.data2_lkup							
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data3 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data3,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+				
+		), w_entity AS (	
+			select t1.enttype, t1.category, t1.description, t1.data3, t1.data3_lkup, t1.data_fields
+			from {sc}.entity as t1
+			left join (SELECT * FROM (VALUES (372), (78), (126)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+			where t2._enttype is null
+			and t1.data_fields > 2 
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data3_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data3_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data3_lkup)) AS t2 on t1.data3_lkup = t2._data3_lkup
+			where t2._data3_lkup is null
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate,
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+								
+		left join {sc}.medical m on m.medcode::text = ac.data3 
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate,
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+
+		left join {sc}.product p on p.prodcode::text = ac.data3 
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate,
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data3 as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+		
+		left join w_lookup ll on ll.code::text = ac.data3 and ll.name = e.data3_lkup							
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data4 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data4,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+				
+		), w_entity AS (	
+			select t1.enttype, t1.category, t1.description, t1.data4, t1.data4_lkup, t1.data_fields
+			from {sc}.entity as t1
+			left join (SELECT * FROM (VALUES (372), (78), (126)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+			where t2._enttype is null
+			and t1.data_fields > 3 
+		
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data4_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data4_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data4_lkup)) AS t2 on t1.data4_lkup = t2._data4_lkup
+			where t2._data4_lkup is null
+		
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data4_lkup = 'dd/mm/yyyy' then ac.data4
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data4 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data4)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+									
+		left join {sc}.medical m on m.medcode::text = ac.data4
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data4_lkup = 'dd/mm/yyyy' then ac.data4
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data4 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data4)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+			
+		left join {sc}.product p on p.prodcode::text = ac.data4
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data4 as value_as_number,
+			case 
+				when e.data4_lkup = 'dd/mm/yyyy' then ac.data4
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data4 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data4)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+			
+		left join w_lookup ll on ll.code::text = ac.data4 and ll.name = e.data4_lkup							
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data5 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data5,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+				
+		), w_entity AS (	
+			select t1.enttype, t1.category, t1.description, t1.data5, t1.data5_lkup, t1.data_fields
+			from {sc}.entity as t1
+			left join (SELECT * FROM (VALUES (78)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+			where t2._enttype is null
+			and t1.data_fields > 4 
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data5_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data5_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data5_lkup)) AS t2 on t1.data5_lkup = t2._data5_lkup
+			where t2._data5_lkup is null
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+								
+		left join {sc}.medical m on m.medcode::text = ac.data5	
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+			
+		left join {sc}.product p on p.prodcode::text = ac.data5
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data5 as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+		
+		left join w_lookup ll on ll.code::text = ac.data5 and ll.name = e.data5_lkup							
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data6 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data6,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+				
+		), w_entity AS (	
+			select t1.enttype, t1.category, t1.description, t1.data6, t1.data6_lkup, t1.data_fields
+			from {sc}.entity as t1
+			left join (SELECT * FROM (VALUES (78)) AS t (_enttype)) AS t2 on t1.enttype = t2._enttype
+			where t2._enttype is null
+			and t1.data_fields > 5 
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data6_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data6_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data6_lkup)) AS t2 on t1.data6_lkup = t2._data6_lkup
+			where t2._data6_lkup is null
+		
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data6_lkup = 'dd/mm/yyyy' then ac.data6
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data6 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data6)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+											
+		left join {sc}.medical m on m.medcode::text = ac.data6
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data6_lkup = 'dd/mm/yyyy' then ac.data6
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data6 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data6)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join {sc}.product p on p.prodcode::text = ac.data6
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data6 as value_as_number,
+			case 
+				when e.data6_lkup = 'dd/mm/yyyy' then ac.data6
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data6 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data6)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype 	
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data6 and ll.name = e.data6_lkup							
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data7 
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data7,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+			
+		), w_entity AS (
+			select *
+			from {sc}.entity
+			where data_fields > 6
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data7_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data7_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data7_lkup)) AS t2 on t1.data7_lkup = t2._data7_lkup
+			where t2._data7_lkup is null
+			
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data7_lkup = 'dd/mm/yyyy' then ac.data7
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data7 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data7)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+												
+		left join {sc}.medical m on m.medcode::text = ac.data7		
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data7_lkup = 'dd/mm/yyyy' then ac.data7
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data7 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data7)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+						
+		left join {sc}.product p on p.prodcode::text = ac.data7
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data7 as value_as_number,
+			case 
+				when e.data7_lkup = 'dd/mm/yyyy' then ac.data7
+			end as value_as_date,
+			'' as unit_source_value,
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data7 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data7)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data7 and ll.name = e.data7_lkup							
+
+		order by patid
+		GO
+				With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data3, a.data4
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data3, a.data4,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+			
+		), w_entity AS (
+			select *
+			from {sc}.entity
+			where enttype in (126,78)
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data3_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data3_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data3_lkup)) AS t2 on t1.data3_lkup = t2._data3_lkup
+			where t2._data3_lkup is null	
+		)
+
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 		
+
+		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup						
+		left join {sc}.medical m on m.medcode::text = ac.data3		
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup							
+		left join {sc}.product p on p.prodcode::text = ac.data3
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data3 as value_as_number,
+			case 
+				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data3 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data3)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data3 and ll.name = e.data3_lkup	
+		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup						
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data5, a.data6
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data5, a.data6,
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+			
+		), w_entity AS (
+			select *
+			from {sc}.entity
+			where enttype = 78
+			
+		), w_entity_m AS (
+			select *
+			from w_entity as t
+			where t.data5_lkup = 'Medical Dictionary'
+		
+		), w_entity_p AS (
+			select *
+			from w_entity as t
+			where t.data5_lkup = 'Product Dictionary'
+			
+		), w_entity_oth AS (
+			select *
+			from w_entity as t1
+			left join (SELECT * FROM (VALUES ('Medical Dictionary'), ('Product Dictionary')) AS t (_data5_lkup)) AS t2 on t1.data5_lkup = t2._data5_lkup
+			where t2._data5_lkup is null	
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			m.read_code as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_m e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup						
+		left join {sc}.medical m on m.medcode::text = ac.data5	
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			p.gemscriptcode as value_as_string,
+			null as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_p e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+						
+		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup							
+		left join {sc}.product p on p.prodcode::text = ac.data5
+		
+		UNION
+		
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			ll.text as value_as_string,
+			ac.data5 as value_as_number,
+			case 
+				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
+			end as value_as_date,	
+			ll2.text as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			e.data5 as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data5)  as source_value
+		from ac 
+		join w_entity_oth e on e.enttype = ac.enttype
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data5 and ll.name = e.data5_lkup	
+		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup						
+
+		order by patid
+		GO
+		With ch AS(
+			select person_id 
+			from {sc}.chunk_person
+			where chunk_id = {0}
+
+		), w_additional AS(
+			select a.patid, a.adid, a.enttype, a.data1, a.data3, a.data4
+			from {sc}.additional a
+			join ch on a.patid=ch.person_id
+			
+		), ac AS(
+			select DISTINCT
+				a.patid, a.enttype, a.data1, a.data3, a.data4, 
+				c.staffid, c.consid, c.eventdate 
+			from {sc}.clinical c
+			join w_additional a on c.patid = a.patid and c.adid = a.adid
+			
+		), w_lookup AS(
+			select lu.code, lu.text, lt.name  
+			from {sc}.lookup lu
+			join {sc}.lookuptype lt on lt.lookup_type_id = lu.lookup_type_id
+		)
+		select 
+			ac.patid,
+			ac.eventdate, 
+			ac.staffid,
+			'' as value_as_string,
+			ac.data1 as value_as_number,
+			case 
+				when e.data4_lkup = 'dd/mm/yyyy' then ac.data4
+			end as value_as_date,	
+			'' as unit_source_value,	
+			MOD(ac.patid, 100000) as care_site_id,
+			con.constype,
+			-- concat(ac.patid,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			nextval('{sc}.visit_occurrence_id_seq'::regclass)::numeric as visit_occurrence_id,
+			'' as qualifier_source_value,
+			null as qualifier_concept_id,
+			sm.scoringmethod as data,
+			concat(ac.enttype::varchar, '-', e.category, '-', e.description, '-', e.data4)  as source_value
+		from ac 
+		join {sc}.entity e on e.enttype = ac.enttype and e.enttype = 372
+		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
+					
+		left join w_lookup ll on ll.code::text = ac.data4 and ll.name = e.data4_lkup		
+		left join {sc}.scoremethod sm on ac.data3 = sm.code::text			
+
+
+		order by patid
+	</Query>
+	<Observation>
+		<ObservationDefinition>
+			<PersonId>patid</PersonId>
+			<StartDate>eventdate</StartDate>
+			<ProviderId>staffid</ProviderId>
+			<VisitDetailId>visit_occurrence_id</VisitDetailId>
+			<QualifierConceptId>qualifier_concept_id</QualifierConceptId>
+			<QualifierSourceValue>qualifier_source_value</QualifierSourceValue>
+			<ValuesAsString>
+				<string>value_as_string</string>
+			</ValuesAsString>
+			<ValuesAsNumber>
+				<string>value_as_number</string>
+			</ValuesAsNumber>
+			<AdditionalFields>
+				<string>data</string>
+				<string>constype</string>
+			</AdditionalFields>
+			<Concepts>
+				<Concept>
+					<ConceptIdMappers>
+						<Mapper>
+							<Lookup>Additional</Lookup>
+						</Mapper>
+					</ConceptIdMappers>
+					<Fields>
+						<Field key="source_value" defaultTypeId="38000280" isNullable="true"/>
+					</Fields>
+				</Concept>
+				<Concept>
+					<ConceptIdMappers>
+						<Mapper>
+							<Lookup>Units</Lookup>
+						</Mapper>
+					</ConceptIdMappers>
+					<Fields>
+						<Field key="unit_source_value" defaultTypeId="0" />
+					</Fields>
+				</Concept>
+			</Concepts>
+		</ObservationDefinition>
+	</Observation>
+</QueryDefinition>

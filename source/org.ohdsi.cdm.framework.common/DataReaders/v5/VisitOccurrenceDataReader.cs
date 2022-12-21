@@ -3,6 +3,7 @@ using org.ohdsi.cdm.framework.common.Omop;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 
 namespace org.ohdsi.cdm.framework.common.DataReaders.v5
 {
@@ -37,10 +38,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
             {
                 case 0:
                     {
+                        
                         return _offset.GetKeyOffset(_visitEnumerator.Current.PersonId)
                             .VisitOccurrenceIdChanged
                             ? _offset.GetId(_visitEnumerator.Current.PersonId, _visitEnumerator.Current.Id)
                             : _visitEnumerator.Current.Id;
+                        
                     }
                 case 1:
                     return _visitEnumerator.Current.PersonId;

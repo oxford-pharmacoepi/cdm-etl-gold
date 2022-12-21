@@ -76,13 +76,16 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
             return successful;
         }
 
+        
+
         public void Start()
         {
             if (CreateDestination())
             {
                 CreateLookup();
-                Build();
+                //Build();
             }
+            
         }
 
         public void CreateLookup()
@@ -217,7 +220,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
                 }
             }
         }
-
+        /*
         public void Build()
         {
             if (_taskQueue.Aborted) return;
@@ -301,5 +304,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
             saveQueue.CompleteAdding();
             save.Wait();
         }
+        */
     }
+        
 }

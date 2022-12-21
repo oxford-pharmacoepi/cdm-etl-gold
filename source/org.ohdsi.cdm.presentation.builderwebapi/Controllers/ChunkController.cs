@@ -1,8 +1,10 @@
-﻿using org.ohdsi.cdm.framework.desktop;
+﻿using org.ohdsi.cdm.framework.common.Omop;
+using org.ohdsi.cdm.framework.desktop;
 using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -24,7 +26,10 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
                 "Common",
                 "Scripts",
                 settings.ConversionSettings.SourceEngine
-            }), settings.ConversionSettings.SourceSchema);
+            }), settings.ConversionSettings.SourceSchema,
+                ChunkSize,
+                settings.ConversionSettings.VocabularySchema
+            );
         }
 
         public void ClenupChunks()
@@ -32,15 +37,17 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
             _dbSource.DropChunkTable();
         }
 
+        /*
         public int CreateChunks()
         {
             var chunks = new List<ChunkRecord>();
 
+            Debug.WriteLine("Generating chunk ids...");
             Console.WriteLine("Generating chunk ids...");
             _dbSource.CreateChunkTable();
             _dbSource.CreateIndexesChunkTable();
-
-            var chunkId = 0;
+            
+            var chunkId = 0;            
             var k = 0;
 
             using (var saver = _settings.SourceEngine.GetSaver()
@@ -65,10 +72,13 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
                 saver.Commit();
             }
 
+            Debug.WriteLine("Chunk ids were generated and saved, total count=" + chunkId);
             Console.WriteLine("Chunk ids were generated and saved, total count=" + chunkId);
 
             return chunkId;
+            
         }
+        */
 
         public IEnumerable<List<KeyValuePair<string, string>>> GetPersonKeys(int batchSize)
         {

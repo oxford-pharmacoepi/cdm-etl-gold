@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace org.ohdsi.cdm.framework.common.Lookups
 {

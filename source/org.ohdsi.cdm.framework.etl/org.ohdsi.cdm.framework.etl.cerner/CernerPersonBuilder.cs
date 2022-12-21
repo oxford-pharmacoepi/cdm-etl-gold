@@ -5,6 +5,7 @@ using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.common.PregnancyAlgorithm;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.etl.cerner
@@ -375,7 +376,7 @@ namespace org.ohdsi.cdm.framework.etl.cerner
                 return Attrition.ImplausibleYOBPostEarliestOP;
             }
 
-            var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
+            //var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
 
             foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
@@ -415,11 +416,12 @@ namespace org.ohdsi.cdm.framework.etl.cerner
                 .ToArray();
             var deviceExposure =
                 BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-
+            /*
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
             SetPayerPlanPeriodId(payerPlanPeriods, drugExposures, procedureOccurrences,
                 visitOccurrences.Values.ToArray(),
                 deviceExposure);
+            */
 
             // set corresponding ProviderIds
             SetProviderIds(drugExposures);
@@ -433,13 +435,18 @@ namespace org.ohdsi.cdm.framework.etl.cerner
             var visitCosts = BuildVisitCosts(visitOccurrences.Values.ToArray()).ToArray();
             var devicCosts = BuildDeviceCosts(deviceExposure).ToArray();
 
-            var cohort = BuildCohort(CohortRecords.ToArray(), observationPeriods).ToArray();
-            var notes = BuildNote(NoteRecords.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            //var cohort = BuildCohort(CohortRecords.ToArray(), observationPeriods).ToArray();
+            //var notes = BuildNote(NoteRecords.ToArray(), visitOccurrences, observationPeriods).ToArray();
 
             // push built entities to ChunkBuilder for further save to CDM database
+            /*
             AddToChunk(person, death, observationPeriods, payerPlanPeriods, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
                 visitOccurrences.Values.ToArray(), null, cohort, deviceExposure, notes);
+            */
+            AddToChunk(person, death, observationPeriods, null, drugExposures,
+                conditionOccurrences, procedureOccurrences, observations, measurements,
+                visitOccurrences.Values.ToArray(), null, null, deviceExposure, null);
 
             var pg = new PregnancyAlgorithm();
             foreach (var pe in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,

@@ -162,15 +162,15 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
+                    return typeof(DateTime);
                 case 2:
                     return typeof(DateTime);
                 case 3:
-                    return typeof(DateTime);
-                case 4:
                     return typeof(int?);
 
                 default:

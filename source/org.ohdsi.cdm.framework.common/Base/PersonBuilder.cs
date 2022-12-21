@@ -7,6 +7,8 @@ using org.ohdsi.cdm.framework.common.Omop;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.common.Base
@@ -303,13 +305,13 @@ namespace org.ohdsi.cdm.framework.common.Base
                         AddEntity((Death)data, DeathRecords);
                         break;
                     }
-
+                    /*
                 case EntityType.PayerPlanPeriod:
                     {
                         AddEntity((PayerPlanPeriod)data, PayerPlanPeriodsRaw);
                         break;
                     }
-
+                    */
                 case EntityType.ConditionOccurrence:
                     {
                         AddEntity((ConditionOccurrence)data, ConditionOccurrencesRaw);
@@ -345,13 +347,13 @@ namespace org.ohdsi.cdm.framework.common.Base
                         AddEntity((VisitDetail)data, VisitDetailsRaw);
                         break;
                     }
-
+                    /*
                 case EntityType.Cohort:
                     {
                         AddEntity((Cohort)data, CohortRecords);
                         break;
                     }
-
+                    */
                 case EntityType.Measurement:
                     {
                         AddEntity((Measurement)data, MeasurementsRaw);
@@ -363,12 +365,13 @@ namespace org.ohdsi.cdm.framework.common.Base
                         AddEntity((DeviceExposure)data, DeviceExposureRaw);
                         break;
                     }
-
+                    /*
                 case EntityType.Note:
                     {
                         //AddEntity((Note)data, NoteRecords); TMP: NOTE 
                         break;
                     }
+                    */
             }
         }
 
@@ -537,6 +540,7 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <returns>Person entity</returns>
         public virtual KeyValuePair<Person, Attrition> BuildPerson(List<Person> records)
         {
+
             if (records == null || records.Count == 0)
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnacceptablePatientQuality);
 
@@ -819,6 +823,8 @@ namespace org.ohdsi.cdm.framework.common.Base
 
             var result = BuildPerson(PersonRecords.ToList());
             var person = result.Key;
+
+
             if (person == null)
             {
                 Complete = true;
@@ -827,7 +833,7 @@ namespace org.ohdsi.cdm.framework.common.Base
 
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, ObservationPeriodsRaw.ToArray()).ToArray();
-
+            
             // Delete any individual that has an OBSERVATION_PERIOD that is >= 2 years prior to the YEAR_OF_BIRTH
             if (Excluded(person, observationPeriods))
             {
@@ -835,7 +841,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 return Attrition.ImplausibleYOBPostEarliestOP;
             }
 
-            var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
+            //var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
 
             foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
@@ -854,6 +860,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             var conditionOccurrences =
                 BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
                     .ToArray();
+            
             var procedureOccurrences =
                 BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
                     .ToArray();
@@ -863,12 +870,13 @@ namespace org.ohdsi.cdm.framework.common.Base
                 .ToArray();
             var deviceExposure =
                 BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-
+            
+            /*
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
             SetPayerPlanPeriodId(payerPlanPeriods, drugExposures, procedureOccurrences,
                 visitOccurrences.Values.ToArray(),
                 deviceExposure);
-
+            */
             // set corresponding ProviderIds
             SetProviderIds(drugExposures);
             SetProviderIds(conditionOccurrences);
@@ -883,13 +891,18 @@ namespace org.ohdsi.cdm.framework.common.Base
             var visitCosts = BuildVisitCosts(visitOccurrences.Values.ToArray()).ToArray();
             var devicCosts = BuildDeviceCosts(deviceExposure).ToArray();
 
-            var cohort = BuildCohort(CohortRecords.ToArray(), observationPeriods).ToArray();
-            var notes = BuildNote(NoteRecords.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            //var cohort = BuildCohort(CohortRecords.ToArray(), observationPeriods).ToArray();
+            //var notes = BuildNote(NoteRecords.ToArray(), visitOccurrences, observationPeriods).ToArray();
 
             // push built entities to ChunkBuilder for further save to CDM database
+            /*
             AddToChunk(person, death, observationPeriods, payerPlanPeriods, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
                 visitOccurrences.Values.ToArray(), visitDetails, cohort, deviceExposure, notes);
+            */
+            AddToChunk(person, death, observationPeriods, null, drugExposures,
+                conditionOccurrences, procedureOccurrences, observations, measurements,
+                visitOccurrences.Values.ToArray(), visitDetails, null, deviceExposure, null);
 
             Complete = true;
 
@@ -958,10 +971,12 @@ namespace org.ohdsi.cdm.framework.common.Base
                 ChunkData.AddData(observationPeriod);
             }
 
+            /*
             foreach (var payerPlanPeriod in ppp)
             {
                 ChunkData.AddData(payerPlanPeriod);
             }
+            */
 
             foreach (var visitOccurrence in visitOccurrences)
             {
@@ -976,6 +991,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 }
             }
 
+            /*
             if (cohort != null)
             {
                 foreach (var c in cohort)
@@ -983,6 +999,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                     ChunkData.AddData(c);
                 }
             }
+            
 
             if (notes != null)
             {
@@ -993,6 +1010,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                     //ChunkData.AddData(n);
                 }
             }
+            */
 
             AddToChunk("Condition", conditionOccurrences);
             AddToChunk("Drug", drugExposures);

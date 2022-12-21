@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Xml.Serialization;
@@ -215,6 +216,8 @@ namespace org.ohdsi.cdm.framework.common.Definitions
 
         public string GetSql(string vendor)
         {
+            Debug.WriteLine("Get SQL in xml");
+
             if (!IsSuitable(Query.Database, vendor))
                 return null;
 

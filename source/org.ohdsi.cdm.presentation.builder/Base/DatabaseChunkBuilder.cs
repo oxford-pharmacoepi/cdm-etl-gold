@@ -32,7 +32,7 @@ namespace org.ohdsi.cdm.presentation.builder.Base
         {
             try
             {
-                Console.WriteLine("DatabaseChunkBuilder");
+                Debug.WriteLine("_chunkId=" + _chunkId);
 
                 var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0);
 
@@ -49,9 +49,11 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 }
 
                 Logger.Write(_chunkId, LogMessageTypes.Info,
-                    $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+                   $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds* 0.000016666666666666667} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
 
                 part.Build();
+                Logger.Write(_chunkId, LogMessageTypes.Info,
+                   $"ChunkId={_chunkId} was built | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
 
                 return part;
             }

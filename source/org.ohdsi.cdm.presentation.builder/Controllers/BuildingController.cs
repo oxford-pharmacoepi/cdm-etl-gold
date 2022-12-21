@@ -1,7 +1,9 @@
-﻿using org.ohdsi.cdm.framework.common.Lookups;
+﻿using org.ohdsi.cdm.framework.common.Definitions;
+using org.ohdsi.cdm.framework.common.Lookups;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace org.ohdsi.cdm.presentation.builder.Controllers
@@ -69,13 +71,31 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             if (_builderController.CurrentState == BuilderState.Running)
             {
+
+                DataCleaning();
                 CreateDestination();
 
                 var vocabulary = new Vocabulary();
                 CreateLookup(vocabulary);
+
+                //Map Patient to Person First before create a chunk
+                //MapPatientToPerson(vocabulary);
                 Build(vocabulary);
+                
+                //CreateCdmIndexes();
             }
         }
+
+        private void DataCleaning()
+        {
+            if (Settings.Current.Building.BuildingState.DataCleaningDone) return;
+
+            UpdateDate("DataCleaningStart");
+            _builderController.DataCleaning();
+            UpdateDate("DataCleaningEnd");
+        }
+
+
 
         private void CreateDestination()
         {
@@ -94,6 +114,18 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             _builderController.CreateLookup(vocabulary);
             UpdateDate("CreateLookupEnd");
         }
+        /*
+        private void MapPatientToPerson(IVocabulary vocabulary) {
+
+            if (Settings.Current.Building.BuildingState.LookupCreated && !Settings.Current.Building.BuildingState.MapPatientToPersonDone) {
+
+                UpdateDate("MapPatientToPersonStart");
+                _builderController.MapPatientToPerson(vocabulary);
+                UpdateDate("MapPatientToPersonEnd");
+            }
+
+        }
+        */
 
         private bool Build(IVocabulary vocabulary)
         {
@@ -119,13 +151,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 }
 
                 _builderController.Build(vocabulary);
-
+                
                 if (_builderController.CurrentState != BuilderState.Error)
                 {
                     allChunksComplete = true;
                     UpdateDate("BuildingEnd");
                 }
-
+                
             }
             return allChunksComplete;
         }
@@ -140,7 +172,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             var time = DateTime.Now;
             typeof(Building).GetProperty(fieldName).SetValue(Settings.Current.Building.BuildingState, time, null);
-
             return time;
         }
 
@@ -166,6 +197,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         public IEnumerable<string> GetErrors()
         {
             return Logger.GetErrors();
+        }
+
+        public void DataCleaningStep()
+        {
+            _builderController.DataCleaning();
+            UpdateDate("DataCleaningStart", DateTime.Now);
+            UpdateDate("DataCleaningEnd", DateTime.Now);
         }
 
         public void ResetDbCreationStep()
@@ -194,6 +232,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateChunksEnd", DateTime.MaxValue);
         }
 
+        public void SkipDataCleaningStep()
+        {
+            UpdateDate("DataCleaningStart", DateTime.MaxValue);
+            UpdateDate("DataCleaningEnd", DateTime.MaxValue);
+        }
+
         public void RestartChunksCreationStep()
         {
             //CreateChunks(true);
@@ -204,6 +248,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateChunksStart", null);
             UpdateDate("CreateChunksEnd", null);
         }
+
+        public void ResetDataCleaningStep()
+        {
+            UpdateDate("DataCleaningStart", null);
+            UpdateDate("DataCleaningEnd", null);
+        }  
 
         public void ResetLookupCreationStep(bool onlyDataUpdate)
         {

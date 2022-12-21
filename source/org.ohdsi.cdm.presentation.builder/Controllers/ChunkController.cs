@@ -3,6 +3,7 @@ using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -21,7 +22,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 "Common",
                 "Scripts",
                 Settings.Current.Building.SourceEngine.Database.ToString()
-            }), Settings.Current.Building.SourceSchema);
+            }), 
+            Settings.Current.Building.SourceSchema, 
+            Settings.Current.Building.ChunkSize,
+            Settings.Current.Building.CdmSchema
+            );
         }
 
 
@@ -29,6 +34,27 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         {
             _dbSource.DropChunkTable();
         }
+
+        public int CreateChunk()
+        {
+            int chuckCount = 0;
+            chuckCount = _dbSource.CreateChunkTable();
+            _dbSource.CreateIndexesChunkTable();
+
+            return chuckCount;
+        }
+
+        public List<int> GetNotCompletedChunkId() {
+            List<int> ints = new List<int>();
+            ints = _dbSource.GetNotCompletedChunkId();
+            return ints;
+        }
+
+        public void UpdateCompletedChunk(int ChunkId) {
+
+            _dbSource.UpdateCompletedChunk(ChunkId);
+        }
+
 
         public int CreateChunks()
         {
@@ -38,7 +64,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             _dbSource.CreateChunkTable();
             _dbSource.CreateIndexesChunkTable();
 
-            var chunkId = 0;
+            var chunkId = 1;  //TO-DO: updated by Teen: the 1st chunk = 1, so the last number will coincide with the total
             var k = 0;
 
             using (var saver = Settings.Current.Building.SourceEngine.GetSaver()
@@ -78,6 +104,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             var batch = new List<KeyValuePair<string, string>>(batchSize);
 
             var query = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database, Settings.Current.Building.BatchScript, Settings.Current.Building.SourceSchema);
+            Debug.WriteLine("query=" + query);
+            Debug.WriteLine("batches=" + batches);
+            Debug.WriteLine("batchSize=" + batchSize);
 
             foreach (var reader in _dbSource.GetPersonKeys(query, batches, batchSize))
             {

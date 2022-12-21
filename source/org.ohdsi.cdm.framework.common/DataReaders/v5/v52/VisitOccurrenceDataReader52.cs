@@ -36,9 +36,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v52
             {
                 case 0:
                     {
+                        /*
                         return _offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged
                             ? _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id)
                             : _enumerator.Current.Id;
+                        */
+                        return _enumerator.Current.Id;
                     }
                 case 1:
                     return _enumerator.Current.PersonId;
@@ -73,10 +76,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v52
                 case 16:
                     if (_enumerator.Current.PrecedingVisitOccurrenceId.HasValue)
                     {
+                        /*
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
                             return _offset.GetId(_enumerator.Current.PersonId,
                                 _enumerator.Current.PrecedingVisitOccurrenceId.Value);
-
+                        */
                         return _enumerator.Current.PrecedingVisitOccurrenceId;
                     }
 

@@ -3,6 +3,7 @@ using org.ohdsi.cdm.framework.common.Omop;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 
 namespace org.ohdsi.cdm.framework.common.DataReaders.v6
 {

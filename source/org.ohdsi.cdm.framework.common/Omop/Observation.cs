@@ -1,6 +1,8 @@
 ﻿using org.ohdsi.cdm.framework.common.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection.Emit;
 
 namespace org.ohdsi.cdm.framework.common.Omop
 {
@@ -104,5 +106,6 @@ namespace org.ohdsi.cdm.framework.common.Omop
         {
             return EntityType.Observation;
         }
+
     }
 }

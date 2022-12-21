@@ -15,7 +15,6 @@ namespace org.ohdsi.cdm.presentation.builder
             _threadlock = new object();
         }
 
-
         public static void WriteError(Exception e)
         {
             Write(null, LogMessageTypes.Error, CreateExceptionString(e));

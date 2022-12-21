@@ -107,6 +107,8 @@ namespace org.ohdsi.cdm.presentation.builder
                                 sql = sql.Replace("{base}", baseSql);
                                 sql = sql.Replace("{sc}", Settings.Current.Building.VocabSchema);
 
+                                Debug.WriteLine("lookup sql=" + sql);
+
                                 try
                                 {
                                     Console.WriteLine(conceptIdMapper.Lookup + " - Loading...");
@@ -208,6 +210,7 @@ namespace org.ohdsi.cdm.presentation.builder
         public int? LookupGender(string genderSourceValue)
         {
             var res = _genderConcepts.LookupValue(genderSourceValue);
+
             if (!res.HasValue || res.Value == 0)
                 return 8551; // UNKNOWN
 

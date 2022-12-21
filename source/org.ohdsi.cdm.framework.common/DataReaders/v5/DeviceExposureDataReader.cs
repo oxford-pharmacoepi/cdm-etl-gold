@@ -55,10 +55,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
                 case 9:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
                     {
+                        
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
                             return _offset.GetId(_enumerator.Current.PersonId,
                                 _enumerator.Current.VisitOccurrenceId.Value);
-
+                        
                         return _enumerator.Current.VisitOccurrenceId.Value;
                     }
 

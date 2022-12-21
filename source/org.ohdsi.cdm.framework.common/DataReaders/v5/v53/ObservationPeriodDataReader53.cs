@@ -35,6 +35,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
             switch (i)
             {
+                
                 case 0:
                     return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 1:
@@ -45,6 +46,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     return _enumerator.Current.EndDate;
                 case 4:
                     return _enumerator.Current.TypeConceptId;
+                
 
                 default:
                     throw new NotImplementedException();
@@ -55,12 +57,13 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+
                 case 0: return "observation_period_id";
                 case 1: return "person_id";
                 case 2: return "observation_period_start_date";
                 case 3: return "observation_period_end_date";
                 case 4: return "period_type_concept_id";
-
+                
                 default:
                     throw new NotImplementedException();
             }
