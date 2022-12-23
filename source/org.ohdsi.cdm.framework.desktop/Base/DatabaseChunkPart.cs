@@ -63,8 +63,6 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                     foreach (var subQuery in q.Split(new[] { "GO" + "\r\n", "GO" + "\n" }, StringSplitOptions.RemoveEmptyEntries))
                     {
 
-                        Debug.WriteLine("subQuery=" + subQuery);
-
                         using (var cdm = sourceEngine.GetCommand(subQuery, sourceConnection))
                         {
                             cdm.CommandTimeout = 0;

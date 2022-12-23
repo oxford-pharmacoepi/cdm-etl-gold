@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
         public int FieldCount
         {
-            get { return 16; }
+            //get { return 16; }
+            get { return 15; }
         }
 
         // is this called only because the datatype specific methods are not implemented?  
@@ -34,27 +35,27 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
-                case 1:
                     return _enumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _enumerator.Current.ConceptId;
+                case 2:
+                    return _enumerator.Current.StartDate;
                 case 3:
                     return _enumerator.Current.StartDate;
                 case 4:
-                    return _enumerator.Current.StartDate;
+                    return _enumerator.Current.EndDate;
                 case 5:
                     return _enumerator.Current.EndDate;
                 case 6:
-                    return _enumerator.Current.EndDate;
-                case 7:
                     return _enumerator.Current.TypeConceptId;
-                case 8:
+                case 7:
                     return _enumerator.Current.StopReason;
-                case 9:
+                case 8:
                     return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
-                case 10:
+                case 9:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
                     {
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
@@ -64,7 +65,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 11:
+                case 10:
                     if (_enumerator.Current.VisitDetailId.HasValue)
                     {
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
@@ -74,13 +75,13 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 12:
+                case 11:
                     return _enumerator.Current.StatusConceptId;
-                case 13:
+                case 12:
                     return _enumerator.Current.SourceValue;
-                case 14:
+                case 13:
                     return _enumerator.Current.SourceConceptId;
-                case 15:
+                case 14:
                     return _enumerator.Current.StatusSourceValue;
                 default:
                     throw new NotImplementedException();
@@ -91,22 +92,22 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
-                case 0: return "condition_occurrence_id";
-                case 1: return "person_id";
-                case 2: return "condition_concept_id";
-                case 3: return "condition_start_date";
-                case 4: return "condition_start_datetime";
-                case 5: return "condition_end_date";
-                case 6: return "condition_end_datetime";
-                case 7: return "condition_type_concept_id";
-                case 8: return "stop_reason";
-                case 9: return "provider_id";
-                case 10: return "visit_occurrence_id";
-                case 11: return "visit_detail_id";
-                case 12: return "condition_status_concept_id";
-                case 13: return "condition_source_value";
-                case 14: return "condition_source_concept_id";
-                case 15: return "condition_status_source_value";
+                //case 0: return "condition_occurrence_id";
+                case 0: return "person_id";
+                case 1: return "condition_concept_id";
+                case 2: return "condition_start_date";
+                case 3: return "condition_start_datetime";
+                case 4: return "condition_end_date";
+                case 5: return "condition_end_datetime";
+                case 6: return "condition_type_concept_id";
+                case 7: return "stop_reason";
+                case 8: return "provider_id";
+                case 9: return "visit_occurrence_id";
+                case 10: return "visit_detail_id";
+                case 11: return "condition_status_concept_id";
+                case 12: return "condition_source_value";
+                case 13: return "condition_source_concept_id";
+                case 14: return "condition_status_source_value";
                 default:
                     throw new NotImplementedException();
             }
@@ -203,37 +204,37 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
-                case 2:
                     return typeof(int);
+                case 2:
+                    return typeof(DateTime);
                 case 3:
                     return typeof(DateTime);
                 case 4:
-                    return typeof(DateTime);
-                case 5:
                     return typeof(DateTime?);
-                case 6:
+                case 5:
                     return typeof(DateTime);
-                case 7:
+                case 6:
                     return typeof(int?);
-                case 8:
+                case 7:
                     return typeof(string);
+                case 8:
+                    return typeof(long?);
                 case 9:
                     return typeof(long?);
                 case 10:
                     return typeof(long?);
                 case 11:
-                    return typeof(long?);
+                    return typeof(int);
                 case 12:
-                    return typeof(int);
-                case 13:
                     return typeof(string);
-                case 14:
+                case 13:
                     return typeof(int);
-                case 15:
+                case 14:
                     return typeof(string);
                 default:
                     throw new NotImplementedException();

@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS {sc}.cohort_definition
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_era
 (
-   condition_era_id            bigint    NOT NULL,
+   condition_era_id            BIGSERIAL NOT NULL,
    person_id                   bigint    NOT NULL,
    condition_concept_id        integer   NOT NULL,
    condition_era_start_date    date		 NOT NULL,		
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_era
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
 (
-   condition_occurrence_id        bigint        NOT NULL,
+   condition_occurrence_id        BIGSERIAL     NOT NULL,
    person_id                      bigint        NOT NULL,
    condition_concept_id           integer       NOT NULL,
    condition_start_date           date          NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS {sc}.death
 
 CREATE TABLE IF NOT EXISTS {sc}.device_exposure
 (
-   device_exposure_id              bigint         NOT NULL,
+   device_exposure_id              BIGSERIAL      NOT NULL,
    person_id                       bigint         NOT NULL,
    device_concept_id               integer        NOT NULL,
    device_exposure_start_date      date           NOT NULL,
@@ -157,29 +157,29 @@ CREATE TABLE IF NOT EXISTS {sc}.device_exposure
 
 CREATE TABLE IF NOT EXISTS {sc}.dose_era
 (
-   dose_era_id          bigint    NOT NULL,
-   person_id            bigint    NOT NULL,
-   drug_concept_id      integer   NOT NULL,
-   unit_concept_id      integer   NOT NULL,
-   dose_value           numeric   NOT NULL,
-   dose_era_start_date  timestamp NOT NULL,		--from date to timestamp
-   dose_era_end_date    timestamp NOT NULL		--from date to timestamp
+   dose_era_id          BIGSERIAL    	NOT NULL,
+   person_id            bigint    		NOT NULL,
+   drug_concept_id      integer   		NOT NULL,
+   unit_concept_id      integer  		NOT NULL,
+   dose_value           numeric   		NOT NULL,
+   dose_era_start_date  timestamp 		NOT NULL,		--from date to timestamp
+   dose_era_end_date    timestamp 		NOT NULL		--from date to timestamp
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.drug_era
 (
-   drug_era_id          bigint    NOT NULL,
-   person_id            bigint    NOT NULL,
-   drug_concept_id      integer   NOT NULL,
-   drug_era_start_date  date	  NOT NULL,		
-   drug_era_end_date    date	  NOT NULL,		
+   drug_era_id          BIGSERIAL    	NOT NULL,
+   person_id            bigint    		NOT NULL,
+   drug_concept_id      integer   		NOT NULL,
+   drug_era_start_date  date	  		NOT NULL,		
+   drug_era_end_date    date	  		NOT NULL,		
    drug_exposure_count  integer,
    gap_days             integer
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
 (
-   drug_exposure_id              bigint        NOT NULL,
+   drug_exposure_id              BIGSERIAL     NOT NULL,
    person_id                     bigint        NOT NULL,
    drug_concept_id               integer       NOT NULL,
    drug_exposure_start_date      date          NOT NULL,
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS {sc}.location
 
 CREATE TABLE IF NOT EXISTS {sc}.measurement
 (
-   measurement_id                 bigint          NOT NULL,
+   measurement_id                 BIGSERIAL       NOT NULL,
    person_id                      bigint          NOT NULL,
    measurement_concept_id         integer         NOT NULL,
    measurement_date               date            NOT NULL,
@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note_nlp
 
 CREATE TABLE IF NOT EXISTS {sc}.observation
 (
-   observation_id                 bigint       	  NOT NULL,
+   observation_id                 BIGSERIAL       NOT NULL,
    person_id                      bigint          NOT NULL,
    observation_concept_id         integer         NOT NULL,
    observation_date               date            NOT NULL,
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
 
 CREATE TABLE IF NOT EXISTS {sc}.observation_period
 (
-   observation_period_id          bigint 	NOT NULL,
+   observation_period_id          BIGSERIAL NOT NULL,
    person_id                      bigint    NOT NULL,
    observation_period_start_date  date      NOT NULL,
    observation_period_end_date    date      NOT NULL,
@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS {sc}.person
 
 CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
 (
-   procedure_occurrence_id      bigint        NOT NULL,
+   procedure_occurrence_id      BIGSERIAL     NOT NULL,
    person_id                    bigint        NOT NULL,
    procedure_concept_id         integer       NOT NULL,
    procedure_date               date          NOT NULL,
@@ -414,7 +414,7 @@ CREATE TABLE IF NOT EXISTS {sc}.provider
 
 CREATE TABLE IF NOT EXISTS {sc}.specimen
 (
-   specimen_id                  integer       NOT NULL,
+   specimen_id                  SERIAL     	  NOT NULL,
    person_id                    bigint        NOT NULL,
    specimen_concept_id          integer       NOT NULL,
    specimen_type_concept_id     integer       NOT NULL,

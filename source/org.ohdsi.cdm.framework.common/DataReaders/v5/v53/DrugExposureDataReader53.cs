@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
         public int FieldCount
         {
-            get { return 23; }
+            //get { return 23; }
+            get { return 22; }
         }
 
         public object GetValue(int i)
@@ -34,41 +35,41 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
             switch (i)
             {
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
-                case 1:
                     return _enumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _enumerator.Current.ConceptId;
+                case 2:
+                    return _enumerator.Current.StartDate;
                 case 3:
                     return _enumerator.Current.StartDate;
                 case 4:
-                    return _enumerator.Current.StartDate;
+                    return _enumerator.Current.EndDate;
                 case 5:
                     return _enumerator.Current.EndDate;
                 case 6:
-                    return _enumerator.Current.EndDate;
-                case 7:
                     return _enumerator.Current.VerbatimEndDate;
-                case 8:
+                case 7:
                     return _enumerator.Current.TypeConceptId;
-                case 9:
+                case 8:
                     return _enumerator.Current.StopReason;
-                case 10:
+                case 9:
                     return _enumerator.Current.Refills;
-                case 11:
+                case 10:
                     return _enumerator.Current.Quantity;
-                case 12:
+                case 11:
                     return _enumerator.Current.DaysSupply;
-                case 13:
+                case 12:
                     return _enumerator.Current.Sig;
-                case 14:
+                case 13:
                     return _enumerator.Current.RouteConceptId;
-                case 15:
+                case 14:
                     return _enumerator.Current.LotNumber;
-                case 16:
+                case 15:
                     return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
-                case 17:
+                case 16:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
                     {
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
@@ -78,7 +79,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 18:
+                case 17:
                     if (_enumerator.Current.VisitDetailId.HasValue)
                     {
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
@@ -88,13 +89,13 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 19:
+                case 18:
                     return _enumerator.Current.SourceValue;
-                case 20:
+                case 19:
                     return _enumerator.Current.SourceConceptId;
-                case 21:
+                case 20:
                     return _enumerator.Current.RouteSourceValue;
-                case 22:
+                case 21:
                     return _enumerator.Current.DoseUnitSourceValue;
                 default:
                     throw new NotImplementedException();
@@ -105,29 +106,29 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
-                case 0: return "drug_exposure_id";
-                case 1: return "person_id";
-                case 2: return "drug_concept_id";
-                case 3: return "drug_exposure_start_date";
-                case 4: return "drug_exposure_start_datetime";
-                case 5: return "drug_exposure_end_date";
-                case 6: return "drug_exposure_end_datetime";
-                case 7: return "verbatim_end_date";
-                case 8: return "drug_type_concept_id";
-                case 9: return "stop_reason";
-                case 10: return "refills";
-                case 11: return "quantity";
-                case 12: return "days_supply";
-                case 13: return "sig";
-                case 14: return "route_concept_id";
-                case 15: return "lot_number";
-                case 16: return "provider_id";
-                case 17: return "visit_occurrence_id";
-                case 18: return "visit_detail_id";
-                case 19: return "drug_source_value";
-                case 20: return "drug_source_concept_id";
-                case 21: return "route_source_value";
-                case 22: return "dose_unit_source_value";
+                //case 0: return "drug_exposure_id";
+                case 0: return "person_id";
+                case 1: return "drug_concept_id";
+                case 2: return "drug_exposure_start_date";
+                case 3: return "drug_exposure_start_datetime";
+                case 4: return "drug_exposure_end_date";
+                case 5: return "drug_exposure_end_datetime";
+                case 6: return "verbatim_end_date";
+                case 7: return "drug_type_concept_id";
+                case 8: return "stop_reason";
+                case 9: return "refills";
+                case 10: return "quantity";
+                case 11: return "days_supply";
+                case 12: return "sig";
+                case 13: return "route_concept_id";
+                case 14: return "lot_number";
+                case 15: return "provider_id";
+                case 16: return "visit_occurrence_id";
+                case 17: return "visit_detail_id";
+                case 18: return "drug_source_value";
+                case 19: return "drug_source_concept_id";
+                case 20: return "route_source_value";
+                case 21: return "dose_unit_source_value";
                 default:
                     throw new NotImplementedException();
             }
@@ -224,51 +225,51 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
-                case 2:
                     return typeof(int);
+                case 2:
+                    return typeof(DateTime);
                 case 3:
                     return typeof(DateTime);
                 case 4:
-                    return typeof(DateTime);
+                    return typeof(DateTime?);
                 case 5:
-                    return typeof(DateTime?);
-                case 6:
                     return typeof(DateTime);
-                case 7:
+                case 6:
                     return typeof(DateTime?);
+                case 7:
+                    return typeof(int?);
                 case 8:
-                    return typeof(int?);
+                    return typeof(string);
                 case 9:
-                    return typeof(string);
+                    return typeof(int?);
                 case 10:
-                    return typeof(int?);
-                case 11:
                     return typeof(decimal?);
-                case 12:
+                case 11:
                     return typeof(int?);
+                case 12:
+                    return typeof(string);
                 case 13:
-                    return typeof(string);
-                case 14:
                     return typeof(int);
-                case 15:
+                case 14:
                     return typeof(string);
+                case 15:
+                    return typeof(long?);
                 case 16:
                     return typeof(long?);
                 case 17:
                     return typeof(long?);
                 case 18:
-                    return typeof(long?);
+                    return typeof(string);
                 case 19:
-                    return typeof(string);
-                case 20:
                     return typeof(int);
-                case 21:
+                case 20:
                     return typeof(string);
-                case 22:
+                case 21:
                     return typeof(string);
 
                 default:

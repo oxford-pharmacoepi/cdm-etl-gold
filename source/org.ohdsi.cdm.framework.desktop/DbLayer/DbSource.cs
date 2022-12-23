@@ -49,7 +49,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 {
                     using (var command = new OdbcCommand(subQuery, connection))
                     {
-                        Debug.WriteLine("subQuery=" + subQuery);
                         command.CommandTimeout = 0;
                         int c = command.ExecuteNonQuery();
 

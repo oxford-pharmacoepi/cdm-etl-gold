@@ -137,7 +137,11 @@ namespace org.ohdsi.cdm.framework.common.Base
                                 {
                                     var parent = (DrugExposure)entity;
                                     if (queryDefinition.DrugCost != null && queryDefinition.DrugCost[0].Match(reader))
+                                    {
                                         PersonBuilders[parent.PersonId].Value.AddChildData(parent, queryDefinition.DrugCost[0].CreateEnity(parent, reader));
+                                    }
+                                    else {
+                                    }
                                     break;
                                 }
 

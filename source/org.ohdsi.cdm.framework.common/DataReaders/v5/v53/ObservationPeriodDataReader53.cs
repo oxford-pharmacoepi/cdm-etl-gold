@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
         public int FieldCount
         {
-            get { return 5; }
+            //get { return 5; }
+            get { return 4; }
         }
 
         // is this called only because the datatype specific methods are not implemented?  
@@ -36,15 +37,15 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
             switch (i)
             {
                 
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
-                case 1:
                     return _enumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _enumerator.Current.StartDate;
-                case 3:
+                case 2:
                     return _enumerator.Current.EndDate;
-                case 4:
+                case 3:
                     return _enumerator.Current.TypeConceptId;
                 
 
@@ -58,11 +59,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
             switch (i)
             {
 
-                case 0: return "observation_period_id";
-                case 1: return "person_id";
-                case 2: return "observation_period_start_date";
-                case 3: return "observation_period_end_date";
-                case 4: return "period_type_concept_id";
+                //case 0: return "observation_period_id";
+                case 0: return "person_id";
+                case 1: return "observation_period_start_date";
+                case 2: return "observation_period_end_date";
+                case 3: return "period_type_concept_id";
                 
                 default:
                     throw new NotImplementedException();
@@ -160,15 +161,15 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
+                    return typeof(DateTime);
                 case 2:
                     return typeof(DateTime);
                 case 3:
-                    return typeof(DateTime);
-                case 4:
                     return typeof(int?);
 
                 default:

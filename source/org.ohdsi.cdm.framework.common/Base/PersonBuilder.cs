@@ -1110,6 +1110,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                                           {
                                               Id = Offset.GetKeyOffset(entity.PersonId).DeviceExposureId
                                           });
+                        
                         break;
 
                     case "Drug":
