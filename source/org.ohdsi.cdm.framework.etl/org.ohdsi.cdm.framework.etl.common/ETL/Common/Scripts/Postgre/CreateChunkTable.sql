@@ -22,6 +22,3 @@ CREATE TABLE {sc}.chunk AS
 SELECT distinct chunk_id,
 0::smallint as completed 
 FROM {sc}.chunk_person;
-
-
-
