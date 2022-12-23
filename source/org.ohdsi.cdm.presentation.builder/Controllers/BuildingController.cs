@@ -79,7 +79,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 CreateLookup(vocabulary);
 
                 //Map Patient to Person First before create a chunk
-                //MapPatientToPerson(vocabulary);
                 Build(vocabulary);
                 
                 //CreateCdmIndexes();

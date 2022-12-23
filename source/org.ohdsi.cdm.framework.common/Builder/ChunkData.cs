@@ -45,8 +45,6 @@ namespace org.ohdsi.cdm.framework.common.Builder
         
         public void AddAttrition(long personId, Attrition attrition)
         {
-            Debug.WriteLine("personId=" + personId + " attrition=" + attrition.ToName());
-            
             if (attrition == Attrition.None)
                 return;
             

@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
         public int FieldCount
         {
-            get { return 14; }
+            //get { return 14; }
+            get { return 13; }
         }
 
         public object GetValue(int i)
@@ -34,25 +35,25 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
             switch (i)
             {
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
-                case 1:
                     return _enumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _enumerator.Current.ConceptId;
+                case 2:
+                    return _enumerator.Current.StartDate;
                 case 3:
                     return _enumerator.Current.StartDate;
                 case 4:
-                    return _enumerator.Current.StartDate;
-                case 5:
                     return _enumerator.Current.TypeConceptId;
-                case 6:
+                case 5:
                     return _enumerator.Current.ModifierConceptId;
-                case 7:
+                case 6:
                     return _enumerator.Current.Quantity;
-                case 8:
+                case 7:
                     return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
-                case 9:
+                case 8:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
                     {
                         if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
@@ -63,7 +64,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 10:
+                case 9:
                     if (_enumerator.Current.VisitDetailId.HasValue)
                     {
 
@@ -75,11 +76,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                     }
 
                     return null;
-                case 11:
+                case 10:
                     return _enumerator.Current.SourceValue;
-                case 12:
+                case 11:
                     return _enumerator.Current.SourceConceptId;
-                case 13:
+                case 12:
                     return _enumerator.Current.QualifierSourceValue;
 
                 default:
@@ -91,20 +92,20 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
-                case 0: return "procedure_occurrence_id";
-                case 1: return "person_id";
-                case 2: return "procedure_concept_id";
-                case 3: return "procedure_date";
-                case 4: return "procedure_datetime";
-                case 5: return "procedure_type_concept_id";
-                case 6: return "modifier_concept_id";
-                case 7: return "quantity";
-                case 8: return "provider_id";
-                case 9: return "visit_occurrence_id";
-                case 10: return "visit_detail_id";
-                case 11: return "procedure_source_value";
-                case 12: return "procedure_source_concept_id";
-                case 13: return "modifier_source_value";
+                //case 0: return "procedure_occurrence_id";
+                case 0: return "person_id";
+                case 1: return "procedure_concept_id";
+                case 2: return "procedure_date";
+                case 3: return "procedure_datetime";
+                case 4: return "procedure_type_concept_id";
+                case 5: return "modifier_concept_id";
+                case 6: return "quantity";
+                case 7: return "provider_id";
+                case 8: return "visit_occurrence_id";
+                case 9: return "visit_detail_id";
+                case 10: return "procedure_source_value";
+                case 11: return "procedure_source_concept_id";
+                case 12: return "modifier_source_value";
                 default:
                     throw new NotImplementedException();
             }
@@ -202,33 +203,33 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
-                case 2:
                     return typeof(int);
+                case 2:
+                    return typeof(DateTime);
                 case 3:
                     return typeof(DateTime);
                 case 4:
-                    return typeof(DateTime);
+                    return typeof(int?);
                 case 5:
-                    return typeof(int?);
-                case 6:
                     return typeof(int);
-                case 7:
+                case 6:
                     return typeof(int?);
+                case 7:
+                    return typeof(long?);
                 case 8:
                     return typeof(long?);
                 case 9:
                     return typeof(long?);
                 case 10:
-                    return typeof(long?);
-                case 11:
                     return typeof(string);
-                case 12:
+                case 11:
                     return typeof(int);
-                case 13:
+                case 12:
                     return typeof(string);
                 default:
                     throw new NotImplementedException();

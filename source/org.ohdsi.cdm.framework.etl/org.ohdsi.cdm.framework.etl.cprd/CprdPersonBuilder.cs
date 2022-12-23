@@ -209,7 +209,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
                 Clean(deviceExposure, person).ToArray(), null);
-
+            
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
                 ChunkData.ConditionOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
@@ -221,7 +221,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
                 ChunkData.ConditionEra.Add(r);
             }
-
+            
 
             return Attrition.None;
         }

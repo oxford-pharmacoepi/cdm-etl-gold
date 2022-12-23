@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
 
         public int FieldCount
         {
-            get { return 7; }
+            //get { return 7; }
+            get { return 6; }
         }
 
         public object GetValue(int i)
@@ -34,19 +35,19 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
 
             switch (i)
             {
+                //case 0:
+                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
-                case 1:
                     return _enumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _enumerator.Current.ConceptId;
-                case 3:
+                case 2:
                     return _enumerator.Current.UnitConceptId;
-                case 4:
+                case 3:
                     return _enumerator.Current.DoseValue;
-                case 5:
+                case 4:
                     return _enumerator.Current.StartDate;
-                case 6:
+                case 5:
                     return _enumerator.Current.EndDate;
 
                 default:
@@ -58,13 +59,13 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
-                case 0: return "dose_era_id";
-                case 1: return "person_id";
-                case 2: return "drug_concept_id";
-                case 3: return "unit_concept_id";
-                case 4: return "dose_value";
-                case 5: return "dose_era_start_date";
-                case 6: return "dose_era_end_date";
+                //case 0: return "dose_era_id";
+                case 0: return "person_id";
+                case 1: return "drug_concept_id";
+                case 2: return "unit_concept_id";
+                case 3: return "dose_value";
+                case 4: return "dose_era_start_date";
+                case 5: return "dose_era_end_date";
                 default:
                     throw new NotImplementedException();
             }
@@ -161,19 +162,19 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
+                    return typeof(int);
                 case 2:
                     return typeof(int);
                 case 3:
-                    return typeof(int);
-                case 4:
                     return typeof(decimal);
-                case 5:
+                case 4:
                     return typeof(DateTime);
-                case 6:
+                case 5:
                     return typeof(DateTime);
                 default:
                     throw new NotImplementedException();

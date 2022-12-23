@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
 
         public int FieldCount
         {
-            get { return 6; }
+            //get { return 6; }
+            get { return 5; }
         }
 
         // is this called only because the datatype specific methods are not implemented?  
@@ -34,17 +35,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
+                //case 0:
+                //    return _offset.GetId(_conditionEnumerator.Current.PersonId, _conditionEnumerator.Current.Id);
                 case 0:
-                    return _offset.GetId(_conditionEnumerator.Current.PersonId, _conditionEnumerator.Current.Id);
-                case 1:
                     return _conditionEnumerator.Current.PersonId;
-                case 2:
+                case 1:
                     return _conditionEnumerator.Current.ConceptId;
-                case 3:
+                case 2:
                     return _conditionEnumerator.Current.StartDate;
-                case 4:
+                case 3:
                     return _conditionEnumerator.Current.EndDate;
-                case 5:
+                case 4:
                     return _conditionEnumerator.Current.OccurrenceCount;
                 default:
                     throw new NotImplementedException();
@@ -55,12 +56,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
-                case 0: return "condition_era_id";
-                case 1: return "person_id";
-                case 2: return "condition_concept_id";
-                case 3: return "condition_era_start_date";
-                case 4: return "condition_era_end_date";
-                case 5: return "condition_occurrence_count";
+                //case 0: return "condition_era_id";
+                case 0: return "person_id";
+                case 1: return "condition_concept_id";
+                case 2: return "condition_era_start_date";
+                case 3: return "condition_era_end_date";
+                case 4: return "condition_occurrence_count";
                 default:
                     throw new NotImplementedException();
             }
@@ -157,17 +158,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
         {
             switch (i)
             {
+                //case 0:
+                //    return typeof(long);
                 case 0:
                     return typeof(long);
                 case 1:
-                    return typeof(long);
-                case 2:
                     return typeof(int);
-                case 3:
+                case 2:
                     return typeof(DateTime);
-                case 4:
+                case 3:
                     return typeof(DateTime?);
-                case 5:
+                case 4:
                     return typeof(int);
                 default:
                     throw new NotImplementedException();
