@@ -206,8 +206,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 }
                 */
                 
-                //4. Add indexes for Mapping in the source tables
-                /*
+                //4. Add indexes for Mapping in the source tables              
                 if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) && 
                     !Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED))
                 {
@@ -222,7 +221,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Debug.WriteLine("Create Mapping indexes ended");
                     Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes ended");
                 }
-                */
+                
                 
                 timer.Stop();
 
@@ -540,6 +539,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Logger.Write(null, LogMessageTypes.Info, "==================== Create Chunks started ====================");
                     //Settings.Current.Building.ChunksCount = _chunkController.CreateChunks();
                     Settings.Current.Building.ChunksCount = _chunkController.CreateChunk();
+                    Debug.WriteLine("Settings.Current.Building.ChunksCount=" + Settings.Current.Building.ChunksCount);
  
                     Logger.Write(null, LogMessageTypes.Info, "==================== Create Chunks ended ====================");
                 }
@@ -582,9 +582,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                 Settings.Current.Building.DestinationEngine,
                                 Settings.Current.Building.SourceSchema,
                                 Settings.Current.Building.CdmSchema);
- 
-                            Debug.WriteLine("Updated " + data.ChunkData.ChunkId + " as completed");
-                            _chunkController.UpdateCompletedChunk(data.ChunkData.ChunkId);
 
                             Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
 
@@ -608,12 +605,17 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 });
 
 
-                //List<int> chunkIds = _chunkController.GetNotCompletedChunkId();
-                //    chunkIds.Sort();
+                List<int> incompleteChunkIds = _chunkController.GetIncompleteChunkId();
+                incompleteChunkIds.Sort();
 
-                Parallel.For(1, Settings.Current.Building.ChunksCount+1,
-                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
-                        {
+                Parallel.For(0, incompleteChunkIds.Count,
+                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) => { 
+
+                            var chunkId = incompleteChunkIds[i];
+
+                //Parallel.For(1, Settings.Current.Building.ChunksCount+1,
+                //        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
+                //        {
                             if (CurrentState != BuilderState.Running)
                                 state.Break();
 

@@ -153,11 +153,11 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         }
 
 
-        public List<int> GetNotCompletedChunkId()
+        public List<int> GetIncompleteChunkId()
         {
             List<int> list = new List<int>();
 
-            var sql = "select chunk_id as min_i from {sc}.chunk where completed = 0";
+            var sql = "select chunk_id from {sc}.chunk where completed = 0";
             sql = sql.Replace("{sc}", _schemaName);
 
             using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
