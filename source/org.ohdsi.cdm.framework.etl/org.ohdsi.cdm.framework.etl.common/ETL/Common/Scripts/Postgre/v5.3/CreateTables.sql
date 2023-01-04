@@ -414,7 +414,7 @@ CREATE TABLE IF NOT EXISTS {sc}.provider
 
 CREATE TABLE IF NOT EXISTS {sc}.specimen
 (
-   specimen_id                  SERIAL     	  NOT NULL,
+   specimen_id                  int     	  NOT NULL,
    person_id                    bigint        NOT NULL,
    specimen_concept_id          integer       NOT NULL,
    specimen_type_concept_id     integer       NOT NULL,
