@@ -91,6 +91,17 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             }
         }
 
+        public override void UpdateChunkStatus(int? chunkId) {
+            //Update Chunk completed = 1
+            var sql = $" UPDATE {SourceSchema}.chunk SET completed=1 WHERE chunk_id={chunkId}";
+            Debug.WriteLine("UpdateCompletedChunk sql=" + sql);
+
+            var command = new NpgsqlCommand(sql, _connection);
+            command.ExecuteNonQuery();
+
+        }
+
+
         private static NpgsqlDbType GetFieldType(Type type, string fieldName)
         {
             var name = type.Name;

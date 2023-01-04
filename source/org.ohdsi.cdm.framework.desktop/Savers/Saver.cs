@@ -514,6 +514,9 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                 //Task.WaitAll(tasks.ToArray());
 
+                //Update Chunk completed = 1
+                UpdateChunkStatus(chunk.ChunkId);
+
                 Commit();
             }
             catch (Exception e)
@@ -619,6 +622,11 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
         public virtual void Dispose()
         {
 
+        }
+
+        public virtual void UpdateChunkStatus(int? chunkId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

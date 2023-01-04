@@ -20,6 +20,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
         void AddChunk(List<ChunkRecord> chunk, int index);
         void Write(int? chunkId, int? subChunkId, IDataReader reader, string tableName);
         void Write(ChunkData chunk, string table);
+        void UpdateChunkStatus(int? chunkId);
         void Commit();
         void Rollback();
 

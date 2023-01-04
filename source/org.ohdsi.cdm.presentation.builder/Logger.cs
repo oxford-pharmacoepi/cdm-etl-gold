@@ -54,6 +54,7 @@ namespace org.ohdsi.cdm.presentation.builder
             {
                 File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
             }
+
         }
 
         public static IEnumerable<string> GetErrors()
@@ -120,5 +121,6 @@ namespace org.ohdsi.cdm.presentation.builder
                 CreateExceptionString(sb, e.InnerException, indent + "  ");
             }
         }
+
     }
 }

@@ -271,8 +271,8 @@ namespace org.ohdsi.cdm.presentation.builder
 
                 if (DataCleaningDone)
                 {
-                    return Settings.Current.Building.BuildingState.DataCleaningStart.Value.Subtract(
-                        Settings.Current.Building.BuildingState.DataCleaningEnd.Value).ToReadableString();
+                    return Settings.Current.Building.BuildingState.DataCleaningEnd.Value.Subtract(
+                        Settings.Current.Building.BuildingState.DataCleaningStart.Value).ToReadableString();
                 }
 
                 return string.Empty;

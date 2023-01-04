@@ -44,9 +44,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             return chuckCount;
         }
 
-        public List<int> GetNotCompletedChunkId() {
+        public List<int> GetIncompleteChunkId() {
             List<int> ints = new List<int>();
-            ints = _dbSource.GetNotCompletedChunkId();
+            ints = _dbSource.GetIncompleteChunkId();
             return ints;
         }
 
