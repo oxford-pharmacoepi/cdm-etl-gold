@@ -609,13 +609,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 incompleteChunkIds.Sort();
 
                 Parallel.For(0, incompleteChunkIds.Count,
-                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) => { 
-
+                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) => {
+                            Debug.WriteLine("i=" + i + " incompleteChunkIds.Count=" + incompleteChunkIds.Count);
                             var chunkId = incompleteChunkIds[i];
-
-                //Parallel.For(1, Settings.Current.Building.ChunksCount+1,
-                //        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
-                //        {
+                            //Parallel.For(1, Settings.Current.Building.ChunksCount+1,
+                            //        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
+                            //        {
                             if (CurrentState != BuilderState.Running)
                                 state.Break();
 
