@@ -1,7 +1,10 @@
-﻿using org.ohdsi.cdm.framework.desktop.Enums;
+﻿using org.ohdsi.cdm.framework.desktop.DbLayer;
+using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Packaging;
+using System.Net.Sockets;
 using System.Text;
 
 namespace org.ohdsi.cdm.presentation.builder
@@ -50,11 +53,25 @@ namespace org.ohdsi.cdm.presentation.builder
             if (chunkFolder != null)
                 File.AppendAllText($@"{chunkFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
 
+            /*
             lock (_threadlock)
             {
                 File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
             }
+            */
+            lock (_threadlock)
+            {
+                using (FileStream file = new FileStream($@"{buildingFolder}\log.txt", FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    StreamWriter writer = new StreamWriter(file);
 
+                    writer.WriteLine($@"{DateTime.Now:G}| {message}");
+                    writer.Flush();
+
+                    file.Close();
+                }
+            }
+            
         }
 
         public static IEnumerable<string> GetErrors()

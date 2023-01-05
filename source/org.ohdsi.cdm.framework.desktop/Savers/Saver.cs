@@ -335,7 +335,6 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                     case "OBSERVATION":
                         {
-                            Debug.WriteLine("Observations");
                             foreach (var list in SplitList(chunk.Observations))
                             {
                                 if (CdmVersion == CdmVersions.V53)
