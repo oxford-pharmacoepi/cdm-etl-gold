@@ -10,7 +10,7 @@
 		t.patid,
 		t.eventdate,
 		t.staffid,
-		m.read_code,
+		m.readcode,
 		NULL as value_as_number,
 		'' as unit,
 		t.data2 as range_low,
@@ -107,7 +107,7 @@
 		t.patid,
 		t.eventdate,
 		t.staffid,
-		m.read_code,
+		m.readcode,
 		t.data2 as value_as_number,
 		case 
 			when t.data3::bigint != 0 then l2.text
@@ -229,7 +229,7 @@
             </Mapper>
           </ConceptIdMappers>
           <Fields>
-            <Field key="source_code" defaultTypeId="44818702" sourceKey="read_code"/> 
+            <Field key="source_code" defaultTypeId="44818702" sourceKey="readcode"/> 
           </Fields>
         </Concept>
         <Concept>

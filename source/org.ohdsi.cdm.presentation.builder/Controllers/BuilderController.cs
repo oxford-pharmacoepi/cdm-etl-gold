@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -37,6 +38,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         private const string PROC_CREATED = "ProcedureCreated";
         private const string IDX_FOR_MAPPING_CREATED = "MappingIndexesCreated";
         private const string DATA_CLEAN_DONE = "DataCleaningIsDone";
+        private const string DAYSUPPLY_TABLES_CREATED = "DaySupplyTablesCreated";
 
         private string[] sourceTables = {  "patient",
                                             "consultation",
@@ -86,7 +88,21 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         //TO-DO: 1. Create source tables structures
         //       2. Load source data
 
-        public List<Action> CreateActionList(DbCleaning dbCleaning) {
+        public List<Action> CreateDataCleaningIndexesActionList(DbCleaning dbCleaning) {
+
+            var actions = new List<Action>();
+            var queries = Settings.Current.CreateDataCleaningIndexesScripts();
+
+            foreach (var query in queries)
+            {
+                actions.Add(
+                        () => { dbCleaning.ExecuteQuery(query); }
+                );
+            };
+            return actions;
+        }
+
+        public List<Action> CreateDataCleaningActionList(DbCleaning dbCleaning) {
             var actions = new List<Action>();
 
             foreach (string tableName in sourceTables)
@@ -116,6 +132,22 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             return actions;
         }
 
+        public List<Action> CreateMappingIndexesActionList(DbCleaning dbCleaning)
+        {
+            var actions = new List<Action>();
+            var queries = Settings.Current.CreateMappingIndexesScripts();
+
+            foreach (string query in queries)
+            {
+                actions.Add(
+                         () => { dbCleaning.ExecuteQuery(query); }
+                );
+            }
+
+            return actions;
+
+        }
+
         public void DataCleaning()
         {
             PerformAction(() =>
@@ -127,7 +159,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     $"==================== Data Cleaning Started ====================");
 
                 var dbCleaning = new DbCleaning(Settings.Current.Building.SourceConnectionString, Settings.Current.Building.SourceSchema);
-                var actions = CreateActionList(dbCleaning);
+                var createDataCleaningMappingIndexesActions = CreateDataCleaningIndexesActionList(dbCleaning);
+                var datacleaningActions = CreateDataCleaningActionList(dbCleaning);
+                var createMappingIndexesActions = CreateMappingIndexesActionList(dbCleaning);
 
                 //1. Add indexes for data cleaning in the source tables
                 if (Settings.Current.Building.DataCleaningSteps.Contains(INX_FOR_DATA_CLEAN_CREATED))
@@ -135,7 +169,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Logger.Write(null, LogMessageTypes.Info, $"Indexes for Data Cleaning are already created");
                 }
                 else {
-                    dbCleaning.ExecuteQuery(Settings.Current.CreateDataCleaningIndexesScript);
+                    //In parallel by table
+                    Parallel.ForEach(createDataCleaningMappingIndexesActions, action => action());
                     Settings.Current.Building.DataCleaningSteps.Add(INX_FOR_DATA_CLEAN_CREATED);
 
                     Logger.Write(null, LogMessageTypes.Info, $"Indexes for Data Cleaning are created");
@@ -176,7 +211,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Logger.Write(null, LogMessageTypes.Info, sourceTables[0] + $" is clean");
 
                     //Parallel Run
-                    Parallel.ForEach(actions, action => action());
+                    Parallel.ForEach(datacleaningActions, action => action());
                     Settings.Current.Building.DataCleaningSteps.Add(DATA_CLEAN_DONE);
 
                     Debug.WriteLine("Data Cleaning in all tables ended");
@@ -184,45 +219,31 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 }
                 
-                /*
-                // Clean table one by one
-                foreach (string tableName in sourceTables) {
- 
-                    if (!Settings.Current.Building.DataCleaningSteps.Contains(tableName))
-                    {
-                        Debug.WriteLine("Data Cleaning in " + tableName + "started");
-                        Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " started");
-
-                        string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
-                        dbCleaning.ExecuteQuery(query);
-                        //dbCleaning.DataCleaning(tableName);
-                        Settings.Current.Building.DataCleaningSteps.Add(tableName);
-                        
-                        Debug.WriteLine("Data Cleaning in " + tableName + "ended");
-                        Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " ended");
-
-                    }
-                    Logger.Write(null, LogMessageTypes.Info, tableName + $" is clean");
-                }
-                */
-                
                 //4. Add indexes for Mapping in the source tables              
                 if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) && 
                     !Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED))
                 {
 
-                    Debug.WriteLine("Create Mapping indexes started");
-                    Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes started");
-
-                    dbCleaning.ExecuteQuery(Settings.Current.CreateMappingIndexesScript);
-                    Settings.Current.Building.DataCleaningSteps.Add(IDX_FOR_MAPPING_CREATED);
+                    //In parallel by table
+                    Parallel.ForEach(createMappingIndexesActions, action => action());
                     Logger.Write(null, LogMessageTypes.Info, IDX_FOR_MAPPING_CREATED);
+                    Logger.Write(null, LogMessageTypes.Info, $"Indexes for Mapping are created");
 
-                    Debug.WriteLine("Create Mapping indexes ended");
-                    Logger.Write(null, LogMessageTypes.Info, $"Create Mapping indexes ended");
+                }
+
+                //5. Create Daysupply Tables
+                if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) &&
+                    Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED) &&
+                    !Settings.Current.Building.DataCleaningSteps.Contains(DAYSUPPLY_TABLES_CREATED))
+                {
+                    //Run by sequence as running in parallel can slow down the process
+                    dbCleaning.ExecuteQuery(Settings.Current.CreateDaySupplyTablesScript);
+
+                    Logger.Write(null, LogMessageTypes.Info, DAYSUPPLY_TABLES_CREATED);
+                    Logger.Write(null, LogMessageTypes.Info, $"DaySupply Tables are created");
                 }
                 
-                
+
                 timer.Stop();
 
                 Logger.Write(null, LogMessageTypes.Info,
@@ -443,43 +464,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create Lookup Ended ====================");
             });
-        }
-
-
-        private void FillPersonList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed) where T : IEntity
-        {
-            var sql = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database,
-                qd.GetSql(Settings.Current.Building.Vendor, Settings.Current.Building.SourceSchema), Settings.Current.Building.SourceSchema);
-
-
-            if (string.IsNullOrEmpty(sql)) return;
-
-            using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
-            {
-                connection.Open();
-                using (var c = new OdbcCommand(sql, connection))
-                {
-                    c.CommandTimeout = 0;
-                    using (var reader = c.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            
-                            Concept conceptDef = null;
-                            if (ed.Concepts != null && ed.Concepts.Any())
-                                conceptDef = ed.Concepts[0];
-
-                            var concept = (T)ed.GetConcepts(conceptDef, reader, null).ToList()[0];
-
-                            list.Add(concept);
-
-                            if (CurrentState != BuilderState.Running)
-                                break;
-                            
-                        }
-                    }
-                }
-            }
         }
 
 

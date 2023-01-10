@@ -50,7 +50,7 @@
 		ac.patid,
 		ac.eventdate, 
 		ac.staffid,
-		m.read_code as value_as_string,
+		m.readcode as value_as_string,
 		null as value_as_number,
 		case
 		when e.data1_lkup = 'dd/mm/yyyy' then ac.data1
@@ -187,7 +187,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data2_lkup = 'dd/mm/yyyy' then ac.data2
@@ -323,7 +323,7 @@
 			ac.patid,
 			ac.eventdate,
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
@@ -443,7 +443,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data4_lkup = 'dd/mm/yyyy' then ac.data4
@@ -563,7 +563,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
@@ -683,7 +683,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data6_lkup = 'dd/mm/yyyy' then ac.data6
@@ -802,7 +802,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data7_lkup = 'dd/mm/yyyy' then ac.data7
@@ -921,7 +921,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data3_lkup = 'dd/mm/yyyy' then ac.data3
@@ -1042,7 +1042,7 @@
 			ac.patid,
 			ac.eventdate, 
 			ac.staffid,
-			m.read_code as value_as_string,
+			m.readcode as value_as_string,
 			null as value_as_number,
 			case 
 				when e.data5_lkup = 'dd/mm/yyyy' then ac.data5
@@ -1160,7 +1160,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join w_lookup ll on ll.code::text = ac.data4 and ll.name = e.data4_lkup		
-		left join {sc}.scoremethod sm on ac.data3 = sm.code::text			
+		left join {sc}.scoringmethod sm on ac.data3 = sm.code::text			
 
 
 		order by patid

@@ -484,6 +484,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             {
                 //var tasks = new List<Task>();
                 Write(chunk, "PERSON");
+                
                 Write(chunk, "OBSERVATION_PERIOD");
                 //Write(chunk, "PAYER_PLAN_PERIOD");
                 Write(chunk, "DEATH");
@@ -502,20 +503,19 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                 Write(chunk, "COST");
                 //Write(chunk, "NOTE");
-
+                
                 if (CdmVersion == CdmVersions.V53 || CdmVersion == CdmVersions.V6)
                 {
                     Write(chunk, "VISIT_DETAIL");
                     Write(chunk.ChunkId, chunk.SubChunkId, new MetadataDataReader(chunk.Metadata.Values.ToList()), "METADATA_TMP");
                 }
-
+                
                 Write(chunk, "FACT_RELATIONSHIP");
-
+                
                 //Task.WaitAll(tasks.ToArray());
-
+                
                 //Update Chunk completed = 1
                 UpdateChunkStatus(chunk.ChunkId);
-
                 Commit();
             }
             catch (Exception e)

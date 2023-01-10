@@ -9,7 +9,7 @@
 		i.eventdate,
 		i.patid,
 		i.staffid,
-		m.read_code,
+		m.readcode,
 		concat(ch.temp_person_id,to_char(i.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
 		MOD(i.patid, 100000) as care_site_id,
 		case
@@ -97,7 +97,7 @@
             </Mapper>
           </ConceptIdMappers>
           <Fields>
-            <Field key="read_code" defaultTypeId="38000280" caseSensitive="true"/>
+            <Field key="readcode" defaultTypeId="38000280" caseSensitive="true"/>
           </Fields>
         </Concept>
       </Concepts>

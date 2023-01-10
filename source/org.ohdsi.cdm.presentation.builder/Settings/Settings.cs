@@ -1,5 +1,8 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System;
+using System.Configuration;
 using System.IO;
+using System.Windows.Documents;
 
 namespace org.ohdsi.cdm.presentation.builder
 {
@@ -54,15 +57,26 @@ namespace org.ohdsi.cdm.presentation.builder
                 "CreateDestination.sql"
             }));
 
-        public string CreateDataCleaningIndexesScript => File.ReadAllText(
-            Path.Combine(
+        public List<string> CreateDataCleaningIndexesScripts()
+        {
+
+            List<string> scripts = new List<string>();
+            var path = Path.Combine(
                         BuilderFolder,
                         "ETL",
                         "Common",
                         "Scripts",
                         Building.SourceEngine.Database.ToString(),
                         "DataCleaning",
-                        "01_CreateDataCleaningIndexes.sql"));
+                        "01_CreateDataCleanningIndexes");
+
+            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
+            {
+                scripts.Add(File.ReadAllText(file));
+            }
+
+            return scripts;
+        }
 
         public string DataCleaningScript => File.ReadAllText(
             Path.Combine(
@@ -74,15 +88,35 @@ namespace org.ohdsi.cdm.presentation.builder
                         "DataCleaning",
                         "02_DataCleaning.sql"));
 
-        public string CreateMappingIndexesScript => File.ReadAllText(
-            Path.Combine(
+        public List<string> CreateMappingIndexesScripts() { 
+        
+            List<string> scripts = new List<string>();
+            var path = Path.Combine(
                         BuilderFolder,
                         "ETL",
                         "Common",
                         "Scripts",
                         Building.SourceEngine.Database.ToString(),
                         "DataCleaning",
-                        "03_CreateMappingIndexes.sql"));
+                        "03_CreateMappingIndexes");
+            
+            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
+            {
+                scripts.Add(File.ReadAllText(file));
+            }
+
+            return scripts;
+        }
+
+        public string CreateDaySupplyTablesScript => File.ReadAllText(
+           Path.Combine(
+                       BuilderFolder,
+                       "ETL",
+                       "Common",
+                       "Scripts",
+                       Building.SourceEngine.Database.ToString(),
+                       "DataCleaning",
+                       "04_Create_daysupply_tables.sql"));
 
         /*
          public string CreateCdmIndexesScript => File.ReadAllText(

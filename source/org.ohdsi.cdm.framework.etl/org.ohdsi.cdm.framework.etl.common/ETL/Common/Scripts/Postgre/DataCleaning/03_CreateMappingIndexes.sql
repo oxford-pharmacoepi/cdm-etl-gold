@@ -112,6 +112,11 @@ create index IF NOT EXISTS idx_lookup_code on {sc}.lookup(code);
 create index IF NOT EXISTS idx_lookuptype_name on {sc}.lookuptype(name);
 
 
+--Staff
+-- alter table {sc}.staff add constraint pk_staff primary key (staffid);							-- already exists
+create index IF NOT EXISTS idx_staff_role on {sc}.staff(role);	
+
+
 -- daysupply_decodes
 -- CONSTRAINT daysupply_decodes_pkey PRIMARY KEY (id)
 --TO BE ADDED JUST BEFORE MAPPING 	create index idx_daysupply_decodes_prodcode on {sc}.daysupply_decodes(prodcode);   -- prodcode is not unique

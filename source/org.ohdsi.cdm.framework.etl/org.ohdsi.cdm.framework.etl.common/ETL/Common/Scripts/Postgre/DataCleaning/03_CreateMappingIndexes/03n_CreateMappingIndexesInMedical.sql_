@@ -1,0 +1,2 @@
+-- Medical
+-- alter table {sc}.medical add constraint pk_medical primary key (medcode);						-- already exists

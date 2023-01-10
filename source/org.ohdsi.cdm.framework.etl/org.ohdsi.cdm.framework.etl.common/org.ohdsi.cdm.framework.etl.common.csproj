@@ -38,9 +38,28 @@
     <None Remove="ETL\Common\Scripts\Postgre\CreateDestination.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\CreateIndexesChunkTable.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\DropChunkTable.sql" />
-	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleaningIndexes.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01a_CreateDataCleaningIndexesInConsultation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01b_CreateDataCleaningIndexesInClinical.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01c_CreateDataCleaningIndexesInAdditional.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01d_CreateDataCleaningIndexesInReferral.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01e_CreateDataCleaningIndexesInImmunisation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01f_CreateDataCleaningIndexesInTest.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01g_CreateDataCleaningIndexesInTherapy.sql" />
 	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\02_DataCleaning.sql" />
-	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03a_CreateMappingIndexesInPatient.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03b_CreateMappingIndexesInPractice.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03c_CreateMappingIndexesInConsultation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03d_CreateMappingIndexesInClinical.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03e_CreateMappingIndexesInAdditional.sql" />	  
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03f_CreateMappingIndexesInReferral.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03g_CreateMappingIndexesInImmunisation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03h_CreateMappingIndexesInTest.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03i_CreateMappingIndexesInTherapy.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03j_CreateMappingIndexesInEntity.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03k_CreateMappingIndexesInLookup.sql" />
+    <None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03l_CreateMappingIndexesInLookupType.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03m_CreateMappingIndexesInStaff.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\04_Create_daysupply_tables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql" />
@@ -145,13 +164,34 @@
     <Content Include="ETL\Common\Scripts\MSSQL\DropChunkTable.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleaningIndexes.sql">
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01a_CreateDataCleaningIndexesInConsultation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01b_CreateDataCleaningIndexesInClinical.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01c_CreateDataCleaningIndexesInAdditional.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01d_CreateDataCleaningIndexesInReferral.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01e_CreateDataCleaningIndexesInImmunisation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01f_CreateDataCleaningIndexesInTest.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\01_CreateDataCleanningIndexes\01g_CreateDataCleaningIndexesInTherapy.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
 	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\02_DataCleaning.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
 	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+    <Content Include="ETL\Common\Scripts\Postgre\DataCleaning\04_Create_daysupply_tables.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
   </ItemGroup>
