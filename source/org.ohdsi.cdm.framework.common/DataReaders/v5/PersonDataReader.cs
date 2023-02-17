@@ -15,6 +15,10 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
             _personEnumerator = batch?.GetEnumerator();
         }
 
+        public PersonDataReader(List<object> list)
+        {
+        }
+
         public bool Read()
         {
             return _personEnumerator.MoveNext();

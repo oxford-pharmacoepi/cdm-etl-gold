@@ -53,25 +53,18 @@ namespace org.ohdsi.cdm.presentation.builder
             if (chunkFolder != null)
                 File.AppendAllText($@"{chunkFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
 
-            /*
             lock (_threadlock)
             {
-                File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
-            }
-            */
-            lock (_threadlock)
-            {
-                using (FileStream file = new FileStream($@"{buildingFolder}\log.txt", FileMode.Append, FileAccess.Write, FileShare.Read))
+                try
                 {
-                    StreamWriter writer = new StreamWriter(file);
-
-                    writer.WriteLine($@"{DateTime.Now:G}| {message}");
-                    writer.Flush();
-
-                    file.Close();
+                    File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
+                }
+                catch 
+                {
+                    Console.WriteLine($"Fail to write '{message}' to file log");
                 }
             }
-            
+
         }
 
         public static IEnumerable<string> GetErrors()

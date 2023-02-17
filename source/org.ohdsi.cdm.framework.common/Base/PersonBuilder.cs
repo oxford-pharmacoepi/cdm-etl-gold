@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.common.Base
@@ -558,11 +559,13 @@ namespace org.ohdsi.cdm.framework.common.Base
             person.RaceConceptId = race.RaceConceptId;
             person.RaceSourceValue = race.RaceSourceValue;
 
+            //Eliminated patients with unknown gender during Data Cleaning.
+            /*
             if (person.GenderConceptId == 8551) //UNKNOWN
             {
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnknownGender);
             }
-
+            */
             return new KeyValuePair<Person, Attrition>(person, Attrition.None);
         }
 
@@ -611,6 +614,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
         {
             return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
+            //return BuildEntities2(drugExposures, visitOccurrences.Values.ToList(), observationPeriods, false);
         }
 
         /// <summary>
@@ -625,6 +629,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             ObservationPeriod[] observationPeriods)
         {
             return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, false);
+           // return BuildEntities2(conditionOccurrences, visitOccurrences.Values.ToList(), observationPeriods, false);
         }
 
         /// <summary>
@@ -792,10 +797,41 @@ namespace org.ohdsi.cdm.framework.common.Base
             where T : IEntity
         {
             var uniqueEntities = new HashSet<T>();
+
             foreach (var e in Clean(entitiesToBuild, observationPeriods, withinTheObservationPeriod))
             {
                 if (e.VisitOccurrenceId == null || visitOccurrences.ContainsKey(e.VisitOccurrenceId.Value))
+                //if (e.VisitOccurrenceId == null || vo!=null)
                 {
+                    if (e.IsUnique)
+                    {
+                        uniqueEntities.Add(e);
+                    }
+                    else
+                    {
+                        yield return e;
+                    }
+                }
+            }
+
+            foreach (var ue in uniqueEntities)
+            {
+                yield return ue;
+            }
+        }
+
+        public virtual IEnumerable<T> BuildEntities2<T>(IEnumerable<T> entitiesToBuild,
+            List<VisitOccurrence> visitOccurrences, IEnumerable<ObservationPeriod> observationPeriods, bool withinTheObservationPeriod)
+            where T : IEntity
+        {
+            var uniqueEntities = new HashSet<T>();
+
+            foreach (var e in Clean(entitiesToBuild, observationPeriods, withinTheObservationPeriod))
+            {
+
+                if (e.VisitOccurrenceId == null || (visitOccurrences.Exists(obj => obj.Id == e.VisitOccurrenceId)))
+                {
+
                     if (e.IsUnique)
                     {
                         uniqueEntities.Add(e);
@@ -821,7 +857,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             this.Offset = o;
             this.ChunkData = data;
 
-            var result = BuildPerson(PersonRecords.ToList());
+            var result = BuildPerson(PersonRecords);
             var person = result.Key;
 
 
@@ -830,7 +866,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 Complete = true;
                 return result.Value;
             }
-
+            
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, ObservationPeriodsRaw.ToArray()).ToArray();
             
@@ -840,6 +876,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 Complete = true;
                 return Attrition.ImplausibleYOBPostEarliestOP;
             }
+            
 
             //var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
@@ -921,6 +958,10 @@ namespace org.ohdsi.cdm.framework.common.Base
             return Attrition.None;
         }
 
+        public virtual Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om) {
+            return Attrition.None;
+        }
+
         protected void AddToChunk(Person person, Death death, ObservationPeriod[] observationPeriods,
             PayerPlanPeriod[] ppp, DrugExposure[] drugExposures,
             ConditionOccurrence[] conditionOccurrences,
@@ -956,8 +997,8 @@ namespace org.ohdsi.cdm.framework.common.Base
             Measurement[] measurements, VisitOccurrence[] visitOccurrences, VisitDetail[] visitDetails, Cohort[] cohort,
             DeviceExposure[] devExposure, Note[] notes)
         {
-            ChunkData.AddData(person);
-
+            //ChunkData.AddData(person);
+            /*
             if (death != null)
             {
                 if (!death.CauseConceptId.HasValue)
@@ -965,12 +1006,12 @@ namespace org.ohdsi.cdm.framework.common.Base
 
                 ChunkData.AddData(death);
             }
-
+            
             foreach (var observationPeriod in observationPeriods)
             {
                 ChunkData.AddData(observationPeriod);
             }
-
+            */
             /*
             foreach (var payerPlanPeriod in ppp)
             {
@@ -1012,6 +1053,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             }
             */
 
+            
             AddToChunk("Condition", conditionOccurrences);
             AddToChunk("Drug", drugExposures);
             AddToChunk("Procedure", procedureOccurrences);
@@ -1031,6 +1073,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             {
                 ChunkData.AddData(eraEntity, EntityType.ConditionEra);
             }
+            
         }
 
         public string GetDomain(string entityDomain, string conceptDomain)

@@ -10,7 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using Thrift.Protocol;
 using cdm6 = org.ohdsi.cdm.framework.common.DataReaders.v6;
 
 namespace org.ohdsi.cdm.framework.desktop.Savers
@@ -483,11 +487,11 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             try
             {
                 //var tasks = new List<Task>();
-                Write(chunk, "PERSON");
+                //Write(chunk, "PERSON");
                 
-                Write(chunk, "OBSERVATION_PERIOD");
+                //Write(chunk, "OBSERVATION_PERIOD");
                 //Write(chunk, "PAYER_PLAN_PERIOD");
-                Write(chunk, "DEATH");
+                //Write(chunk, "DEATH");
                 Write(chunk, "DRUG_EXPOSURE");
                 Write(chunk, "OBSERVATION");
                 Write(chunk, "VISIT_OCCURRENCE");
@@ -501,7 +505,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                 Write(chunk, "CONDITION_OCCURRENCE");
 
-                Write(chunk, "COST");
+                //Write(chunk, "COST");
                 //Write(chunk, "NOTE");
                 
                 if (CdmVersion == CdmVersions.V53 || CdmVersion == CdmVersions.V6)
@@ -572,6 +576,59 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 Rollback();
                 throw;
             }
+        }
+
+        public virtual void SaveEntity<T>(List<T> list, string type) where T : IEntity
+        {
+            if (list != null && list.Count > 0)
+            {
+
+                switch (type)
+                {
+                    case "PERSON":
+                        List<Person> person = list.Cast<Person>().ToList();
+                        Write(null, null, new PersonDataReader(person), "PERSON");
+                        break;
+
+                    case "DEATH":
+                        List<Death> deadth = list.Cast<Death>().ToList();
+                        Write(null, null, new DeathDataReader52(deadth), "DEATH");
+                        break;
+
+                    case "OBSERVATION_PERIOD":
+                        List<ObservationPeriod> op = list.Cast<ObservationPeriod>().ToList();
+                        Write(null, null, new ObservationPeriodDataReader53(op, _offsetManager), "OBSERVATION_PERIOD");
+                        break;
+
+                    case "LOCATION":
+                        List<Location> loc = list.Cast<Location>().ToList();
+                        Write(null, null, new LocationDataReader(loc), "LOCATION");
+                        break;
+
+                    case "CARE_SITE":
+                        List<CareSite> cs = list.Cast<CareSite>().ToList();
+                        Write(null, null, new CareSiteDataReader(cs), "CARE_SITE");
+                        break;
+
+                    case "PROVIDER":
+                        List<Provider> provider = list.Cast<Provider>().ToList();
+                        Write(null, null, new ProviderDataReader(provider), "PROVIDER");
+                        break;
+
+                    default:
+                        // code block
+                        break;
+                }
+            }
+        }
+        //Since metadata is not entity type
+        public virtual void SaveMetadata(List<Metadata> metadata) {
+            
+            if (metadata != null && metadata.Count > 0)
+            {
+                Write(null, null, new MetadataDataReader(metadata), "METADATA_TMP");
+            }
+  
         }
 
         private static int _cnt = 0;

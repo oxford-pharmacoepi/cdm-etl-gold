@@ -55,7 +55,8 @@ namespace org.ohdsi.cdm.presentation.builder
                 "Scripts",
                 Building.DestinationEngine.Database.ToString(),
                 "CreateDestination.sql"
-            }));
+            })
+        );
 
         public List<string> CreateDataCleaningIndexesScripts()
         {
@@ -86,7 +87,8 @@ namespace org.ohdsi.cdm.presentation.builder
                         "Scripts", 
                         Building.SourceEngine.Database.ToString(),
                         "DataCleaning",
-                        "02_DataCleaning.sql"));
+                        "02_DataCleaning.sql")
+        );
 
         public List<string> CreateMappingIndexesScripts() { 
         
@@ -107,6 +109,61 @@ namespace org.ohdsi.cdm.presentation.builder
 
             return scripts;
         }
+
+        public string CreateCdmPKScripts => File.ReadAllText(
+            Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        GetCdmVersionFolder(),
+                        "CreateIndexes",
+                        "01_CreatePKConstraints.sql")
+        );
+
+        public List<string> CreateCdmIndexesScripts()
+        {
+            List<string> scripts = new List<string>();
+            var path = Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        GetCdmVersionFolder(),
+                        "CreateIndexes",
+                        "02_CreateIndexes");
+
+            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
+            {
+                scripts.Add(File.ReadAllText(file));
+            }
+
+            return scripts;
+        }
+
+        public List<string> CreateCdmFKScripts()
+        {
+            List<string> scripts = new List<string>();
+            var path = Path.Combine(
+                        BuilderFolder,
+                        "ETL",
+                        "Common",
+                        "Scripts",
+                        Building.SourceEngine.Database.ToString(),
+                        GetCdmVersionFolder(),
+                        "CreateIndexes",
+                        "03_CreateFKConstraints");
+
+            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
+            {
+                scripts.Add(File.ReadAllText(file));
+            }
+
+            return scripts;
+        }
+
 
         public string CreateDaySupplyTablesScript => File.ReadAllText(
            Path.Combine(

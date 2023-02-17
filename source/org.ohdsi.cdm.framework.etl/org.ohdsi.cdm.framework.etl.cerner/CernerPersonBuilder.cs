@@ -370,6 +370,13 @@ namespace org.ohdsi.cdm.framework.etl.cerner
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, ObservationPeriodsRaw.ToArray()).ToArray();
 
+
+            var op = ObservationPeriodsRaw.Where(op =>
+                    op.StartDate < op.EndDate &&
+                    op.StartDate.Year >= person.YearOfBirth &&
+                    op.EndDate.Value.Year >= person.YearOfBirth &&
+                    op.StartDate.Year <= DateTime.Now.Year).ToArray();
+
             // Delete any individual that has an OBSERVATION_PERIOD that is >= 2 years prior to the YEAR_OF_BIRTH
             if (Excluded(person, observationPeriods))
             {

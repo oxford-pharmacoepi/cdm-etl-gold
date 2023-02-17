@@ -33,12 +33,13 @@ BEGIN
 	IF('patient' = in_TableName) THEN	
 		
 		With t as (
-						SELECT DISTINCT patid 
-						FROM {sc}.patient 
+						SELECT DISTINCT a.patid 
+						FROM {sc}.patient a
+						join {sc}.practice b on a.pracid = b.pracid
 						where accept = 0 
 						OR (gender is null or gender in (3,4)) 
 						OR (case when yob < 1000 then 1800 + yob else yob end) < 1875 
-						OR (deathdate is not null AND deathdate <  frd) 
+						OR (deathdate is not null AND deathdate < (case when a.frd > b.uts then a.frd else b.uts end)) 
 				)
 				INSERT INTO {SOURCE_NOK_SCHEMA}.patient 
 				SELECT t1.* FROM {sc}.patient as t1 

@@ -110,7 +110,7 @@ namespace org.ohdsi.cdm.framework.common.Helpers
                   period =>
                      new ObservationPeriod
                      {
-                         Id = offset.GetKeyOffset(period.PersonId).ObservationPeriodId,
+                         //Id = offset.GetKeyOffset(period.PersonId).ObservationPeriodId,
                          PersonId = period.PersonId,
                          StartDate = period.StartDate,
                          EndDate = period.EndDate.Value,

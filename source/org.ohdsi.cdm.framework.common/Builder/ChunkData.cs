@@ -8,9 +8,9 @@ namespace org.ohdsi.cdm.framework.common.Builder
 {
     public class ChunkData
     {
-
         public int SubChunkId { get; set; }
         public int ChunkId { get; set; }
+        public int ChunkSize { get; set; }
 
         public List<Person> Persons { get; private set; }
         public List<Death> Deaths { get; private set; }
@@ -36,10 +36,11 @@ namespace org.ohdsi.cdm.framework.common.Builder
         public List<FactRelationship> FactRelationships { get; private set; }
 
         
-        public ChunkData(int chunkId, int subChunkId)
+        public ChunkData(int chunkId, int subChunkId, int chunkSize)
         {
             ChunkId = chunkId;
             SubChunkId = subChunkId;
+            ChunkSize = chunkSize;
             Init();
         }
         

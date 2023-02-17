@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:org.ohdsi.cdm.presentation.builder"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="568.409" Width="775" MinHeight="779" MinWidth="775">
+        Title="{Binding Title}" Height="568.409" Width="900" MinHeight="779" MinWidth="900">
     <Window.Resources>
         <Style x:Key="LinkButton" TargetType="ToggleButton">
             <Setter Property="Template">
@@ -208,19 +208,10 @@
                             <ToggleButton Style="{StaticResource PlayButton}" Margin="0,0,15,0" Command ="{Binding Path=StartBuildingCommand}" IsEnabled="{Binding ButtonEnabled}" IsChecked="{Binding Path=PlayButtonChecked, Mode=OneWay}" />
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
-                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding DestinationStarted, Converter={StaticResource boolToVisConverter}}" />
+                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding DataCleaningStarted, Converter={StaticResource boolToVisConverter}}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="Data Cleaning">
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Data Cleaning" Command ="{Binding Path=DataCleaningStepCommand}"/>
-                                                <Separator/>
-                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipDataCleaningStepCommand}"/>
-                                                <MenuItem Header="Reset step" Command ="{Binding Path=ResetDataCleaningStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
-                                    </TextBlock>
+                                    <TextBlock Style="{StaticResource ActionTextBlock}">Data Cleaning<LineBreak/></TextBlock>
                                     <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
                                 </StackPanel>
                                 <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding DataCleaningDone, Converter={StaticResource boolToVisConverter}}"/>
@@ -233,7 +224,7 @@
                                     <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding DestinationStarted, Converter={StaticResource boolToVisConverter}}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="CDM database creation">
+                                    <TextBlock Style="{StaticResource ActionTextBlock}">CDM database creation<LineBreak/>
                                         <TextBlock.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Create tables" Command ="{Binding Path=CreateTablesStepCommand}"/>
@@ -250,18 +241,45 @@
                                 <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding DestinationWorking, Converter={StaticResource boolToVisConverter}}"/>
                                 <TextBlock Text="{Binding DestinationInfo}" TextAlignment="Center"/>
                             </StackPanel>
-                            <!--<StackPanel Orientation="Vertical">
+                            
+                            <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
-                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding ChunksStarted, Converter={StaticResource boolToVisConverter}}"/>
+                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding LookupStarted, Converter={StaticResource boolToVisConverter}}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="Chunks creation">
+                                    <TextBlock xml:space="preserve" Style="{StaticResource ActionTextBlock}">Lookup creation<LineBreak/>(Provider, CareSites, Location)</TextBlock>
+                                    <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
+                                </StackPanel>
+                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding LookupCreated, Converter={StaticResource boolToVisConverter}}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding LookupWorking, Converter={StaticResource boolToVisConverter}}"/>
+                                <TextBlock Text="{Binding LookupInfo}" TextAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Height="5">
+                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding MapAllPatientsStarted, Converter={StaticResource boolToVisConverter}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <TextBlock Style="{StaticResource ActionTextBlock}">Map All Patients<LineBreak/>(Person, Obervation Period, Metadata)</TextBlock>
+                                    <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
+                                </StackPanel>
+                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding MapAllPatientsDone, Converter={StaticResource boolToVisConverter}}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding MapAllPatientsWorking, Converter={StaticResource boolToVisConverter}}"/>
+                                <TextBlock Text="{Binding MapAllPatientsInfo}" TextAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Height="5">
+                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding ChunksStarted, Converter={StaticResource boolToVisConverter}}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <TextBlock Style="{StaticResource ActionTextBlock}">Create Chunks<LineBreak/>
                                         <TextBlock.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem Header="Create Chunks" Command ="{Binding Path=CreateChunksStepCommand}"/>
+                                                <Separator/>
                                                 <MenuItem Header="Skip step" Command ="{Binding Path=SkipChunksCreationStepCommand}"/>
                                                 <MenuItem Header="Reset step" Command ="{Binding Path=ResetChunksCreationStepCommand}"/>
-                                                <Separator/>
-                                                <MenuItem Header="Restart chunks creation" Command ="{Binding Path=RestartChunksCreationStepCommand}"/>
                                             </ContextMenu>
                                         </TextBlock.ContextMenu>
                                     </TextBlock>
@@ -270,26 +288,8 @@
                                 <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding ChunksCreated, Converter={StaticResource boolToVisConverter}}"/>
                                 <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding ChunksWorking, Converter={StaticResource boolToVisConverter}}"/>
                                 <TextBlock Text="{Binding ChunksInfo}" TextAlignment="Center"/>
-                            </StackPanel>-->
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Height="5">
-                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding LookupStarted, Converter={StaticResource boolToVisConverter}}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="Lookup creation">
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipLookupCreationStepCommand}"/>
-                                                <MenuItem Header="Reset step" Command ="{Binding Path=ResetLookupCreationStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
-                                    </TextBlock>
-                                    <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
-                                </StackPanel>
-                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding LookupCreated, Converter={StaticResource boolToVisConverter}}"/>
-                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding LookupWorking, Converter={StaticResource boolToVisConverter}}"/>
-                                <TextBlock Text="{Binding LookupInfo}" TextAlignment="Center"/>
                             </StackPanel>
+
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding BuildingStarted, Converter={StaticResource boolToVisConverter}}"/>
@@ -308,11 +308,32 @@
                                             </ContextMenu>
                                         </TextBlock.ContextMenu>
                                     </TextBlock>
-                                    <!--<Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>-->
+                                    <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
                                 </StackPanel>
                                 <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding BuildingComplete, Converter={StaticResource boolToVisConverter}}"/>
                                 <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding BuildingWorking, Converter={StaticResource boolToVisConverter}}"/>
                                 <TextBlock Text="{Binding BuildingInfo}" TextAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Height="5">
+                                    <Polygon Points="0,0 2.5,5 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding CreateCdmIndexesStarted, Converter={StaticResource boolToVisConverter}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="CDM Indexes Creation">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipCreateCdmIndexesStepCommand}"/>
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
+                                    <!--<Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>-->
+                                </StackPanel>
+                                <!--
+                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding CreateCdmIndexesDone, Converter={StaticResource boolToVisConverter}}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding CreateCdmIndexesWorking, Converter={StaticResource boolToVisConverter}}"/>
+                                -->
+                                <TextBlock Text="{Binding CreateCdmIndexesInfo}" TextAlignment="Center"/>
                             </StackPanel>
                             <!--<StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">

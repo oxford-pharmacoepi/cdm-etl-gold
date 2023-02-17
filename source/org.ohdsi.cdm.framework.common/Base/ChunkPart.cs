@@ -39,6 +39,7 @@ namespace org.ohdsi.cdm.framework.common.Base
         {
             var recordGuid = Guid.NewGuid();
 
+            
             if(queryDefinition.Persons != null) {
                 AddEntity(queryDefinition, queryDefinition.Persons, reader, recordGuid, "Persons");
             }
@@ -46,7 +47,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             if(queryDefinition.Death != null) {
                 AddEntity(queryDefinition, queryDefinition.Death, reader, recordGuid, "Death");
             }
-
+            
 
             if(queryDefinition.VisitOccurrence != null)
             {

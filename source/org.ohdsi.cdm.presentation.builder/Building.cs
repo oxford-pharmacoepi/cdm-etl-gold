@@ -17,10 +17,12 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? CreateChunksEnd { get; set; }
         public DateTime? CreateLookupStart { get; set; }
         public DateTime? CreateLookupEnd { get; set; }
-        public DateTime? MapPatientToPersonStart { get; set; }
-        public DateTime? MapPatientToPersonEnd { get; set; }
+        public DateTime? MapAllPatientsStart { get; set; }
+        public DateTime? MapAllPatientsEnd { get; set; }
         public DateTime? BuildingStart { get; set; }
         public DateTime? BuildingEnd { get; set; }
+        public DateTime? CreateCdmIndexesStart { get; set; }
+        public DateTime? CreateCdmIndexesEnd { get; set; }
         public DateTime? CopyVocabularyStart { get; set; }
         public DateTime? CopyVocabularyEnd { get; set; }
         public DateTime? CreateIndexesStart { get; set; }
@@ -55,6 +57,33 @@ namespace org.ohdsi.cdm.presentation.builder
         }
 
         [XmlIgnore]
+        public bool CreateCdmIndexesDone
+        {
+            get
+            {
+                if (!CreateCdmIndexesEnd.HasValue)
+                    return false;
+
+                return CreateCdmIndexesEnd.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool CreateCdmIndexesStarted
+        {
+            get
+            {
+                if (CreateCdmIndexesDone)
+                    return false;
+
+                if (!CreateCdmIndexesStart.HasValue)
+                    return false;
+
+                return CreateCdmIndexesStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
         public bool DestinationStarted
         {
             get
@@ -82,34 +111,33 @@ namespace org.ohdsi.cdm.presentation.builder
         }
 
         [XmlIgnore]
-        public bool MapPatientToPersonStarted
+        public bool MapAllPatientsStarted
         {
             get
             {
-                if (MapPatientToPersonDone)
+                if (MapAllPatientsDone)
                     return false;
 
-                if (!MapPatientToPersonStart.HasValue)
+                if (!MapAllPatientsStart.HasValue)
                     return false;
 
-                return MapPatientToPersonStart.Value != DateTime.MinValue;
+                return MapAllPatientsStart.Value != DateTime.MinValue;
             }
 
         }
 
 
         [XmlIgnore]
-        public bool MapPatientToPersonDone
+        public bool MapAllPatientsDone
         {
             get
             {
-                if (!MapPatientToPersonEnd.HasValue)
+                if (!MapAllPatientsEnd.HasValue)
                     return false;
 
-                return MapPatientToPersonEnd.Value != DateTime.MinValue;
+                return MapAllPatientsEnd.Value != DateTime.MinValue;
             }
         }
-        
 
         [XmlIgnore]
         public bool ChunksStarted

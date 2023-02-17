@@ -14,13 +14,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Markup;
+using System.IO;
+
 
 
 namespace org.ohdsi.cdm.presentation.builder.Controllers
@@ -31,6 +30,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private readonly ChunkController _chunkController;
 
+        private List<Person> Persons = new List<Person>();
+        private List<ObservationPeriod> ObservationPeriods = new List<ObservationPeriod>();
+
         #endregion
 
         #region Properties
@@ -40,18 +42,24 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         private const string DATA_CLEAN_DONE = "DataCleaningIsDone";
         private const string DAYSUPPLY_TABLES_CREATED = "DaySupplyTablesCreated";
 
-        private string[] sourceTables = {  "patient",
-                                            "consultation",
-                                            "clinical",
-                                            "additional",
-                                            "referral",
-                                            "immunisation",
-                                            "test",
-                                            "therapy"
+        private string[] sourceTables = {  "patient"
+                                            //,
+                                            //"consultation",
+                                            //"clinical",
+                                            //"additional",
+                                            //"referral",
+                                            //"immunisation",
+                                            //"test",
+                                            //"therapy"
                                         };
 
+        private const string CDM_PK_CREATED = "CdmPKCreated";
+        private const string CDM_IDX_CREATED = "CdmIndexesCreated";
+        private const string CDM_FK_CREATED = "CdmFKCreated";
+
         public BuilderState CurrentState { get; set; }
-        public int CompleteChunksCount => Settings.Current.Building.CompletedChunkIds.Count;
+        //public int CompleteChunksCount => Settings.Current.Building.CompletedChunkIds.Count;
+        public int CompleteChunksCount = 0;
 
         #endregion
 
@@ -60,14 +68,28 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         public BuilderController()
         {
             _chunkController = new ChunkController();
+
+            if (Settings.Current.Building.ChunksCount != 0)
+            {
+                SetCompleteChunksCount();
+            }
         }
 
         #endregion
 
         #region Methods 
 
+        public void SetCompleteChunksCount() {
+
+            var dbCleaning = new DbCleaning(Settings.Current.Building.SourceConnectionString, Settings.Current.Building.SourceSchema);
+
+            CompleteChunksCount = dbCleaning.GetCompletedChunksCount();
+
+        }
+
         private void PerformAction(Action act)
         {
+
             if (CurrentState == BuilderState.Error)
                 return;
 
@@ -84,9 +106,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             {
             }
         }
-
-        //TO-DO: 1. Create source tables structures
-        //       2. Load source data
 
         public List<Action> CreateDataCleaningIndexesActionList(DbCleaning dbCleaning) {
 
@@ -115,7 +134,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                 Debug.WriteLine("Data Cleaning in " + tableName + " started");
                                 Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + tableName + " started");
 
-                                dbCleaning.DataCleaning(tableName);
+                                string query = $"CALL pr_DataCleaning('{tableName}')";
+                                Debug.WriteLine("query=" + query);
+                                dbCleaning.DataCleaning(query);
+
                                 Settings.Current.Building.DataCleaningSteps.Add(tableName);
 
                                 Debug.WriteLine("Data Cleaning in " + tableName + " ended");
@@ -148,6 +170,124 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         }
 
+        public List<Action> CreateCdmPKConstraintsActionList(DbDestination dbDestination)
+        {
+            var actions = new List<Action>();
+            var queries = Settings.Current.CreateCdmPKScripts;
+
+            foreach (var query in queries.Split(new[] {";"}, StringSplitOptions.None))
+            {
+                actions.Add(
+                         () => { dbDestination.ExecuteQuery(query); }
+                );
+            }
+
+            return actions;
+
+        }
+
+        public List<Action> CreateCdmIndexesActionList(DbDestination dbDestination)
+        {
+            var actions = new List<Action>();
+            var queries = Settings.Current.CreateCdmIndexesScripts();
+
+            foreach (string query in queries)
+            {
+                actions.Add(
+                         () => { dbDestination.ExecuteQuery(query); }
+                );
+            }
+
+            return actions;
+
+        }
+
+        public List<Action> CreateCdmFKConstraintsActionList(DbDestination dbDestination)
+        {
+            var actions = new List<Action>();
+            var queries = Settings.Current.CreateCdmFKScripts();
+
+            foreach (string query in queries)
+            {
+                actions.Add(
+                         () => { dbDestination.ExecuteQuery(query); }
+                );
+            }
+
+            return actions;
+
+        }
+
+        public void CreateCdmIndexes() {
+
+            PerformAction(() =>
+            {
+                var timer = new Stopwatch();
+                timer.Start();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Cdm Indexes Creation Started ====================");
+
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema);
+                var createCdmPKConstraintsActions = CreateCdmPKConstraintsActionList(dbDestination);
+                var createCdmIndexesActions = CreateCdmIndexesActionList(dbDestination);
+                var createCdmFKConstraintsActions = CreateCdmFKConstraintsActionList(dbDestination);
+
+                //1. Create PK
+                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_PK_CREATED))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, $"Cdm PK Constraints are already created");
+                }
+                else
+                {
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm PK Constraints Creation Started ====================");
+                    Parallel.ForEach(createCdmPKConstraintsActions, action => action());
+                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_PK_CREATED);
+
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm PK Constraints Creation Ended ====================");
+                }
+
+                //2. Create Index
+                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_IDX_CREATED))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, $"Cdm Indexes Constraints are already created");
+                }
+                else {
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm Indexed Constraints Creation Started ====================");
+                    Parallel.ForEach(createCdmIndexesActions, action => action());
+                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_IDX_CREATED);
+
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm Indexed Constraints Creation Ended ====================");
+                }
+
+                //3. Create FK
+                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_FK_CREATED))
+                {
+                    Logger.Write(null, LogMessageTypes.Info, $"Cdm FK Constraints are already created");
+                }
+                else
+                {
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm FK Constraints Creation Started ====================");
+                    Parallel.ForEach(createCdmFKConstraintsActions, action => action());
+                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_FK_CREATED);
+
+                    Logger.Write(null, LogMessageTypes.Info,
+                       $"==================== Cdm FK Constraints Creation Ended ====================");
+                }
+
+                timer.Stop();
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Cdm Indexes Creation Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+            });
+
+        }
+
         public void DataCleaning()
         {
             PerformAction(() =>
@@ -159,10 +299,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     $"==================== Data Cleaning Started ====================");
 
                 var dbCleaning = new DbCleaning(Settings.Current.Building.SourceConnectionString, Settings.Current.Building.SourceSchema);
-                var createDataCleaningMappingIndexesActions = CreateDataCleaningIndexesActionList(dbCleaning);
-                var datacleaningActions = CreateDataCleaningActionList(dbCleaning);
+                //var createDataCleaningMappingIndexesActions = CreateDataCleaningIndexesActionList(dbCleaning);
+                //var datacleaningActions = CreateDataCleaningActionList(dbCleaning);
                 var createMappingIndexesActions = CreateMappingIndexesActionList(dbCleaning);
 
+                /* Clean invalid patient only
+                 * patid is PK in patient -> no extra index required
                 //1. Add indexes for data cleaning in the source tables
                 if (Settings.Current.Building.DataCleaningSteps.Contains(INX_FOR_DATA_CLEAN_CREATED))
                 {
@@ -175,7 +317,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     Logger.Write(null, LogMessageTypes.Info, $"Indexes for Data Cleaning are created");
                 }
-
+                */
 
                 //2. Create functions and store procedure in db 
                 if (Settings.Current.Building.DataCleaningSteps.Contains(PROC_CREATED))
@@ -197,14 +339,17 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " started");
                     Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + sourceTables[0] + " started");
 
-                    dbCleaning.DataCleaning(sourceTables[0]);
+                    string query = $"CALL pr_DataCleaning('{sourceTables[0]}')";
+
+                    dbCleaning.DataCleaning(query);
                     Settings.Current.Building.DataCleaningSteps.Add(sourceTables[0]);
+                    Settings.Current.Building.DataCleaningSteps.Add(DATA_CLEAN_DONE);
 
                     Debug.WriteLine("Data Cleaning in " + sourceTables[0] + " ended");
                     Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in " + sourceTables[0] + " ended");
                 }
 
-                
+                /*
                 if(Settings.Current.Building.DataCleaningSteps.Contains(PROC_CREATED) &&
                     Settings.Current.Building.DataCleaningSteps.Contains(sourceTables[0]))
                 {
@@ -218,6 +363,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Logger.Write(null, LogMessageTypes.Info, $"Data Cleaning in all tables ended");
 
                 }
+                */
                 
                 //4. Add indexes for Mapping in the source tables              
                 if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) && 
@@ -226,50 +372,33 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     //In parallel by table
                     Parallel.ForEach(createMappingIndexesActions, action => action());
-                    Logger.Write(null, LogMessageTypes.Info, IDX_FOR_MAPPING_CREATED);
+                    Settings.Current.Building.DataCleaningSteps.Add(IDX_FOR_MAPPING_CREATED);
                     Logger.Write(null, LogMessageTypes.Info, $"Indexes for Mapping are created");
 
                 }
-
+                /*
+                //To-Do, update as store procedure
                 //5. Create Daysupply Tables
                 if (Settings.Current.Building.DataCleaningSteps.Contains(DATA_CLEAN_DONE) &&
                     Settings.Current.Building.DataCleaningSteps.Contains(IDX_FOR_MAPPING_CREATED) &&
                     !Settings.Current.Building.DataCleaningSteps.Contains(DAYSUPPLY_TABLES_CREATED))
                 {
                     //Run by sequence as running in parallel can slow down the process
-                    dbCleaning.ExecuteQuery(Settings.Current.CreateDaySupplyTablesScript);
+                    dbCleaning.CreateProcedure(Settings.Current.CreateDaySupplyTablesScript);
+                    string query = "CALL pr_CreateDaySupplyTables()";
+                    dbCleaning.DataCleaning(query);
 
-                    Logger.Write(null, LogMessageTypes.Info, DAYSUPPLY_TABLES_CREATED);
+                    Settings.Current.Building.DataCleaningSteps.Add(DAYSUPPLY_TABLES_CREATED);
                     Logger.Write(null, LogMessageTypes.Info, $"DaySupply Tables are created");
-                }
-                
+                }     
+                */
 
                 timer.Stop();
 
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Data Cleaning Ended - {timer.ElapsedMilliseconds} ms ====================");
+                    $"==================== Data Cleaning Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
             });
         }
-        /*
-        public void CreateCdmIndexes()
-        {
-            PerformAction(() =>
-            {
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Indexes in CDM tables Started ====================");
-
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                   Settings.Current.Building.CdmSchema);
-
-                dbDestination.CreateIndexes(Settings.Current.CreateCdmIndexesScript);
-
-
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Indexes in CDM tables Ended ====================");
-            });
-
-        }
-        */
 
         public void CreateDestination()
         {
@@ -328,67 +457,143 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateWithoutLookupTablesScript);
         }
-        /*
-        public void MapPatientToPerson(IVocabulary vocabulary) {
 
-            PerformAction(() =>
-            {
-                var timer = new Stopwatch();
-                timer.Start();
-
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Mapping Patient to Person started ====================");
-
-                vocabulary.Fill(false, false);
-                Debug.WriteLine("Voacb loaded");
-                Logger.Write(null, LogMessageTypes.Info, $"Voacb loaded");
-                var personList = new List<Person>();
-                var deathList = new List<Death>();
-
-                var person = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Persons != null);
-                var death = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Death != null);
-
-                if (person != null)
-                {
-                    FillPersonList<Person>(personList, person, person.Persons[0]);
-                    FillPersonList<Death>(deathList, death, death.Death[0]);
-
-                }
-
-
-                Console.WriteLine("Saving Person and Death...");
-                var saver = Settings.Current.Building.DestinationEngine.GetSaver();
-                using (saver.Create(Settings.Current.Building.DestinationConnectionString,
-                    Settings.Current.Building.Cdm,
-                    Settings.Current.Building.SourceSchema,
-                    Settings.Current.Building.CdmSchema))
-                {
-                    saver.SavePerson(Settings.Current.Building.Cdm, personList, deathList);
-                }
-
-                Console.WriteLine("Person are saved ");
-                timer.Stop();
-
-
-                personList.Clear();
-                deathList.Clear();
-                personList = null;
-                deathList = null;
-                GC.Collect();
-
-                Logger.Write(null, LogMessageTypes.Info,
-                   $"==================== Mapping Patient to Person ended ====================");
-
-            });
-
-        }
-        */
         public void ResetVocabularyStep()
         {
             var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
                 Settings.Current.Building.CdmSchema);
 
             dbDestination.ExecuteQuery(Settings.Current.DropVocabularyTablesScript);
+        }
+
+        public void MapLocationAndCareSite(IVocabulary vocabulary) {
+
+            var locationConcepts = new List<Location>();
+            var careSiteConcepts = new List<CareSite>();
+
+            Console.WriteLine("Loading locations...");
+            var location = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Locations != null);
+            if (location != null)
+            {
+                FillList<Location>(locationConcepts, location, location.Locations[0], -1);
+            }
+
+            if (locationConcepts.Count == 0)
+                locationConcepts.Add(new Location { Id = Entity.GetId(null) });
+            Console.WriteLine("Locations was loaded");
+
+            Console.WriteLine("Loading care sites...");
+            var careSite = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.CareSites != null);
+            if (careSite != null)
+            {
+                FillList<CareSite>(careSiteConcepts, careSite, careSite.CareSites[0], -1);
+            }
+
+            if (careSiteConcepts.Count == 0)
+                careSiteConcepts.Add(new CareSite { Id = 0, LocationId = 0, OrganizationId = 0, PlaceOfSvcSourceValue = null });
+            Console.WriteLine("Care sites was loaded");
+
+            Console.WriteLine("Saving locations and CareSite...");
+            var saver = Settings.Current.Building.DestinationEngine.GetSaver();
+            using (saver.Create(Settings.Current.Building.DestinationConnectionString,
+                Settings.Current.Building.Cdm,
+                Settings.Current.Building.SourceSchema,
+                Settings.Current.Building.CdmSchema))
+            {
+                try
+                {
+                    saver.SaveEntity(locationConcepts, "LOCATION");
+                    saver.SaveEntity(careSiteConcepts, "CARE_SITE");
+                    saver.Commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.WriteError(e);
+                    saver.Rollback();
+                    throw;
+                }
+                finally
+                {
+                    locationConcepts.Clear();
+                    careSiteConcepts.Clear();
+                    locationConcepts = null;
+                    careSiteConcepts = null;
+                }
+            }
+
+            Console.WriteLine("locations and CareSite were saved ");
+
+        }
+
+        public void MapProvider(IVocabulary vocabulary) {
+
+            Console.WriteLine("Loading providers...");
+            var provider = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Providers != null);
+
+            var pagesize = 50000;
+
+            var dbDestination = new DbSource(Settings.Current.Building.DestinationConnectionString,
+                                            "",
+                                            Settings.Current.Building.SourceSchema,
+                                            Settings.Current.Building.ChunkSize,
+                                            Settings.Current.Building.CdmSchema);
+
+
+            var staffCount = dbDestination.GetStaffCount();
+
+
+            var n = (int)Math.Ceiling(staffCount / pagesize);
+
+            Debug.WriteLine("n=" + n);
+
+            Parallel.For(0, n,
+                new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i) => {
+                    Console.WriteLine($"page={i}");
+
+                    var timer = new Stopwatch();
+                    timer.Start();
+
+                    var providerConcepts = new List<Provider>();
+
+                    if (provider != null)
+                    {
+                        FillEntityByPage<Provider>(providerConcepts, provider, provider.Providers[0], pagesize, i);
+                    }
+                    Console.WriteLine("Providers was loaded");
+
+                    var saver = Settings.Current.Building.DestinationEngine.GetSaver();
+                    try
+                    {
+
+                        using (saver.Create(Settings.Current.Building.DestinationConnectionString,
+                            Settings.Current.Building.Cdm,
+                            Settings.Current.Building.SourceSchema,
+                            Settings.Current.Building.CdmSchema))
+                        {
+                            saver.SaveEntity(providerConcepts, "PROVIDER");
+                            saver.Commit();
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.WriteError(e);
+                        saver.Rollback();
+                        throw;
+                    }
+                    finally {
+                        providerConcepts.Clear();
+                        providerConcepts = null;
+                    }
+
+                    timer.Stop();
+
+                    Logger.Write(null, LogMessageTypes.Info,
+                        $"==================== PROVIDER Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+
+           });
+
+
         }
 
         public void CreateLookup(IVocabulary vocabulary)
@@ -404,6 +609,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 vocabulary.Fill(true, false);
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create Lookup Started ====================");
+
+                MapLocationAndCareSite(vocabulary);
+                MapProvider(vocabulary);
+                /*
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
                 var providerConcepts = new List<Provider>();
@@ -451,7 +660,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Console.WriteLine("Lookups was saved ");
                 timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds* 0.000016666666666666667} mins");
+                    $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins");
 
                 locationConcepts.Clear();
                 careSiteConcepts.Clear();
@@ -459,6 +668,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 locationConcepts = null;
                 careSiteConcepts = null;
                 providerConcepts = null;
+
+
+
+                */
+
                 GC.Collect();
 
                 Logger.Write(null, LogMessageTypes.Info,
@@ -466,17 +680,240 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
-
-        private void FillList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed, int chunkId) where T : IEntity
+        public void CreatChunks()
         {
+            var timer = new Stopwatch();
+            timer.Start();
+
+            Console.WriteLine("Creating chunks...");
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Create Chunks started ====================");
+
+            Settings.Current.Building.ChunksCount = _chunkController.CreateChunk();
+            Console.WriteLine($"{Settings.Current.Building.ChunksCount} chunks have been created");
+            timer.Stop();
+
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Create Chunks ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+
+        }
+
+        public PatientData loadPatients(QueryDefinition qd, int pagesize, int i){
+            //var timer = new Stopwatch();
+            //timer.Start();
+            PatientData data = new PatientData();
+
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Loading Patients... ====================");
+            Console.WriteLine("Loading Patients...");
+
+            if (qd != null)
+                FillEntityByPage<Person>(data.personList, qd, qd.Persons[0], pagesize, i);
+
+            foreach (var p in data.personList)
+            {
+
+                bool validPerson = true;
+
+                if (p.YearOfBirth > DateTime.Now.Year)
+                {
+                    data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Implausible year of birth - post earliest observation period" });
+                    validPerson = false;
+                }
+
+                if (!(p.StartDate < p.EndDate))
+                {
+                    data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Invalid observation time" });
+                    validPerson = false;
+                }
+
+                // Delete any individual that has an OBSERVATION_PERIOD that is >= 2 years prior to the YEAR_OF_BIRTH
+                if (p.YearOfBirth - p.StartDate.Year >= 2)
+                {
+                    data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Implausible year of birth - post earliest observation period" });
+                    validPerson = false;
+                }
+
+                if (validPerson)
+                {
+                    data.ObservationPeriodList.Add(
+                        new ObservationPeriod
+                        {
+                            PersonId = p.PersonId,
+                            StartDate = p.StartDate,
+                            EndDate = p.EndDate,
+                            TypeConceptId = p.TypeConceptId,
+                            AdditionalFields = p.AdditionalFields
+                        }
+                    );
+                }
+            }
+
+            Console.WriteLine("Patient was loaded");
+
+            Console.WriteLine("Excluding invalid patients...");
+            var pb = new PersonBuilder();
+            var result = pb.BuildPerson(data.personList);
+
+            var person = result.Key;
+
+            // Exclude person 
+            foreach (var tmp in data.metadataList)
+            {
+                Person xPerson = data.personList.Find(item => item.PersonId == tmp.PersonId);
+                data.personList.Remove(xPerson);
+            }
+            Console.WriteLine("Excluding invalid patients ended");
+
+            Debug.WriteLine($"personList.Count={data.personList.Count}");
+            Debug.WriteLine($"ObservationPeriodList.Count={data.ObservationPeriodList.Count}");
+            Debug.WriteLine($"metadataList.Count={data.metadataList.Count}");
+            //Debug.WriteLine($"deathList.Count={deathList.Count}");
+
+            //timer.Stop();
+
+            //Logger.Write(null, LogMessageTypes.Info,
+            //    $"==================== Loading Patients ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+
+            return data;
+        }
+
+        public void SavePatients(PatientData data) {
+
+            //var timer = new Stopwatch();
+            //timer.Start();
+
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Saving Patients ====================");
+
+            Console.WriteLine("Saving Person...");
+            Console.WriteLine("Saving Observation Period...");
+            Console.WriteLine("Saving Metadata_tmp...");
+            //Console.WriteLine("Saving death...");
+
+            Debug.WriteLine($"data.personList.Count={data.personList.Count}");
+            Debug.WriteLine($"data.ObservationPeriodList.Count={data.ObservationPeriodList.Count}");
+            Debug.WriteLine($"data.metadataList.Count={data.metadataList.Count}");
+
+            var saver = Settings.Current.Building.DestinationEngine.GetSaver();
+
+            try
+            {
+
+                using (saver.Create(Settings.Current.Building.DestinationConnectionString,
+                    Settings.Current.Building.Cdm,
+                    Settings.Current.Building.SourceSchema,
+                    Settings.Current.Building.CdmSchema))
+                {
+                    saver.SaveEntity(data.personList, "PERSON");
+                    saver.SaveEntity(data.ObservationPeriodList, "OBSERVATION_PERIOD");
+
+                    //saver.SaveEntity(deathList, "DEATH");
+                    saver.SaveMetadata(data.metadataList);
+                    saver.Commit();
+                }
+
+            }
+            catch (Exception e)
+            {
+                Logger.WriteError(e);
+                saver.Rollback();
+                throw;
+            }
+            finally {
+                data.Clean();
+            }
+            //timer.Stop();
+
+            //Logger.Write(null, LogMessageTypes.Info,
+            //    $"==================== Save Patients ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+        }
+
+        public void MapAllPatients(IVocabulary vocabulary) {
+
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Mapping ALL Patients to CDM database Started ====================");
+
+            Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Load vocab ====================");
+
+            vocabulary.Fill(false, false);
+
+            Logger.Write(null, LogMessageTypes.Info,
+                   $"==================== Map ALL Patients started ====================");
+            var pagesize = 50000;
+
+            var dbDestination = new DbSource(Settings.Current.Building.DestinationConnectionString,
+                                            "",
+                                            Settings.Current.Building.SourceSchema,
+                                            Settings.Current.Building.ChunkSize,
+                                            Settings.Current.Building.CdmSchema);
+
+
+            var personCount = dbDestination.GetPersonCount();
+
+            var n = (int)Math.Ceiling(personCount / pagesize);
+
+            Debug.WriteLine("n=" + n);
+
+            var ppl = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Persons != null);
+
+
+
+            Parallel.For(0, n,
+                new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i) => {
+                    Console.WriteLine($"page={i}");
+                    var timer = new Stopwatch();
+                    timer.Start();
+
+                    var data = loadPatients(ppl, pagesize, i);
+                    SavePatients(data);
+
+                    timer.Stop();
+
+                    Logger.Write(null, LogMessageTypes.Info,
+                        $"==================== Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+
+                });
+
+            //To-Do: Add PK in Person and Op
+            /*
+            Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
+                   Settings.Current.Building.CdmSchema);
+
+            dbDestination.ExecuteQuery($"CREATE INDEX IF NOT EXISTS idx_observation_period_id ON {Settings.Current.Building.CdmSchema}.observation_period(person_id ASC)");
+            dbDestination.ExecuteQuery($"CLUSTER {Settings.Current.Building.CdmSchema}.observation_period USING idx_observation_period_id");
+            create index IF NOT EXISTS idx_observation_period_pid on public.observation_period(person_id);	
+
+            Logger.Write(null, LogMessageTypes.Info, 
+                $"==================== Add indexes to Observational Period ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+            */
+        }
+
+
+        private void FillEntityByPage<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed, int pagesize, int page) where T : IEntity {
+
             var sql = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database,
                 qd.GetSql(Settings.Current.Building.Vendor, Settings.Current.Building.SourceSchema), Settings.Current.Building.SourceSchema);
 
-            sql = string.Format(sql, chunkId);
-
             if (string.IsNullOrEmpty(sql)) return;
 
+            //if(!qd.FileName.Contains("Patient")) return;
+
+            sql = sql.Replace("{pagesize}", pagesize.ToString());
+           
+            if (page == 0) {
+                sql = sql.Replace("offset {pagesize*page}", "");
+            }
+            else {
+                sql = sql.Replace("{pagesize*page}", (pagesize*page).ToString());
+            }
+
+            Debug.WriteLine($"sql={sql}");
+            
             var keys = new Dictionary<string, bool>();
+
             using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
             {
                 connection.Open();
@@ -493,15 +930,72 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                             var concept = (T)ed.GetConcepts(conceptDef, reader, null).ToList()[0];
 
-                            var key = concept.GetKey();
-                            if (key == null) continue;
+                            if (!(qd.FileName.Contains("Patient") || qd.FileName.Contains("Death")))
+                            {
+                                var key = concept.GetKey();
+                                if (key == null) continue;
 
-                            if (keys.ContainsKey(key))
-                                continue;
+                                if (keys.ContainsKey(key))
+                                    continue;
 
-                            keys.Add(key, false);
+                                keys.Add(key, false);
+
+                            }
 
                             list.Add(concept);
+
+                            if (CurrentState != BuilderState.Running)
+                                break;
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            
+        }
+
+
+        private void FillList<T>(ICollection<T> list, QueryDefinition qd, EntityDefinition ed, int chunkId) where T : IEntity
+        {
+            var sql = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database,
+                qd.GetSql(Settings.Current.Building.Vendor, Settings.Current.Building.SourceSchema), Settings.Current.Building.SourceSchema);
+
+            sql = string.Format(sql, chunkId);
+
+            Debug.WriteLine($"sql={sql}");
+
+            if (string.IsNullOrEmpty(sql)) return;
+
+            var keys = new Dictionary<string, bool>();
+            
+            using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+            {
+                connection.Open();
+                using (var c = new OdbcCommand(sql, connection))
+                {
+                    c.CommandTimeout = 0;
+                    using (var reader = c.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Concept conceptDef = null;
+                            if (ed.Concepts != null && ed.Concepts.Any())
+                                conceptDef = ed.Concepts[0];
+
+                                var concept = (T)ed.GetConcepts(conceptDef, reader, null).ToList()[0];
+
+                            if (!(qd.FileName.Contains("Patient") || qd.FileName.Contains("Death")))
+                            {
+                                var key = concept.GetKey();
+                                if (key == null) continue;
+
+                                if (keys.ContainsKey(key))
+                                    continue;
+
+                                keys.Add(key, false);
+
+                            }
+                                list.Add(concept);
 
                             if (CurrentState != BuilderState.Running)
                                 break;
@@ -517,7 +1011,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             PerformAction(() =>
             {
-
+                
                 if (Settings.Current.Building.ChunksCount == 0)
                 {
                     Logger.Write(null, LogMessageTypes.Info, "==================== Create Chunks started ====================");
@@ -531,14 +1025,17 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 {
                     Logger.Write(null, LogMessageTypes.Info, "==================== Chunks are already created ====================");
                 }
-
-
+                
                 Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary started ====================");
                 vocabulary.Fill(false, false);
                 Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary ended ====================");
 
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Conversion to CDM was started ====================");
+
+                List<int> incompleteChunkIds = _chunkController.GetIncompleteChunkId();
+                incompleteChunkIds.Sort();
+                //CompleteChunksCount = Settings.Current.Building.ChunksCount - incompleteChunkIds.Count();
                 
                 var save = Task.Run(() =>
                 {
@@ -566,45 +1063,42 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                 Settings.Current.Building.DestinationEngine,
                                 Settings.Current.Building.SourceSchema,
                                 Settings.Current.Building.CdmSchema);
-
-                            Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
+                            
+                            CompleteChunksCount++;
 
                             timer.Stop();
                             /*
                             Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
                                 $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
                             */
-                
-                            Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
-                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds* 0.000016666666666666667} mins");
+                    
+                                Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
+                                    $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins");
+                            }
+
+                            if (CurrentState != BuilderState.Running)
+                                break;
                         }
 
-                        if (CurrentState != BuilderState.Running)
-                            break;
-                        
-                    }
-                
 
-                    CurrentState = BuilderState.Stopped;
+                        CurrentState = BuilderState.Stopped;
+                    
                 });
 
 
-                List<int> incompleteChunkIds = _chunkController.GetIncompleteChunkId();
-                incompleteChunkIds.Sort();
-
-                Parallel.For(0, incompleteChunkIds.Count,
+                Parallel.For(0, incompleteChunkIds.Count(),
                         new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) => {
-                            Debug.WriteLine("i=" + i + " incompleteChunkIds.Count=" + incompleteChunkIds.Count);
+                            
                             var chunkId = incompleteChunkIds[i];
-                            //Parallel.For(1, Settings.Current.Building.ChunksCount+1,
-                            //        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
-                            //        {
+
+                            Debug.WriteLine($"i={i} incompleteChunkIds.Count={incompleteChunkIds.Count} chunkId={chunkId}");
+
                             if (CurrentState != BuilderState.Running)
                                 state.Break();
 
                             if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
                             {
-                                var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
+                                var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder, Settings.Current.Building.ChunkSize);
 
                                 using (var connection =
                                 new OdbcConnection(Settings.Current.Building.SourceConnectionString))
@@ -612,6 +1106,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                     connection.Open();
                                     saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
                                     Settings.Current.Building.SourceSchema,
+                                    Settings.Current.Building.CdmSchema,
                                     Settings.Current.Building.SourceQueryDefinitions,
                                     connection,
                                     Settings.Current.Building.Vendor));
@@ -624,6 +1119,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                     Thread.Sleep(1000);
                                 }
                             }
+                            
+
                         });
 
                 saveQueue.CompleteAdding();

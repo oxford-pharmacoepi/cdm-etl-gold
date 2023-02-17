@@ -25,7 +25,9 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             var odbc = new OdbcConnectionStringBuilder(connectionString);
 
             //var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};SslMode=Require;Trust Server Certificate=true";
-            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};";
+            //There is no way to set no connection Timeout.
+            //Timeout=300 (5 mins) for insert data is enough at the moment even though the database is slow
+            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};CommandTimeout=0;Keepalive=300;Timeout=600;";
 
             var npgsqlConnectionString = connectionStringTemplate.Replace("{server}", odbc["server"].ToString())
                 .Replace("{database}", odbc["database"].ToString()).Replace("{username}", odbc["uid"].ToString())

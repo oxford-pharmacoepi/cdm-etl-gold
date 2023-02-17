@@ -6,7 +6,9 @@ using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.common.PregnancyAlgorithm;
 using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.etl.cprd
@@ -16,6 +18,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
     /// </summary>
     public class CprdPersonBuilder : PersonBuilder
     {
+
         public override string GetFolder()
         {
             return "ETL\\CPRD";
@@ -30,9 +33,8 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 var visitDetail =
                     new VisitDetail(visitOccurrence)
                     {
-                        Id = visitOccurrence.Id,
+                        Id = visitOccurrence.Id,  //call seq
                         CareSiteId = visitOccurrence.CareSiteId,
-
                     };
 
                 yield return visitDetail;
@@ -46,6 +48,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         {
             Offset = om;
             ChunkData = data;
+
             var result = BuildPerson(PersonRecords.ToList());
             var person = result.Key;
             if (person == null)
@@ -65,21 +68,24 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, op).ToArray();
-            
-            /*
+
             var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.Where(pp =>
                     pp.StartDate.Year >= person.YearOfBirth &&
                     pp.EndDate.Value.Year >= person.YearOfBirth &&
                     pp.StartDate.Year <= DateTime.Now.Year).ToArray(), null).ToArray();
-            */
+
+
             var visitDetails = new Dictionary<long, VisitDetail>();
             var visitDetIds = new List<long>();
+
+
             foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
                     vo.StartDate.Year >= person.YearOfBirth &&
                     vo.EndDate.Value.Year >= person.YearOfBirth &&
                     vo.StartDate.Year <= DateTime.Now.Year &&
                     vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray())
             {
+
                 if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
                     vd.StartDate.Month < person.MonthOfBirth ||
                     vd.StartDate.Year < person.YearOfBirth.Value)
@@ -101,6 +107,9 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
                 visitDetails.Add(vd.Id, vd);
                 visitDetIds.Add(vd.Id);
+
+
+
             }
 
             long? prevVisitDetId = null;
@@ -123,6 +132,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 var careSiteId = byStartDate.Min(v => v.CareSiteId);
                 var sourceValue = byStartDate.Min(v => v.SourceValue);
                 var visitOccurrenceId = byStartDate.Min(v => v.Id);
+
                 var visitOccurrence = new VisitOccurrence(vd)
                 {
                     //Id = Offset.GetKeyOffset(vd.PersonId).VisitOccurrenceId,
@@ -170,7 +180,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
             var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
 
-
+            
             if (death != null)
             {
                 person.TimeOfDeath = death.StartDate;
@@ -181,9 +191,10 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 if (death.StartDate.Year < person.YearOfBirth || death.StartDate.Year > DateTime.Now.Year)
                     death = null;
             }
+            
 
             // push built entities to ChunkBuilder for further save to CDM database
-            /*
+
             AddToChunk(person,
                 death,
                 observationPeriods,
@@ -196,10 +207,174 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
                 Clean(deviceExposure, person).ToArray(), null);
+
+            var pg = new PregnancyAlgorithm();
+            foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
+                ChunkData.ConditionOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
+                ChunkData.ProcedureOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
+                ChunkData.Observations.Where(e => e.PersonId == person.PersonId).ToArray(),
+                ChunkData.Measurements.Where(e => e.PersonId == person.PersonId).ToArray(),
+                ChunkData.DrugExposures.Where(e => e.PersonId == person.PersonId).ToArray()))
+            {
+                r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
+                ChunkData.ConditionEra.Add(r);
+            }
+
+
+            return Attrition.None;
+        }
+
+        /// <summary>
+        /// Build person entity and all person related entities like: DrugExposures, ConditionOccurrences, ProcedureOccurrences... from raw data sets 
+        /// </summary>
+        public override Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om)
+        {
+            Offset = om;
+            ChunkData = data;
+
+            PersonRecords = data.Persons;
+
+            var result = BuildPerson(PersonRecords.ToList());
+            var person = result.Key;
+            if (person == null)
+                return result.Value;
+            
+            var observationPeriods = data.ObservationPeriods.ToArray();
+
+            var tempVisitDetails = new Dictionary<string, VisitDetail>();    //TempVisitDetailId
+            var visitDetails = new Dictionary<long, VisitDetail>();
+            var visitDetIds = new List<long>();
+
+            var vds = BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
+                    vo.StartDate.Year >= person.YearOfBirth &&
+                    vo.EndDate.Value.Year >= person.YearOfBirth &&
+                    vo.StartDate.Year <= DateTime.Now.Year &&
+                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray();
+
+            Array.Sort(vds);
+
+            foreach (var vd in vds)
+            {
+
+                if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
+                    vd.StartDate.Month < person.MonthOfBirth ||
+                    vd.StartDate.Year < person.YearOfBirth.Value)
+                    if (vd.StartDate.Year < person.YearOfBirth.Value)
+                    {
+                        if (DateTime.TryParse(person.AdditionalFields["frd"], out var frd))
+                        {
+                            vd.StartDate = frd;
+                            vd.EndDate = frd;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                /*
+                if (visitDetails.ContainsKey(vd.Id))
+                    continue;
+
+                visitDetails.Add(vd.Id, vd);
+                */
+                if (tempVisitDetails.ContainsKey(vd.AdditionalFields["temp_visit_occurrence_id"]))
+                    continue;
+
+                tempVisitDetails.Add(vd.AdditionalFields["temp_visit_occurrence_id"], vd);
+                visitDetails.Add(vd.Id, vd);
+                visitDetIds.Add(vd.Id);
+
+            }
+
+            long? prevVisitDetId = null;
+            foreach (var visitId in visitDetIds.OrderBy(v => v))
+            {
+                if (prevVisitDetId.HasValue)
+                {
+                    visitDetails[visitId].PrecedingVisitDetailId = prevVisitDetId;
+                    //visitDetails.Values.ToList().Find(vd => vd.Id == visitId).PrecedingVisitDetailId = prevVisitDetId;
+                    //visitDetailList.Find(vd=>vd.Id == visitId).PrecedingVisitDetailId = prevVisitDetId;
+                }
+
+                prevVisitDetId = visitId;
+            }
+
+            var visitOccurrences = new Dictionary<long, VisitOccurrence>();
+            var visitIds = new List<long>();
+            foreach (var byStartDate in visitDetails.Values.GroupBy(v => v.StartDate))
+            //foreach (var byStartDate in visitDetailList.GroupBy(v => v.StartDate))
+            {
+                var vd = byStartDate.First();
+                var providerId = byStartDate.Min(v => v.ProviderId);
+                var careSiteId = byStartDate.Min(v => v.CareSiteId);
+                var sourceValue = byStartDate.Min(v => v.SourceValue);
+                var visitOccurrenceId = byStartDate.Min(v => v.Id);
+
+                var visitOccurrence = new VisitOccurrence(vd)
+                {
+                    //Id = Offset.GetKeyOffset(vd.PersonId).VisitOccurrenceId,
+                    Id = visitOccurrenceId,
+                    ProviderId = providerId,
+                    CareSiteId = careSiteId,
+                    SourceValue = sourceValue
+                };
+
+                foreach (var visitDetail in byStartDate)
+                {
+                    visitDetail.VisitOccurrenceId = visitOccurrence.Id;
+                }
+
+                visitOccurrences.Add(visitOccurrence.Id, visitOccurrence);
+                visitIds.Add(visitOccurrence.Id);
+            }
+
+
+            long? prevVisitId = null;
+            foreach (var visitId in visitIds.OrderBy(v => v))
+            {
+                if (prevVisitId.HasValue)
+                {
+                    visitOccurrences[visitId].PrecedingVisitOccurrenceId = prevVisitId;
+                }
+
+                prevVisitId = visitId;
+            }
+
+            SetVisitOccurrenceId(ConditionOccurrencesRaw, tempVisitDetails);
+            SetVisitOccurrenceId(ProcedureOccurrencesRaw, tempVisitDetails);
+            SetVisitOccurrenceId(DrugExposuresRaw, tempVisitDetails);
+            SetVisitOccurrenceId(DeviceExposureRaw, tempVisitDetails);
+            SetVisitOccurrenceId(ObservationsRaw, tempVisitDetails);
+            SetVisitOccurrenceId(MeasurementsRaw, tempVisitDetails);
+
+            var drugExposures = BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+
+            //var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
+
+            /*
+            if (death != null)
+            {
+                person.TimeOfDeath = death.StartDate;
+
+                if (death.StartDate < observationPeriods.Min(op => op.StartDate))
+                    return Attrition.UnacceptablePatientQuality;
+
+                if (death.StartDate.Year < person.YearOfBirth || death.StartDate.Year > DateTime.Now.Year)
+                    death = null;
+            }
             */
-            AddToChunk(person,
-                death,
-                observationPeriods,
+
+            // push built entities to ChunkBuilder for further save to CDM database
+
+            AddToChunk(null,
+                null,
+                null,
                 null,
                 Clean(drugExposures, person).ToArray(),
                 Clean(conditionOccurrences, person).ToArray(),
@@ -267,6 +442,34 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             }
         }
 
+        public override IEnumerable<T> BuildEntities2<T>(IEnumerable<T> entitiesToBuild, List<VisitOccurrence> visitOccurrences, IEnumerable<ObservationPeriod> observationPeriods,
+            bool withinTheObservationPeriod)
+        {
+            var uniqueEntities = new HashSet<T>();
+            foreach (var e in entitiesToBuild)
+            {
+
+                if (e.VisitOccurrenceId == null || (visitOccurrences.Exists(obj => obj.Id == e.VisitOccurrenceId)))
+                //if (e.VisitOccurrenceId == null || visitOccurrences.ContainsKey(e.VisitOccurrenceId.Value))
+                {
+
+                    if (e.IsUnique)
+                    {
+                        uniqueEntities.Add(e);
+                    }
+                    else
+                    {
+                        yield return e;
+                    }
+                }
+            }
+
+            foreach (var ue in uniqueEntities)
+            {
+                yield return ue;
+            }
+        }
+
         private void SetVisitOccurrenceId<T>(IEnumerable<T> inputRecords, IDictionary<long, VisitDetail> vd)
             where T : class, IEntity
         {
@@ -281,9 +484,29 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 }
             }
         }
-        
-        /*
-        private void SetVisitOccurrenceId<T>(IEnumerable<T> inputRecords, IDictionary<long, VisitDetail> vd)
+
+        private void SetVisitOccurrenceId<T>(IEnumerable<T> inputRecords, IDictionary<string, VisitDetail> vd)
+            where T : class, IEntity
+        {
+            foreach (var e in inputRecords)
+            {
+                //if (!e.VisitDetailId.HasValue)
+                
+                if (e.AdditionalFields==null)
+                    continue;
+                
+
+                if (vd.ContainsKey(e.AdditionalFields["temp_visit_occurrence_id"]))
+                {
+                    //e.VisitOccurrenceId = vd[e.VisitDetailId.Value].VisitOccurrenceId;
+                    e.VisitOccurrenceId = vd[e.AdditionalFields["temp_visit_occurrence_id"]].VisitOccurrenceId;
+                    e.VisitDetailId = vd[e.AdditionalFields["temp_visit_occurrence_id"]].Id;
+                    
+                }
+            }
+        }
+
+        private void SetVisitOccurrenceId3<T>(IEnumerable<T> inputRecords, List<VisitDetail> vd)
             where T : class, IEntity
         {
             foreach (var e in inputRecords)
@@ -291,26 +514,32 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 if (!e.VisitDetailId.HasValue)
                     continue;
 
-                var temp_evid = e.PersonId + "" + (e.StartDate != null ? e.StartDate.ToString("yyyyMMdd") : "") + (e.AdditionalFields != null ? e.AdditionalFields.GetValueOrDefault("constyle") : "");
+                //Debug.WriteLine($"e.PersonId={e.PersonId} e.StartDate={e.StartDate} e.AdditionalFields={(e.AdditionalFields == null ? null : e.AdditionalFields["constype"])}");
 
-                foreach (var item in vd)
+                VisitDetail p_vd = null;
+
+                if (e.AdditionalFields == null)
                 {
 
-                    if (item.Value.AdditionalFields != null && item.Value.StartDate != null)
-                    {
-                        var temp_vid = "" + item.Value.PersonId + (item.Value.StartDate.ToString("yyyyMMdd") != null ? item.Value.StartDate.ToString("yyyyMMdd") : "") + (item.Value.AdditionalFields.GetValueOrDefault("constyle") != null ? item.Value.AdditionalFields.GetValueOrDefault("constyle") : "");
+                    p_vd = vd.Find(obj => obj.PersonId == e.PersonId &&
+                                          obj.StartDate == e.StartDate &&
+                                          obj.AdditionalFields == null);
+                }
+                else {
+                    p_vd = vd.Find(obj => obj.PersonId == e.PersonId &&
+                                          obj.StartDate == e.StartDate &&
+                                          obj.AdditionalFields["constype"] == e.AdditionalFields["constype"]);
+                }
 
-                        if (temp_evid == temp_vid)
-                        {
-                            e.VisitOccurrenceId = item.Value.VisitOccurrenceId;
-                            break;
-                        }
-                    }
+
+                if (p_vd != null)
+                {
+                    e.VisitOccurrenceId = p_vd.VisitOccurrenceId;
+                    e.VisitDetailId = p_vd.Id;
                 }
 
             }
         }
-        */
 
         public override KeyValuePair<Person, Attrition> BuildPerson(List<Person> records)
         {
@@ -319,10 +548,10 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
             var ordered = records.OrderByDescending(p => p.StartDate).ToArray();
             var person = ordered.Take(1).First();
-
+            /*
             if (person.AdditionalFields["accept"] != "1")
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnacceptablePatientQuality);
-
+            */
             person.StartDate = ordered.Take(1).Last().StartDate;
 
             var gender =
@@ -335,6 +564,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             person.RaceConceptId = race.RaceConceptId;
             person.RaceSourceValue = race.RaceSourceValue;
 
+            /*
             if (person.YearOfBirth < 1875)
                 return new KeyValuePair<Person, Attrition>(null, Attrition.ImplausibleYOBPast);
 
@@ -352,7 +582,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             {
                 return new KeyValuePair<Person, Attrition>(null, Attrition.GenderChanges);
             }
-
+            */
             return new KeyValuePair<Person, Attrition>(person, Attrition.None);
         }
 
@@ -540,6 +770,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             ObservationPeriod[] observationPeriods)
         {
             return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, false);
+            //return BuildEntities2(procedureOccurrences, visitOccurrences.Values.ToList(), observationPeriods, false);
         }
 
         public override Death BuildDeath(Death[] death, Dictionary<long, VisitOccurrence> visitOccurrences,
@@ -564,6 +795,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
         {
             return BuildEntities(observations, visitOccurrences, observationPeriods, false);
+            //return BuildEntities2(observations, visitOccurrences.Values.ToList(), observationPeriods, false);
         }
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
@@ -571,6 +803,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             ObservationPeriod[] observationPeriods)
         {
             foreach (var mes in BuildEntities(measurements, visitOccurrences, observationPeriods, false))
+            //foreach (var mes in BuildEntities2(measurements, visitOccurrences.Values.ToList(), observationPeriods, false))
             {
                 //if (!string.IsNullOrEmpty(mes.SourceValue))
                 //{
@@ -607,6 +840,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             ObservationPeriod[] observationPeriods)
         {
             return BuildEntities(devExposure, visitOccurrences, observationPeriods, false);
+            //return BuildEntities2(devExposure, visitOccurrences.Values.ToList(), observationPeriods, false);
         }
 
     }
