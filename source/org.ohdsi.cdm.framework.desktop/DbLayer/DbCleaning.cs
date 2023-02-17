@@ -49,16 +49,15 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 }
             }
         }
-        public void DataCleaning(string tableName) {
+        public void DataCleaning(string callPrQuery) {
 
                 //calling store proc is a single transaction
 
-                string query = "CALL pr_DataCleaning('{tableName}')".Replace("{tableName}", tableName);
-                Debug.WriteLine(query);
+                Debug.WriteLine(callPrQuery);
 
                 using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
                 {
-                    using (var command = new OdbcCommand(query, connection))
+                    using (var command = new OdbcCommand(callPrQuery, connection))
                     {
                         command.CommandTimeout = 0;         //A value of 0 indicates no limit (an attempt to execute a command will wait indefinitely)                              
                         command.ExecuteNonQuery();
@@ -73,8 +72,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             query = query.Replace("{sc}", _sourceSchemaName);
             query = query.Replace("{SOURCE_NOK_SCHEMA}", _schemaName);
 
-            Debug.WriteLine("query=" + query);
-
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
                 OdbcTransaction transaction = null;
@@ -85,6 +82,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
                     foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
                     {
+                        Debug.WriteLine("subQuery=" + subQuery);
                         if (string.IsNullOrEmpty(subQuery))
                             continue;
 
@@ -113,6 +111,24 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 }
             }
 
+        }
+
+        public int GetCompletedChunksCount()
+        {
+            int i = 0;
+
+            var sql = "select count(1) from {sc}.chunk where completed = 1";
+            sql = sql.Replace("{sc}", _sourceSchemaName);
+
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                i = reader.GetInt32(0);
+            }
+
+            return i;
         }
 
     }

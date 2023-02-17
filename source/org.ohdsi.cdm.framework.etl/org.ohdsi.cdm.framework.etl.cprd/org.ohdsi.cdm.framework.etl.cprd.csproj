@@ -18,6 +18,7 @@
     <None Remove="ETL\CPRD\Definitions\Referral_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Test_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Therapy_Postgres.xml" />
+	<None Remove="ETL\CPRD\Definitions\Death_Postgres.xml" />
     <None Remove="ETL\CPRD\Lookups\Additional.sql" />
     <None Remove="ETL\CPRD\Lookups\Drug.sql" />
     <None Remove="ETL\CPRD\Lookups\Read_Code.sql" />
@@ -67,6 +68,9 @@
     <Content Include="ETL\CPRD\Definitions\Therapy_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="ETL\CPRD\Definitions\Death_Postgres.xml">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
     <Content Include="ETL\CPRD\Lookups\Additional.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -91,6 +95,10 @@
     <Content Include="ETL\CPRD\Lookups\ValueAsConceptId.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.Odbc" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

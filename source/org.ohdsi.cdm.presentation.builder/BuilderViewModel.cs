@@ -1,4 +1,5 @@
 ﻿using org.ohdsi.cdm.framework.common.Extensions;
+using org.ohdsi.cdm.framework.common.Lookups;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.presentation.builder.Controllers;
 using System;
@@ -237,8 +238,6 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-
-        //
         public bool DataCleaningStarted
         {
             get
@@ -399,6 +398,49 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
+
+        public bool MapAllPatientsStarted
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.MapAllPatientsStarted;
+            }
+        }
+
+        public bool MapAllPatientsWorking => MapAllPatientsStarted && _buildingController.CurrentState == BuilderState.Running;
+
+        public bool MapAllPatientsDone
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return !MapAllPatientsSkipped && Settings.Current.Building.BuildingState.MapAllPatientsDone;
+            }
+        }
+
+        public bool MapAllPatientsSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.MapAllPatientsStart,
+                                              Settings.Current.Building.BuildingState.MapAllPatientsEnd);
+
+        public string MapAllPatientsInfo
+        {
+            get
+            {
+                if (MapAllPatientsSkipped)
+                    return "skipped";
+
+                if (MapAllPatientsDone)
+                {
+                    return Settings.Current.Building.BuildingState.MapAllPatientsEnd.Value.Subtract(
+                        Settings.Current.Building.BuildingState.MapAllPatientsStart.Value).ToReadableString();
+                }
+
+                return string.Empty;
+            }
+        }
+
+
+
         public bool BuildingStarted
         {
             get
@@ -438,18 +480,70 @@ namespace org.ohdsi.cdm.presentation.builder
             {
                 if (BuildingSkipped)
                     return "skipped";
-
+                
                 if (BuildingComplete)
                 {
                     return Settings.Current.Building.BuildingState.BuildingEnd.Value.Subtract(
                         Settings.Current.Building.BuildingState.BuildingStart.Value).ToReadableString();
                 }
+                
 
                 if (BuildingStarted)
                 {
                     return $"{_buildingController.CompleteChunksCount} from {_buildingController.ChunksCount}";
                 }
 
+
+                return string.Empty;
+            }
+        }
+
+
+        public bool CreateCdmIndexesStarted
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.CreateCdmIndexesStarted;
+            }
+        }
+
+        public bool CreateCdmIndexesEnded
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.CreateCdmIndexesDone;
+            }
+        }
+
+        public bool CreateCdmIndexesWorking => CreateCdmIndexesStarted && !BuildingComplete && !CreateCdmIndexesSkipped &&
+                                       _buildingController.CurrentState == BuilderState.Running;
+
+        public bool CreateCdmIndexesDone
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return !CreateCdmIndexesSkipped && Settings.Current.Building.BuildingState.CreateCdmIndexesDone;
+            }
+        }
+
+        public bool CreateCdmIndexesSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CreateCdmIndexesStart,
+                                           Settings.Current.Building.BuildingState.CreateCdmIndexesEnd);
+
+        public string CreateCdmIndexesInfo
+        {
+            get
+            {
+                if (CreateCdmIndexesSkipped)
+                    return "skipped";
+
+                if (CreateCdmIndexesDone)
+                {
+                    return Settings.Current.Building.BuildingState.CreateCdmIndexesEnd.Value.Subtract(
+                        Settings.Current.Building.BuildingState.CreateCdmIndexesStart.Value).ToReadableString();
+                }
 
                 return string.Empty;
             }
@@ -654,9 +748,11 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public ICommand SkipDataCleaningStepCommand => new DelegateCommand(SkipDataCleaningStep);
 
-        public ICommand ResetDataCleaningStepCommand => new DelegateCommand(ResetDataCleaningStep);
-
         public ICommand SkipChunksCreationStepCommand => new DelegateCommand(SkipChunksCreationStep);
+
+        public ICommand SkipCreateCdmIndexesStepCommand => new DelegateCommand(SkipCreateCdmIndexesStep);
+
+        public ICommand CreateChunksStepCommand => new DelegateCommand(CreateChunksStep);
 
         public ICommand ResetChunksCreationStepCommand
         {
@@ -737,6 +833,11 @@ namespace org.ohdsi.cdm.presentation.builder
             _buildingController?.CreateTablesStep();
         }
 
+        private void CreateChunksStep()
+        {
+            _buildingController?.CreateChunksStep();
+        }
+
         private void SkipDbCreationStep()
         {
             if (_buildingController == null) return;
@@ -772,17 +873,6 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        private void ResetDataCleaningStep()
-        {
-            if (_buildingController == null) return;
-            if (!DataCleaningDone) return;
-            if (DataCleaningSkipped) return;
-
-            _buildingController.ResetDataCleaningStep();
-            
-        }
-
-
         private void SkipDataCleaningStep()
         {
             if (_buildingController == null) return;
@@ -797,6 +887,14 @@ namespace org.ohdsi.cdm.presentation.builder
             if (ChunksCreated) return;
 
             _buildingController.SkipChunksCreationStep();
+        }
+
+        private void SkipCreateCdmIndexesStep() {
+
+            if (_buildingController == null) return;
+            if (CreateCdmIndexesDone) return;
+
+            _buildingController.SkipCreateCdmIndexesStep();
         }
 
         private void RestartChunksCreationStep()
@@ -1046,10 +1144,10 @@ namespace org.ohdsi.cdm.presentation.builder
         {
             if (_buildingController == null) return;
 
-
             ButtonEnabled = _buildingController.CurrentState != BuilderState.Stopping;
             SettingUnlocked = !(_buildingController.CurrentState == BuilderState.Running ||
                                 _buildingController.CurrentState == BuilderState.Stopping);
+
 
             if (PropertyChanged != null)
             {
@@ -1072,6 +1170,11 @@ namespace org.ohdsi.cdm.presentation.builder
                 PropertyChanged(this, new PropertyChangedEventArgs("LookupWorking"));
                 PropertyChanged(this, new PropertyChangedEventArgs("LookupCreated"));
                 PropertyChanged(this, new PropertyChangedEventArgs("LookupInfo"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsStarted"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsWorking"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsDone"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsInfo"));
 
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingStarted"));
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingWorking"));

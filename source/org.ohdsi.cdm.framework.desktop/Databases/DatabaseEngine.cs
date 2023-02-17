@@ -44,6 +44,7 @@ namespace org.ohdsi.cdm.framework.desktop.Databases
         public virtual IDataReader ReadChunkData(IDbConnection conn, IDbCommand cmd, QueryDefinition qd, int chunkId,
             string prefix)
         {
+            cmd.CommandTimeout = 0;
             return cmd.ExecuteReader();
         }
 

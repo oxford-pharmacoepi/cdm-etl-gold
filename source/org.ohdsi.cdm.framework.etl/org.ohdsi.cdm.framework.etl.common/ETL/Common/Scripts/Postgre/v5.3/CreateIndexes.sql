@@ -59,8 +59,8 @@ Standardized clinical data
 CREATE UNIQUE INDEX idx_person_id  ON person  (person_id ASC);
 CLUSTER person  USING idx_person_id ;
 
-CREATE INDEX idx_observation_period_id  ON observation_period  (person_id ASC);
-CLUSTER observation_period  USING idx_observation_period_id ;
+-- CREATE INDEX idx_observation_period_id  ON observation_period  (person_id ASC);
+-- CLUSTER observation_period  USING idx_observation_period_id ;
 
 CREATE INDEX idx_specimen_person_id  ON specimen  (person_id ASC);
 CLUSTER specimen  USING idx_specimen_person_id ;

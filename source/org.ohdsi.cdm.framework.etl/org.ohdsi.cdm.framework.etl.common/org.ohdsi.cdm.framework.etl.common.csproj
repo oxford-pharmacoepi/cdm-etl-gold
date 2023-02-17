@@ -61,8 +61,36 @@
 	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03m_CreateMappingIndexesInStaff.sql" />
 	<None Remove="ETL\Common\Scripts\Postgre\DataCleaning\04_Create_daysupply_tables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql" />
-    <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql" />
-    <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql" />
+    <!-- <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql" /> -->
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\01_CreatePKConstraints.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02a_CreateIndexes_Person.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02b_CreateIndexes_Specimen.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02c_CreateIndexes_VisitOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02d_CreateIndexes_VisitDetail.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02e_CreateIndexes_ProcedureOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02f_CreateIndexes_DrugExposure.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02g_CreateIndexes_DeviceExposure.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02h_CreateIndexes_ConditionOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02i_CreateIndexes_Measurement.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02j_CreateIndexes_Note.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02k_CreateIndexes_Notenlp.sql" />
+    <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02l_CreateIndexes_Observation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03a_CreateFKConstraints_Person.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03b_CreateFKConstraints_ObservationPeriod.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03c_CreateFKConstraints_Specimen.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03d_CreateFKConstraints_VisitOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03e_CreateFKConstraints_VisitDetail.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03f_CreateFKConstraints_ProcedureOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03g_CreateFKConstraints_DrugExposure.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03h_CreateFKConstraints_DeviceExposure.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03i_CreateFKConstraints_ConditionOccurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03j_CreateFKConstraints_Measurement.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03k_CreateFKConstraints_Note.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03l_CreateFKConstraints_NoteNlp.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03m_CreateFKConstraints_Observation.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03n_CreateFKConstraints_CareSite.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03o_CreateFKConstraints_Provider.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\DropTables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\DropVocabularyTables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\TruncateLookup.sql" />
@@ -188,9 +216,45 @@
 	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\02_DataCleaning.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
-	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes.sql">
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03a_CreateMappingIndexesInPatient.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03b_CreateMappingIndexesInPractice.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03c_CreateMappingIndexesInConsultation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03d_CreateMappingIndexesInClinical.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03e_CreateMappingIndexesInAdditional.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+    <Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03f_CreateMappingIndexesInReferral.sql">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03g_CreateMappingIndexesInImmunisation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03h_CreateMappingIndexesInTest.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03i_CreateMappingIndexesInTherapy.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03j_CreateMappingIndexesInEntity.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03k_CreateMappingIndexesInLookup.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03l_CreateMappingIndexesInLookupType.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\DataCleaning\03_CreateMappingIndexes\03m_CreateMappingIndexesInStaff.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>	  
     <Content Include="ETL\Common\Scripts\Postgre\DataCleaning\04_Create_daysupply_tables.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
@@ -278,9 +342,98 @@
 	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CopyVocabulary.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+	<!--
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	-->
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\01_CreatePKConstraints.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02a_CreateIndexes_Person.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02b_CreateIndexes_Specimen.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02c_CreateIndexes_VisitOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02d_CreateIndexes_VisitDetail.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02e_CreateIndexes_ProcedureOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02f_CreateIndexes_DrugExposure.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02g_CreateIndexes_DeviceExposure.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02h_CreateIndexes_ConditionOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02i_CreateIndexes_Measurement.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02j_CreateIndexes_Note.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02k_CreateIndexes_Notenlp.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\02_CreateIndexes\02l_CreateIndexes_Observation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03a_CreateFKConstraints_Person.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03a_CreateFKConstraints_Person.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03b_CreateFKConstraints_ObservationPeriod.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03c_CreateFKConstraints_Specimen.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03d_CreateFKConstraints_VisitOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03e_CreateFKConstraints_VisitDetail.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03f_CreateFKConstraints_ProcedureOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03g_CreateFKConstraints_DrugExposure.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03h_CreateFKConstraints_DeviceExposure.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03i_CreateFKConstraints_ConditionOccurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03j_CreateFKConstraints_Measurement.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03k_CreateFKConstraints_Note.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03l_CreateFKConstraints_NoteNlp.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03m_CreateFKConstraints_Observation.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03n_CreateFKConstraints_CareSite.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes\03_CreateFKConstraints\03o_CreateFKConstraints_Provider.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>	  
     <Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -137,7 +137,7 @@ namespace org.ohdsi.cdm.presentation.builder
                                     Console.WriteLine(conceptIdMapper.Lookup + " - Done");
                                     timer.Stop();
                                     Logger.Write(null, LogMessageTypes.Info,
-                                        $"DONE - {timer.ElapsedMilliseconds} ms | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}");
+                                        $"DONE - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}");
                                 }
                                 catch (Exception e)
                                 {

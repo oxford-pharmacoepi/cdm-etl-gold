@@ -1,6 +1,8 @@
 ﻿using MySqlConnector.Logging;
+using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.Odbc;
 using System.Diagnostics;
@@ -82,7 +84,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(sqlConnectionStringBuilder.ConnectionString))
             {
-                
+
                 if (_connectionString.ToLower().Contains("postgres")) {
 
                     if (CheckIfDatabaseExistInPostgres(connection, database))
@@ -102,7 +104,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                         }
                     }
                 }
-                
+
             }
 
 
@@ -126,9 +128,9 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 isExist = Convert.ToInt32(command.ExecuteScalar());
             }
 
-           Debug.WriteLine("isExist=" + (isExist > 0));
-            
-            return isExist>0;
+            Debug.WriteLine("isExist=" + (isExist > 0));
+
+            return isExist > 0;
 
 
         }
@@ -169,12 +171,13 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
                     using (var command = new OdbcCommand(subQuery, connection))
                     {
-                        command.CommandTimeout = 30000;
+                        command.CommandTimeout = 0;
                         command.ExecuteNonQuery();
                     }
                 }
             }
         }
+
     }
 
 }

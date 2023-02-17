@@ -50,11 +50,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             return ints;
         }
 
-        public void UpdateCompletedChunk(int ChunkId) {
-
-            _dbSource.UpdateCompletedChunk(ChunkId);
-        }
-
 
         public int CreateChunks()
         {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using org.ohdsi.cdm.framework.common.Definitions;
 using org.ohdsi.cdm.framework.common.Extensions;
+using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
 using System.Collections;
@@ -40,6 +41,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             var query = File.ReadAllText(Path.Combine(_folder, "CreateChunkTable.sql"));
             query = query.Replace("{sc}", _schemaName);
             query = query.Replace("{CHUNK_SIZE}", _chunkSize.ToString());
+            query = query.Replace("{des}", _destinationSchemaName);
             //query = query.Replace("{TARGET_SCHEMA}", _destinationSchemaName);
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString)) {
@@ -49,6 +51,8 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 {
                     using (var command = new OdbcCommand(subQuery, connection))
                     {
+                        Debug.WriteLine($"subQuery={subQuery}");
+
                         command.CommandTimeout = 0;
                         int c = command.ExecuteNonQuery();
 
@@ -79,6 +83,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         {
             var query = File.ReadAllText(Path.Combine(_folder, "CreateIndexesChunkTable.sql"));
             query = query.Replace("{sc}", _schemaName);
+            
             if (string.IsNullOrEmpty(query.Trim())) return;
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
@@ -157,8 +162,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         {
             List<int> list = new List<int>();
 
-            var sql = "select chunk_id from {sc}.chunk where completed = 0";
-            sql = sql.Replace("{sc}", _schemaName);
+            var sql = $"select chunk_id from {_schemaName}.chunk where completed = 0";
 
             using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
             using var command = new OdbcCommand(sql, connection);
@@ -171,18 +175,59 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             return list;
         }
 
-        public void UpdateCompletedChunk(int ChunkId) {
-            var sql = $" UPDATE {_schemaName}.chunk SET completed=1 WHERE chunk_id={ChunkId}";
-            Debug.WriteLine("UpdateCompletedChunk sql=" + sql);
+        public double GetStaffCount()
+        {
+            int i = 0;
+
+            var sql = "select count(1) from {sc}.staff";
+            sql = sql.Replace("{sc}", _schemaName);
+
             using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
             using var command = new OdbcCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
             {
-                //command.CommandTimeout = 0;
-                command.ExecuteNonQuery();
+                i = reader.GetInt32(0);
             }
+
+            return (double)i;
         }
 
-       
+        public double GetPersonCount()
+        {
+            int i = 0;
+
+            var sql = "select count(1) from {sc}.Person";
+            sql = sql.Replace("{sc}", _destinationSchemaName);
+
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                i = reader.GetInt32(0);
+            }
+
+            return (double)i;
+        }
+
+        public int GetVisitOccurenceIdSeq()
+        {
+            int i = 0;
+
+            var sql = $"select nextval('{_schemaName}.visit_detail_id_seq')";
+
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                i = reader.GetInt32(0);
+            }
+
+            connection.Close();
+            return i;
+        }
 
     }
 

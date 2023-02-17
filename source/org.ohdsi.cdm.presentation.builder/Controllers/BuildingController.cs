@@ -1,5 +1,6 @@
 ﻿using org.ohdsi.cdm.framework.common.Definitions;
 using org.ohdsi.cdm.framework.common.Lookups;
+using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
@@ -79,10 +80,23 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 CreateLookup(vocabulary);
 
                 //Map Patient to Person First before create a chunk
+                //MapAllPatients(vocabulary);
+
+                //Create chunk
+                //CreateChunks();
+                
                 Build(vocabulary);
                 
-                //CreateCdmIndexes();
             }
+        }
+
+        private void CreateCdmIndexes()
+        {
+            if (Settings.Current.Building.BuildingState.CreateCdmIndexesDone) return;
+
+            UpdateDate("CreateCdmIndexesStart");
+            _builderController.CreateCdmIndexes();
+            UpdateDate("CreateCdmIndexesEnd");
         }
 
         private void DataCleaning()
@@ -94,7 +108,24 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("DataCleaningEnd");
         }
 
+        private void MapAllPatients(IVocabulary vocabulary) {
 
+            if (Settings.Current.Building.BuildingState.MapAllPatientsDone) return;
+
+            UpdateDate("MapAllPatientsStart");
+            _builderController.MapAllPatients(vocabulary);
+            UpdateDate("MapAllPatientsEnd");
+
+        }
+
+        private void CreateChunks()
+        {
+            if (Settings.Current.Building.BuildingState.ChunksCreated) return;
+
+            UpdateDate("CreateChunksStart");
+            _builderController.CreatChunks();
+            UpdateDate("CreateChunksEnd");
+        }
 
         private void CreateDestination()
         {
@@ -107,24 +138,14 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private void CreateLookup(IVocabulary vocabulary)
         {
+
             if (Settings.Current.Building.BuildingState.LookupCreated) return;
 
             UpdateDate("CreateLookupStart");
             _builderController.CreateLookup(vocabulary);
             UpdateDate("CreateLookupEnd");
         }
-        /*
-        private void MapPatientToPerson(IVocabulary vocabulary) {
 
-            if (Settings.Current.Building.BuildingState.LookupCreated && !Settings.Current.Building.BuildingState.MapPatientToPersonDone) {
-
-                UpdateDate("MapPatientToPersonStart");
-                _builderController.MapPatientToPerson(vocabulary);
-                UpdateDate("MapPatientToPersonEnd");
-            }
-
-        }
-        */
 
         private bool Build(IVocabulary vocabulary)
         {
@@ -151,7 +172,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 _builderController.Build(vocabulary);
                 
-                if (_builderController.CurrentState != BuilderState.Error)
+                if (_builderController.CurrentState != BuilderState.Error && _builderController.CompleteChunksCount == Settings.Current.Building.ChunksCount)
                 {
                     allChunksComplete = true;
                     UpdateDate("BuildingEnd");
@@ -219,6 +240,18 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateDestinationDbEnd", DateTime.Now);
         }
 
+        public void MapAllPatientsStep(IVocabulary vocabulary) {
+            _builderController.MapAllPatients(vocabulary);
+            UpdateDate("MapAllPatientStart", DateTime.Now);
+            UpdateDate("MapAllPatientEnd", DateTime.Now);
+        }
+
+        public void CreateChunksStep() {
+            _builderController.CreatChunks();
+            UpdateDate("CreateChunksStart", DateTime.Now);
+            UpdateDate("CreateChunksEnd", DateTime.Now);
+        }
+
         public void SkipDbCreationStep()
         {
             UpdateDate("CreateDestinationDbStart", DateTime.MaxValue);
@@ -237,6 +270,17 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("DataCleaningEnd", DateTime.MaxValue);
         }
 
+        public void SkipMapAllPatientsStep() {
+            UpdateDate("MapAllPatientsStart", DateTime.MaxValue);
+            UpdateDate("MapAllPatientsEnd", DateTime.MaxValue);
+        }
+
+        public void SkipCreateCdmIndexesStep()
+        {
+            UpdateDate("CreateCdmIndexesStart", DateTime.MaxValue);
+            UpdateDate("CreateCdmIndexesEnd", DateTime.MaxValue);
+        }
+
         public void RestartChunksCreationStep()
         {
             //CreateChunks(true);
@@ -247,12 +291,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateChunksStart", null);
             UpdateDate("CreateChunksEnd", null);
         }
-
-        public void ResetDataCleaningStep()
-        {
-            UpdateDate("DataCleaningStart", null);
-            UpdateDate("DataCleaningEnd", null);
-        }  
 
         public void ResetLookupCreationStep(bool onlyDataUpdate)
         {

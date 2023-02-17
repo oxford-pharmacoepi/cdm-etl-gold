@@ -5,12 +5,13 @@
 		from {sc}.chunk_person
 		where chunk_id = {0}
 	
-	) 
+	), x AS( 
 	select distinct 
 		c.eventdate,
 		c.patid,
 		c.staffid,
-		concat(ch.temp_person_id,to_char(c.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(ch.temp_person_id,to_char(c.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		concat(c.patid,to_char(c.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 		MOD(c.patid, 100000) as care_site_id,
 		m.readcode,
 		case
@@ -82,7 +83,11 @@
 	join {sc}.Clinical c on c.patid = ch.person_id
 	join {sc}.consultation con on c.patid = con.patid and c.consid = con.consid
 	left join {sc}.Medical m on (c.medcode = m.medcode)
-	order by c.patid
+	)
+	select x.*,
+	nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
+	from x
+	order by x.patid
   </Query>
   <ConditionOccurrence>
     <ConditionOccurrenceDefinition>
@@ -90,7 +95,7 @@
       <StartDate>eventdate</StartDate>
       <EndDate>eventdate</EndDate>
       <ProviderId>staffid</ProviderId>
-	  <VisitDetailId>visit_occurrence_id</VisitDetailId>
+	  <!--<VisitDetailId>visit_occurrence_id</VisitDetailId>-->
       <Concepts>
         <Concept>
           <ConceptIdMappers>
@@ -103,6 +108,9 @@
           </Fields>
         </Concept>
       </Concepts>
+	  <AdditionalFields>
+		<string>temp_visit_occurrence_id</string>
+      </AdditionalFields>
     </ConditionOccurrenceDefinition>
   </ConditionOccurrence>
   <VisitOccurrence>
@@ -115,6 +123,7 @@
       <ProviderId>staffid</ProviderId>
       <AdditionalFields>
         <string>constype</string>
+		<string>temp_visit_occurrence_id</string>
       </AdditionalFields>
       <Concepts>
         <Concept>

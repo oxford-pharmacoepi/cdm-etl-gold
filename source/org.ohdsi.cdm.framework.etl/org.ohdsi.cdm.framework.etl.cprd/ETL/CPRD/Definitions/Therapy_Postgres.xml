@@ -1,7 +1,7 @@
 ﻿<QueryDefinition>
   <Query>
     With ch AS(
-				select person_id, temp_person_id
+				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
 			
@@ -13,7 +13,9 @@
 		a.eventdate,
 		product.gemscriptcode,
 		round(case when a.qty &lt; 0 then null else a.qty end, 0) qty,
-		concat(ch.temp_person_id,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(ch.temp_person_id,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99))::numeric as visit_occurrence_id,
+		nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
+		concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99)) as temp_visit_occurrence_id,
 		a.consid,
 		d.dosage_text,
 		coalesce(a.numpacks, 0) numpacks,	
@@ -106,7 +108,8 @@
       <StartDate>eventdate</StartDate>
       <EndDate>eventdate</EndDate>
       <DaysSupply>days_supply</DaysSupply>
-	  <VisitDetailId>visit_occurrence_id</VisitDetailId>
+	  <!--<VisitDetailId>visit_occurrence_id</VisitDetailId>-->
+	  <TempVisitDetailId>temp_visit_occurrence_id</TempVisitDetailId>
       <Refill>issueseq</Refill>
       <Sig>dosage_text</Sig>
       <Quantity>qty</Quantity>
@@ -123,6 +126,9 @@
           </Fields>
         </Concept>
       </Concepts>
+	  <AdditionalFields>
+        <string>temp_visit_occurrence_id</string>
+      </AdditionalFields>
     </DrugExposureDefinition>
   </DrugExposure>
   <VisitOccurrence>
@@ -135,6 +141,7 @@
       <ProviderId>staffid</ProviderId>
       <AdditionalFields>
         <string>constype</string>
+		<string>temp_visit_occurrence_id</string>
       </AdditionalFields>
       <Concepts>
         <Concept>

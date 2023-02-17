@@ -1,5 +1,11 @@
 ﻿<QueryDefinition>
   <Query>
+	With staff AS(
+			select staffid as id
+			from {sc}.staff
+			order by staffid
+			limit {pagesize} offset {pagesize*page}
+	)
 	  select
 	  staffid as PROVIDER_ID,
 	  MOD(staffid, 100000)  as CARE_SITE_ID,
@@ -16,7 +22,7 @@
 	      when coalesce(gender, 0) = 2 then 8532
 	      else 0
 	  end as gender_concept_id
-	  from {sc}.Staff s
+	  from staff ss join {sc}.Staff s on s.staffid=ss.id
 	  JOIN {sc}.lookup l ON s.role = l.code
 	  where lookup_type_id = 76
   </Query>

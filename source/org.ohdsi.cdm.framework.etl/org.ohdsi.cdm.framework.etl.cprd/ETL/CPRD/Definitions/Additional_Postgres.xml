@@ -1,18 +1,18 @@
 ﻿<QueryDefinition>
 	<Query>
 		With ch AS(
-		select person_id, temp_person_id
+		select person_id
 		from {sc}.chunk_person
 		where chunk_id = {0}
 
 		), w_additional AS(
-		select a.patid, a.adid, a.enttype, a.data1, ch.temp_person_id
+		select a.patid, a.adid, a.enttype, a.data1
 		from {sc}.additional a
 		join ch on a.patid=ch.person_id
 
 		), ac AS(
 		select DISTINCT
-		a.temp_person_id, a.patid, a.enttype, a.data1,
+		a.patid, a.enttype, a.data1,
 		c.staffid, c.consid, c.eventdate
 		from {sc}.clinical c
 		join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -64,7 +64,8 @@
 		end as unit_source_value,
 		MOD(ac.patid, 100000) as care_site_id,
 		con.constype,
-		concat(ac.temp_person_id, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(ac.temp_person_id, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 		'' as qualifier_source_value,
 		null as qualifier_concept_id,
 		e.data1 as data,
@@ -95,7 +96,8 @@
 		end as unit_source_value,
 		MOD(ac.patid, 100000) as care_site_id,
 		con.constype,
-		concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 		'' as qualifier_source_value,
 		null as qualifier_concept_id,
 		e.data1 as data,
@@ -125,7 +127,8 @@
 		end as unit_source_value,
 		MOD(ac.patid, 100000) as care_site_id,
 		con.constype,
-		concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+		concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 		'' as qualifier_source_value,
 		null as qualifier_concept_id,
 		e.data1 as data,
@@ -139,18 +142,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data2, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data2 
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data2,
+				a.patid, a.enttype, a.data2,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -200,7 +203,8 @@
 			end as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data2 as data,
@@ -231,7 +235,8 @@
 			end as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data2 as data,
@@ -261,7 +266,8 @@
 			end as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data2 as data,
@@ -275,18 +281,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data3, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data3 
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data3,
+				a.patid, a.enttype, a.data3,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -331,7 +337,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -356,7 +363,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -381,7 +389,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -395,18 +404,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data4, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data4 
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data4,
+				a.patid, a.enttype, a.data4,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -451,7 +460,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data4 as data,
@@ -476,7 +486,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data4 as data,
@@ -501,7 +512,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data4 as data,
@@ -515,18 +527,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data5, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data5
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data5,
+				a.patid, a.enttype, a.data5,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -571,7 +583,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -596,7 +609,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -621,7 +635,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -635,18 +650,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data6, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data6 
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data6,
+				a.patid, a.enttype, a.data6,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -691,7 +706,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data6 as data,
@@ -716,7 +732,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data6 as data,
@@ -741,7 +758,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data6 as data,
@@ -755,18 +773,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data7, ch.temp_person_id 
+			select a.patid, a.adid, a.enttype, a.data7 
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data7,
+				a.patid, a.enttype, a.data7,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -810,7 +828,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data7 as data,
@@ -835,7 +854,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data7 as data,
@@ -860,7 +880,8 @@
 			'' as unit_source_value,
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data7 as data,
@@ -874,18 +895,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data3, a.data4, ch.temp_person_id
+			select a.patid, a.adid, a.enttype, a.data3, a.data4
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data3, a.data4,
+				a.patid, a.enttype, a.data3, a.data4,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -929,7 +950,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -955,7 +977,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -981,7 +1004,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data3 as data,
@@ -996,18 +1020,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data5, a.data6, ch.temp_person_id
+			select a.patid, a.adid, a.enttype, a.data5, a.data6
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data5, a.data6,
+				a.patid, a.enttype, a.data5, a.data6,
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -1050,7 +1074,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -1076,7 +1101,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -1102,7 +1128,8 @@
 			ll2.text as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			e.data5 as data,
@@ -1117,18 +1144,18 @@
 		order by patid
 		GO
 		With ch AS(
-			select person_id, temp_person_id
+			select person_id
 			from {sc}.chunk_person
 			where chunk_id = {0}
 
 		), w_additional AS(
-			select a.patid, a.adid, a.enttype, a.data1, a.data3, a.data4, ch.temp_person_id
+			select a.patid, a.adid, a.enttype, a.data1, a.data3, a.data4
 			from {sc}.additional a
 			join ch on a.patid=ch.person_id
 			
 		), ac AS(
 			select DISTINCT
-				a.temp_person_id, a.patid, a.enttype, a.data1, a.data3, a.data4, 
+				a.patid, a.enttype, a.data1, a.data3, a.data4, 
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
@@ -1150,7 +1177,8 @@
 			'' as unit_source_value,	
 			MOD(ac.patid, 100000) as care_site_id,
 			con.constype,
-			concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			-- concat(ac.temp_person_id,to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99))::numeric as visit_occurrence_id,
+			concat(ac.patid, to_char(ac.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			'' as qualifier_source_value,
 			null as qualifier_concept_id,
 			sm.scoringmethod as data,
@@ -1170,7 +1198,7 @@
 			<PersonId>patid</PersonId>
 			<StartDate>eventdate</StartDate>
 			<ProviderId>staffid</ProviderId>
-			<VisitDetailId>visit_occurrence_id</VisitDetailId>
+			<!--<VisitDetailId>visit_occurrence_id</VisitDetailId>-->
 			<QualifierConceptId>qualifier_concept_id</QualifierConceptId>
 			<QualifierSourceValue>qualifier_source_value</QualifierSourceValue>
 			<ValuesAsString>
@@ -1182,6 +1210,7 @@
 			<AdditionalFields>
 				<string>data</string>
 				<string>constype</string>
+				<string>temp_visit_occurrence_id</string>
 			</AdditionalFields>
 			<Concepts>
 				<Concept>

@@ -47,6 +47,8 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public List<string> DataCleaningSteps { get; set; }
 
+        public List<string> CreateCdmIndexesSteps { get; set; }
+
         public int ChunksCount { get; set; }
 
         public string PersonBuilder

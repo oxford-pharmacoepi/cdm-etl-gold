@@ -14,6 +14,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
         #region Variables
 
         private readonly int _chunkId;
+        private readonly int _chunkSize;
 
         #endregion
 
@@ -30,9 +31,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
         {
             try
             {
-                Console.WriteLine("DatabaseChunkBuilder");
-
-                var part = new DatabaseChunkPart(_chunkId, () => new PersonBuilder(), "0", 0);
+                var part = new DatabaseChunkPart(_chunkId, () => new PersonBuilder(), "0", 0, _chunkSize);
 
                 var timer = new Stopwatch();
                 timer.Start();
