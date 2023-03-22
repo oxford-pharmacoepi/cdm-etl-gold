@@ -48,8 +48,9 @@ Select distinct A.concept_id as concept_id,
 FROM {sc}.CONCEPT C
 JOIN {sc}.CONCEPT_ANCESTOR CA
 	ON CA.ancestor_concept_id = C.concept_id
-	and (c.vocabulary_id) = 'RxNorm'
-	and (c.concept_class_id) = 'Ingredient'
+	-- and (c.vocabulary_id) = 'RxNorm'
+	-- and (c.concept_class_id) = 'Ingredient'
+    and ((c.vocabulary_id = 'RxNorm' and c.concept_class_id = 'Ingredient') or (c.vocabulary_id = 'CVX' and c.standard_concept='S'))
 	and (invalid_reason is null or invalid_reason = '')
 JOIN {sc}.CONCEPT A
 	ON CA.descendant_CONCEPT_ID = A.CONCEPT_ID

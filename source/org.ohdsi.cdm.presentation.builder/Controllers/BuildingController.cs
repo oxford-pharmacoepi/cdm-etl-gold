@@ -80,14 +80,26 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 CreateLookup(vocabulary);
 
                 //Map Patient to Person First before create a chunk
-                //MapAllPatients(vocabulary);
+                MapAllPatients(vocabulary);
 
                 //Create chunk
-                //CreateChunks();
-                
+                CreateChunks();
+
+                //Map all death
+                MapDeath(vocabulary);
+
+                //Map other cdm 
                 Build(vocabulary);
-                
+
             }
+        }
+
+        private void MapDeath(IVocabulary vocabulary) {
+            if (Settings.Current.Building.BuildingState.MapAllDeathDone) return;
+
+            UpdateDate("MapAllDeathStart");
+            _builderController.MapDeath(vocabulary);
+            UpdateDate("MapAllDeathEnd");
         }
 
         private void CreateCdmIndexes()
@@ -250,6 +262,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             _builderController.CreatChunks();
             UpdateDate("CreateChunksStart", DateTime.Now);
             UpdateDate("CreateChunksEnd", DateTime.Now);
+        }
+
+        public void MapAllDeathStep(IVocabulary vocabulary)
+        {
+            _builderController.MapDeath(vocabulary);
+            UpdateDate("MapAllDeathStart", DateTime.Now);
+            UpdateDate("MapAllDeathEnd", DateTime.Now);
         }
 
         public void SkipDbCreationStep()

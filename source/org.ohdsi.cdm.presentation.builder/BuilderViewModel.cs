@@ -318,6 +318,7 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
+
         public bool ChunksStarted
         {
             get
@@ -352,6 +353,41 @@ namespace org.ohdsi.cdm.presentation.builder
                 {
                     return Settings.Current.Building.BuildingState.CreateChunksEnd.Value.Subtract(
                         Settings.Current.Building.BuildingState.CreateChunksStart.Value).ToReadableString();
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public bool MapAllDeathStarted
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.MapAllDeathStarted;
+            }
+        }
+
+        public bool MapAllDeathWorking => MapAllDeathStarted && _buildingController.CurrentState == BuilderState.Running;
+
+        public bool MapAllDeathDone
+        {
+            get
+            {
+                if (_buildingController == null) return false;
+                return Settings.Current.Building.BuildingState.MapAllDeathDone;
+            }
+        }
+
+        public string MapAllDeathInfo
+        {
+            get
+            {
+
+                if (MapAllDeathDone)
+                {
+                    return Settings.Current.Building.BuildingState.MapAllDeathEnd.Value.Subtract(
+                        Settings.Current.Building.BuildingState.MapAllDeathStart.Value).ToReadableString();
                 }
 
                 return string.Empty;
@@ -837,6 +873,7 @@ namespace org.ohdsi.cdm.presentation.builder
         {
             _buildingController?.CreateChunksStep();
         }
+        
 
         private void SkipDbCreationStep()
         {
@@ -1175,6 +1212,11 @@ namespace org.ohdsi.cdm.presentation.builder
                 PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsWorking"));
                 PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsDone"));
                 PropertyChanged(this, new PropertyChangedEventArgs("MapAllPatientsInfo"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllDeathStarted"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllDeathWorking"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllDeathDone"));
+                PropertyChanged(this, new PropertyChangedEventArgs("MapAllDeathInfo"));
 
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingStarted"));
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingWorking"));

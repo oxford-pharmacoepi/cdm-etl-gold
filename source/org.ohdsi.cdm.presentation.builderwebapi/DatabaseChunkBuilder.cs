@@ -32,6 +32,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
             try
             {
                 var part = new DatabaseChunkPart(_chunkId, () => new PersonBuilder(), "0", 0, _chunkSize);
+                //var part = new DatabaseChunkPart(_chunkId, () => new PersonBuilder(), "0", 0);
 
                 var timer = new Stopwatch();
                 timer.Start();

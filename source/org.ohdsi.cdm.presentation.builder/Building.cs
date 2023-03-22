@@ -21,8 +21,11 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? MapAllPatientsEnd { get; set; }
         public DateTime? BuildingStart { get; set; }
         public DateTime? BuildingEnd { get; set; }
+
         public DateTime? CreateCdmIndexesStart { get; set; }
         public DateTime? CreateCdmIndexesEnd { get; set; }
+        public DateTime? MapAllDeathStart { get; set; }
+        public DateTime? MapAllDeathEnd { get; set; }
         public DateTime? CopyVocabularyStart { get; set; }
         public DateTime? CopyVocabularyEnd { get; set; }
         public DateTime? CreateIndexesStart { get; set; }
@@ -40,6 +43,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
                 if (!DataCleaningStart.HasValue)
                     return false;
+
                 return DataCleaningStart.Value != DateTime.MinValue;
             }
         }
@@ -65,6 +69,33 @@ namespace org.ohdsi.cdm.presentation.builder
                     return false;
 
                 return CreateCdmIndexesEnd.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool MapAllDeathStarted
+        {
+            get
+            {
+                if (MapAllDeathDone)
+                    return false;
+
+                if (!MapAllDeathStart.HasValue)
+                    return false;
+
+                return MapAllDeathStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool MapAllDeathDone
+        {
+            get
+            {
+                if (!MapAllDeathEnd.HasValue)
+                    return false;
+
+                return MapAllDeathEnd.Value != DateTime.MinValue;
             }
         }
 

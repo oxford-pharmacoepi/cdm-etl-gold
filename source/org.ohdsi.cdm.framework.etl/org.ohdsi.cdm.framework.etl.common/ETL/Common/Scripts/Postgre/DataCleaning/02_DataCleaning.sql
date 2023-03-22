@@ -35,7 +35,7 @@ BEGIN
 		With t as (
 						SELECT DISTINCT a.patid 
 						FROM {sc}.patient a
-						join {sc}.practice b on a.pracid = b.pracid
+						join {sc}.practice b on MOD(a.patid, 100000) = b.pracid
 						where accept = 0 
 						OR (gender is null or gender in (3,4)) 
 						OR (case when yob < 1000 then 1800 + yob else yob end) < 1875 

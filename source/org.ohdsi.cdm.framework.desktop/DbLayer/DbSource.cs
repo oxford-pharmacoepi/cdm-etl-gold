@@ -229,6 +229,26 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             return i;
         }
 
+        public void ExecuteQuery(string query)
+        {
+            using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
+            {
+                query = query.Replace("{sc}", _destinationSchemaName);
+
+                foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
+                {
+                    if (string.IsNullOrEmpty(subQuery))
+                        continue;
+
+                    using (var command = new OdbcCommand(subQuery, connection))
+                    {
+                        command.CommandTimeout = 0;
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
     }
 
 }

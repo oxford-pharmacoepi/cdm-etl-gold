@@ -17,6 +17,10 @@ namespace org.ohdsi.cdm.framework.desktop
         public DateTime? CreateLookupEnd { get; private set; }
         public DateTime? BuildingStart { get; private set; }
         public DateTime? BuildingEnd { get; private set; }
+        public DateTime? MapAllPatientsStart { get; private set; }
+        public DateTime? MapAllPatientsEnd { get; private set; }
+        public DateTime? MapAllDeathStart { get; private set; }
+        public DateTime? MapAllDeathEnd { get; private set; }
         public DateTime? CopyVocabularyStart { get; private set; }
         public DateTime? CopyVocabularyEnd { get; private set; }
         public DateTime? CreateIndexesStart { get; private set; }
@@ -122,6 +126,28 @@ namespace org.ohdsi.cdm.framework.desktop
             }
         }
 
+        public bool MapAllDeathStarted
+        {
+            get
+            {
+                if (!MapAllDeathStart.HasValue)
+                    return false;
+
+                return MapAllDeathStart.Value != DateTime.MinValue;
+            }
+        }
+
+        public bool MapAllDeathDone
+        {
+            get
+            {
+                if (!MapAllDeathEnd.HasValue)
+                    return false;
+
+                return MapAllDeathEnd.Value != DateTime.MinValue;
+            }
+        }
+
         public bool IndexesStarted
         {
             get
@@ -212,12 +238,16 @@ namespace org.ohdsi.cdm.framework.desktop
             CreateLookupEnd = reader.GetDateTime("CreateLookupEnd");
             BuildingStart = reader.GetDateTime("BuildingStart");
             BuildingEnd = reader.GetDateTime("BuildingEnd");
-            CopyVocabularyStart = reader.GetDateTime("CopyVocabularyStart");
-            CopyVocabularyEnd = reader.GetDateTime("CopyVocabularyEnd");
-            CreateIndexesStart = reader.GetDateTime("CreateIndexesStart");
-            CreateIndexesEnd = reader.GetDateTime("CreateIndexesEnd");
-            PostprocessStart = reader.GetDateTime("PostprocessStart");
-            PostprocessEnd = reader.GetDateTime("PostprocessEnd");
+            MapAllPatientsStart = reader.GetDateTime("MapAllPatientsStart");
+            MapAllPatientsEnd = reader.GetDateTime("MapAllPatientsEnd");
+            MapAllDeathStart = reader.GetDateTime("MapAllDeathStart");
+            MapAllDeathEnd = reader.GetDateTime("MapAllDeathEnd");
+            //CopyVocabularyStart = reader.GetDateTime("CopyVocabularyStart");
+            //CopyVocabularyEnd = reader.GetDateTime("CopyVocabularyEnd");
+            //CreateIndexesStart = reader.GetDateTime("CreateIndexesStart");
+            //CreateIndexesEnd = reader.GetDateTime("CreateIndexesEnd");
+            //PostprocessStart = reader.GetDateTime("PostprocessStart");
+            //PostprocessEnd = reader.GetDateTime("PostprocessEnd");
         }
         #endregion
     }

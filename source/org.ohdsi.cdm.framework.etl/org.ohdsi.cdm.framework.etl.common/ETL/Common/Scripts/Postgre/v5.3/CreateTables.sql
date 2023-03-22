@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
-   cdm_source_name                 varchar(255)   NOT NULL,
+   cdm_source_name                 varchar(255)   PRIMARY KEY,
    cdm_source_abbreviation         varchar(25),
    cdm_holder                      varchar(255),
    source_description              text,

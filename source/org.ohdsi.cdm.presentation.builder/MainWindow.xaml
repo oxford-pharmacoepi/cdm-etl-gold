@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:org.ohdsi.cdm.presentation.builder"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="568.409" Width="900" MinHeight="779" MinWidth="900">
+        Title="{Binding Title}" Height="568.409" Width="1200" MinHeight="779" MinWidth="900">
     <Window.Resources>
         <Style x:Key="LinkButton" TargetType="ToggleButton">
             <Setter Property="Template">
@@ -225,15 +225,6 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
                                     <TextBlock Style="{StaticResource ActionTextBlock}">CDM database creation<LineBreak/>
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Create tables" Command ="{Binding Path=CreateTablesStepCommand}"/>
-                                                <!--<MenuItem Header="Drop tables" Command ="{Binding Path=DropTableStepCommand}"/>-->
-                                                <Separator/>
-                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipDbCreationStepCommand}"/>
-                                                <MenuItem Header="Reset step" Command ="{Binding Path=ResetDbCreationStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
                                     </TextBlock>
                                     <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
                                 </StackPanel>
@@ -267,21 +258,13 @@
                                 <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding MapAllPatientsWorking, Converter={StaticResource boolToVisConverter}}"/>
                                 <TextBlock Text="{Binding MapAllPatientsInfo}" TextAlignment="Center"/>
                             </StackPanel>
-                            
+
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding ChunksStarted, Converter={StaticResource boolToVisConverter}}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
                                     <TextBlock Style="{StaticResource ActionTextBlock}">Create Chunks<LineBreak/>
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Create Chunks" Command ="{Binding Path=CreateChunksStepCommand}"/>
-                                                <Separator/>
-                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipChunksCreationStepCommand}"/>
-                                                <MenuItem Header="Reset step" Command ="{Binding Path=ResetChunksCreationStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
                                     </TextBlock>
                                     <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
                                 </StackPanel>
@@ -292,21 +275,23 @@
 
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
+                                    <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding MapAllDeathStarted, Converter={StaticResource boolToVisConverter}}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <TextBlock Style="{StaticResource ActionTextBlock}">Map All Death<LineBreak/></TextBlock>
+                                    <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
+                                </StackPanel>
+                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding MapAllDeathDone, Converter={StaticResource boolToVisConverter}}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding MapAllDeathWorking, Converter={StaticResource boolToVisConverter}}"/>
+                                <TextBlock Text="{Binding MapAllDeathInfo}" TextAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding BuildingStarted, Converter={StaticResource boolToVisConverter}}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
                                     <TextBlock Style="{StaticResource ActionTextBlock}" Text="Conversion to CDM">
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <!--<MenuItem Header="Reset not finished chunks" Command ="{Binding Path=ResetNotFinishedChunksCommand}"/>-->
-                                                <MenuItem Header="Truncate tables" Command ="{Binding Path=TruncateTablesCommand}"/>
-                                                <MenuItem Header="Truncate tables without lookup" Command ="{Binding Path=TruncateWithoutLookupTablesCommand}"/>
-                                                <!--<MenuItem Header="Fill post build tables" Command ="{Binding Path=FillPostBuildTableCommand}"/>-->
-                                                <Separator/>
-                                                <!--<MenuItem Header="Skip step" Command ="{Binding Path=SkipBuildingStepCommand}"/>-->
-                                                <MenuItem Header="Reset step" Command ="{Binding Path=ResetBuildingStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
                                     </TextBlock>
                                     <Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>
                                 </StackPanel>
@@ -315,26 +300,6 @@
                                 <TextBlock Text="{Binding BuildingInfo}" TextAlignment="Center"/>
                             </StackPanel>
                             
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Height="5">
-                                    <Polygon Points="0,0 2.5,5 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding CreateCdmIndexesStarted, Converter={StaticResource boolToVisConverter}}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ActionTextBlock}" Text="CDM Indexes Creation">
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Skip step" Command ="{Binding Path=SkipCreateCdmIndexesStepCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
-                                    </TextBlock>
-                                    <!--<Separator Width="20" Foreground="Black" Margin="3,1,3,0"/>-->
-                                </StackPanel>
-                                <!--
-                                <ProgressBar Minimum="0" Maximum="0" Height="4" BorderThickness="0" Visibility="{Binding CreateCdmIndexesDone, Converter={StaticResource boolToVisConverter}}"/>
-                                <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding CreateCdmIndexesWorking, Converter={StaticResource boolToVisConverter}}"/>
-                                -->
-                                <TextBlock Text="{Binding CreateCdmIndexesInfo}" TextAlignment="Center"/>
-                            </StackPanel>
                             <!--<StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding VocabularyStarted, Converter={StaticResource boolToVisConverter}}"/>
