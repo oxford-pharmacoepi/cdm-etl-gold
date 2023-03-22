@@ -511,7 +511,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 if (CdmVersion == CdmVersions.V53 || CdmVersion == CdmVersions.V6)
                 {
                     Write(chunk, "VISIT_DETAIL");
-                    Write(chunk.ChunkId, chunk.SubChunkId, new MetadataDataReader(chunk.Metadata.Values.ToList()), "METADATA_TMP");
+                    //Write(chunk.ChunkId, chunk.SubChunkId, new MetadataDataReader(chunk.Metadata.Values.ToList()), "METADATA_TMP");
                 }
                 
                 Write(chunk, "FACT_RELATIONSHIP");

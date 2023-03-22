@@ -175,17 +175,24 @@ namespace org.ohdsi.cdm.presentation.builder
                        "DataCleaning",
                        "04_Create_daysupply_tables.sql"));
 
-        /*
-         public string CreateCdmIndexesScript => File.ReadAllText(
-            Path.Combine(
+        public List<string> CreateCdmPkIdxScripts()
+        {
+            List<string> scripts = new List<string>();
+            var path = Path.Combine(
                         BuilderFolder,
                         "ETL",
                         "Common",
                         "Scripts",
                         Building.SourceEngine.Database.ToString(),
-                        GetCdmVersionFolder(),
-                        "CreateIndexes.sql"));
-        */
+                        "CreateIndexes");
+
+            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
+            {
+                scripts.Add(File.ReadAllText(file));
+            }
+
+            return scripts;
+        }
 
         #endregion
 

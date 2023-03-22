@@ -35,12 +35,12 @@ namespace org.ohdsi.cdm.framework.common.Builder
 
         public List<FactRelationship> FactRelationships { get; private set; }
 
-        
+
         public ChunkData(int chunkId, int subChunkId, int chunkSize)
+        //public ChunkData(int chunkId, int subChunkId)
         {
             ChunkId = chunkId;
             SubChunkId = subChunkId;
-            ChunkSize = chunkSize;
             Init();
         }
         

@@ -4,6 +4,16 @@
 				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}
+	),temp AS(
+				select distinct a.patid, a.eventdate, c.constype
+				from ch
+				join {sc}.therapy a on ch.person_id = a.patid
+				join {sc}.consultation c on a.patid = c.patid and a.consid = c.consid	
+	), x AS(
+				select patid, eventdate, constype,
+				concat(patid,to_char(eventdate,'YYYYMMDD'), coalesce(constype, 99)) as temp_visit_occurrence_id,
+				nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
+				from temp
 	)
 	select  
 		a.patid,
@@ -13,8 +23,8 @@
 		product.gemscriptcode,
 		round(case when a.qty &lt; 0 then null else a.qty end, 0) qty,
 		-- concat(ch.temp_person_id,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99))::numeric as visit_occurrence_id,
-		concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99)) as temp_visit_occurrence_id,
-		nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
+		x.temp_visit_occurrence_id,
+		x.visit_occurrence_id,
 		a.consid,
 		d.dosage_text,
 		coalesce(a.numpacks, 0) numpacks,	
@@ -88,6 +98,7 @@
 	from ch
 	join {sc}.therapy a on a.patid = ch.person_id
 	join {sc}.consultation c on a.patid = c.patid and a.consid = c.consid
+	join x on a.patid = x.patid and a.eventdate = x.eventdate and c.constype = x.constype
 
 	left join {sc}.Product product on a.prodcode = product.prodcode
 	left join {sc}.commondosages d on a.dosageid = d.dosageid
@@ -99,8 +110,6 @@
 																end, 0) 
 										and dd.numpacks = coalesce(a.numpacks, 0)
 	left join {sc}.daysupply_modes dm on a.prodcode = dm.prodcode
-	where a.eventdate is not null 
-	and c.eventdate is not null
     order by a.patid
   </Query>
   <DrugExposure>
@@ -110,6 +119,7 @@
       <EndDate>eventdate</EndDate>
       <DaysSupply>days_supply</DaysSupply>
 	  <!--<VisitDetailId>visit_occurrence_id</VisitDetailId>-->
+	  <TempVisitDetailId>temp_visit_occurrence_id</TempVisitDetailId>
       <Refill>issueseq</Refill>
       <Sig>dosage_text</Sig>
       <Quantity>qty</Quantity>

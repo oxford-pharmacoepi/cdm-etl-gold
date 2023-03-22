@@ -801,7 +801,6 @@ namespace org.ohdsi.cdm.framework.common.Base
             foreach (var e in Clean(entitiesToBuild, observationPeriods, withinTheObservationPeriod))
             {
                 if (e.VisitOccurrenceId == null || visitOccurrences.ContainsKey(e.VisitOccurrenceId.Value))
-                //if (e.VisitOccurrenceId == null || vo!=null)
                 {
                     if (e.IsUnique)
                     {

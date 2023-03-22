@@ -25,6 +25,7 @@ namespace org.ohdsi.cdm.presentation.builder.Base
         #region Constructors
 
         public DatabaseChunkBuilder(int chunkId, Func<IPersonBuilder> createPersonBuilder, int chunkSize)
+        //public DatabaseChunkBuilder(int chunkId, Func<IPersonBuilder> createPersonBuilder)
         {
             _chunkId = chunkId;
             _chunkSize = chunkSize;
@@ -41,6 +42,7 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 Debug.WriteLine("_chunkId=" + _chunkId);
 
                 var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0, _chunkSize);
+                //var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0);
 
                 var timer = new Stopwatch();
                 timer.Start();

@@ -1,11 +1,11 @@
 ﻿<QueryDefinition>
 	<Query>
-	With ch AS(
-				select person_id
-				from {sc}.chunk_person
-				where chunk_id = {0}	
-	)
-			SELECT DISTINCT
+		With pat AS(
+			select patid from {sc}.patient
+			order by patid
+			limit {pagesize} offset {pagesize*page}
+		)
+		SELECT DISTINCT
 			a.patid,
 			a.frd,
 			case
@@ -37,15 +37,14 @@
 			toreason,
 			CASE
 				WHEN toreason = 1 and deathdate is not null and deathdate &gt; '1987-01-01' THEN 1
-			ELSE 0
-			END as DIED,
-			null as RACE_CONCEPT_ID,
-			null as RACE_SOURCE_VALUE,
-			accept,
-			44814725 PeriodTypeConceptId
-			from ch
-			join {sc}.PATIENT a on a.patid = ch.person_id
-			join {sc}.practice b on a.pracid = b.pracid
+		ELSE 0
+		END as DIED,
+		null as RACE_CONCEPT_ID,
+		null as RACE_SOURCE_VALUE,
+		accept,
+		44814725 PeriodTypeConceptId
+		from pat join {sc}.patient a on a.patid=pat.patid
+		join {sc}.practice b on MOD(a.patid, 100000) = b.pracid
 	</Query>
 	<Persons>
 		<PersonDefinition>
@@ -67,18 +66,4 @@
 			</AdditionalFields>
 		</PersonDefinition>
 	</Persons>
-	<Death>
-		<DeathDefinition>
-			<PersonId>patid</PersonId>
-			<StartDate>deathdate</StartDate>
-			<Died>DIED</Died>
-			<Concepts>
-				<Concept>
-					<Fields>
-						<Field key="toreason" defaultConceptId = "1" defaultTypeId = "38003569"/>
-					</Fields>
-				</Concept>
-			</Concepts>
-		</DeathDefinition>
-	</Death>
 </QueryDefinition>

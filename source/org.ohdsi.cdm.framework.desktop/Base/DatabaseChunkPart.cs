@@ -20,8 +20,10 @@ namespace org.ohdsi.cdm.framework.desktop.Base
         public ChunkData ChunkData { get; private set; }
 
         public DatabaseChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt, int chunkSize) : base(chunkId, createPersonBuilder, prefix, attempt)
+        //public DatabaseChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt) : base(chunkId, createPersonBuilder, prefix, attempt)
         {
             ChunkData = new ChunkData(ChunkId, int.Parse(Prefix), chunkSize);
+            //ChunkData = new ChunkData(ChunkId, int.Parse(Prefix));
             PersonBuilders = new Dictionary<long, Lazy<IPersonBuilder>>();
             OffsetManager = new KeyMasterOffsetManager(ChunkId, int.Parse(Prefix), 0);
         }
@@ -29,6 +31,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
         public void Reset()
         {
             ChunkData = new ChunkData(ChunkId, int.Parse(Prefix), 0);
+            //ChunkData = new ChunkData(ChunkId, int.Parse(Prefix));
             PersonBuilders = new Dictionary<long, Lazy<IPersonBuilder>>();
             OffsetManager = new KeyMasterOffsetManager(ChunkId, int.Parse(Prefix), 0);
         }

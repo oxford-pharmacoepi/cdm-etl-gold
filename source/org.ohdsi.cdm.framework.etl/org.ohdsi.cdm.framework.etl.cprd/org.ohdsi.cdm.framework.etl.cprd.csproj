@@ -98,10 +98,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.Odbc" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
   </ItemGroup>
 

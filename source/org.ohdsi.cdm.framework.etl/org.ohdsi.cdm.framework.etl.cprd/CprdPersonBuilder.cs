@@ -28,12 +28,30 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
         {
 
+
             foreach (var visitOccurrence in visitOccurrences)
             {
                 var visitDetail =
                     new VisitDetail(visitOccurrence)
                     {
-                        Id = visitOccurrence.Id,  //call seq
+                        Id = visitOccurrence.Id,
+                        CareSiteId = visitOccurrence.CareSiteId,
+                    };
+
+                yield return visitDetail;
+            }
+        }
+
+        public IEnumerable<VisitDetail> BuildVisitDetails(Dictionary<string, long> grp,
+            VisitOccurrence[] visitOccurrences)
+        {
+
+            foreach (var visitOccurrence in visitOccurrences)
+            {
+                var visitDetail =
+                    new VisitDetail(visitOccurrence)
+                    {
+                        Id = grp[visitOccurrence.AdditionalFields["temp_visit_occurrence_id"]],
                         CareSiteId = visitOccurrence.CareSiteId,
                     };
 
@@ -241,19 +259,43 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             
             var observationPeriods = data.ObservationPeriods.ToArray();
 
-            var tempVisitDetails = new Dictionary<string, VisitDetail>();    //TempVisitDetailId
             var visitDetails = new Dictionary<long, VisitDetail>();
             var visitDetIds = new List<long>();
+            var tempVisitDetails = new Dictionary<string, VisitDetail>();    //TempVisitDetailId
 
-            var vds = BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
+            
+            //set visit_occurrence_id in vo_raw
+            var visitDetailIds = new Dictionary<string, long>();
+            var grpby = VisitOccurrencesRaw.GroupBy(u => u.AdditionalFields["temp_visit_occurrence_id"]).Select(x => x.OrderBy(u => u.Id).First());
+
+            foreach (var obj in grpby)
+            {
+                var key = obj.AdditionalFields["temp_visit_occurrence_id"];
+
+                if (visitDetailIds.ContainsKey(key))
+                    continue;
+
+                visitDetailIds.Add(key, obj.Id);
+            }
+
+            foreach (var vd in VisitOccurrencesRaw) {
+
+                var key = vd.AdditionalFields["temp_visit_occurrence_id"];
+
+                if (visitDetailIds.ContainsKey(key))
+                    vd.Id = visitDetailIds[key];
+
+            }
+            //set visit_occurrence_id in vo_raw
+            
+
+            //Debug.WriteLine($"VisitOccurrencesRaw.Count={VisitOccurrencesRaw.Count}");
+
+            foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
                     vo.StartDate.Year >= person.YearOfBirth &&
                     vo.EndDate.Value.Year >= person.YearOfBirth &&
                     vo.StartDate.Year <= DateTime.Now.Year &&
-                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray();
-
-            Array.Sort(vds);
-
-            foreach (var vd in vds)
+                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray().OrderBy(u=>u.StartDate).ThenBy(u=>u.AdditionalFields["constype"]))
             {
 
                 if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
@@ -271,38 +313,34 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                             continue;
                         }
                     }
-                /*
+
                 if (visitDetails.ContainsKey(vd.Id))
                     continue;
 
                 visitDetails.Add(vd.Id, vd);
-                */
-                if (tempVisitDetails.ContainsKey(vd.AdditionalFields["temp_visit_occurrence_id"]))
-                    continue;
-
-                tempVisitDetails.Add(vd.AdditionalFields["temp_visit_occurrence_id"], vd);
-                visitDetails.Add(vd.Id, vd);
                 visitDetIds.Add(vd.Id);
 
+                tempVisitDetails.Add(vd.AdditionalFields["temp_visit_occurrence_id"], vd);
+
             }
+            
 
             long? prevVisitDetId = null;
-            foreach (var visitId in visitDetIds.OrderBy(v => v))
+            //foreach (var visitId in visitDetIds.OrderBy(v => v))
+            foreach (var visitId in visitDetIds)
             {
                 if (prevVisitDetId.HasValue)
                 {
                     visitDetails[visitId].PrecedingVisitDetailId = prevVisitDetId;
-                    //visitDetails.Values.ToList().Find(vd => vd.Id == visitId).PrecedingVisitDetailId = prevVisitDetId;
-                    //visitDetailList.Find(vd=>vd.Id == visitId).PrecedingVisitDetailId = prevVisitDetId;
                 }
 
                 prevVisitDetId = visitId;
             }
+            
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var byStartDate in visitDetails.Values.GroupBy(v => v.StartDate))
-            //foreach (var byStartDate in visitDetailList.GroupBy(v => v.StartDate))
+            foreach (var byStartDate in visitDetails.Values.OrderBy(x => x.StartDate).GroupBy(v => v.StartDate))
             {
                 var vd = byStartDate.First();
                 var providerId = byStartDate.Min(v => v.ProviderId);
@@ -328,9 +366,17 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitIds.Add(visitOccurrence.Id);
             }
 
+            /*
+            foreach (var vo in visitOccurrences.Values.OrderBy(x => x.AdditionalFields["constype"]).ThenBy(x => x.StartDate))
+            {
+                visitIds.Add(vo.Id);
+            }
+            */
+            
 
             long? prevVisitId = null;
-            foreach (var visitId in visitIds.OrderBy(v => v))
+            //foreach (var visitId in visitIds.OrderBy(v => v))
+            foreach (var visitId in visitIds)
             {
                 if (prevVisitId.HasValue)
                 {
@@ -491,53 +537,18 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             foreach (var e in inputRecords)
             {
                 //if (!e.VisitDetailId.HasValue)
-                
-                if (e.AdditionalFields==null)
-                    continue;
-                
+                //    continue;
+                //if (e.AdditionalFields==null)
+                //    continue;
 
                 if (vd.ContainsKey(e.AdditionalFields["temp_visit_occurrence_id"]))
                 {
-                    //e.VisitOccurrenceId = vd[e.VisitDetailId.Value].VisitOccurrenceId;
-                    e.VisitOccurrenceId = vd[e.AdditionalFields["temp_visit_occurrence_id"]].VisitOccurrenceId;
-                    e.VisitDetailId = vd[e.AdditionalFields["temp_visit_occurrence_id"]].Id;
                     
+                    var obj = vd[e.AdditionalFields["temp_visit_occurrence_id"]];
+                    e.VisitDetailId = obj.Id;
+                    e.VisitOccurrenceId = obj.VisitOccurrenceId;
+
                 }
-            }
-        }
-
-        private void SetVisitOccurrenceId3<T>(IEnumerable<T> inputRecords, List<VisitDetail> vd)
-            where T : class, IEntity
-        {
-            foreach (var e in inputRecords)
-            {
-                if (!e.VisitDetailId.HasValue)
-                    continue;
-
-                //Debug.WriteLine($"e.PersonId={e.PersonId} e.StartDate={e.StartDate} e.AdditionalFields={(e.AdditionalFields == null ? null : e.AdditionalFields["constype"])}");
-
-                VisitDetail p_vd = null;
-
-                if (e.AdditionalFields == null)
-                {
-
-                    p_vd = vd.Find(obj => obj.PersonId == e.PersonId &&
-                                          obj.StartDate == e.StartDate &&
-                                          obj.AdditionalFields == null);
-                }
-                else {
-                    p_vd = vd.Find(obj => obj.PersonId == e.PersonId &&
-                                          obj.StartDate == e.StartDate &&
-                                          obj.AdditionalFields["constype"] == e.AdditionalFields["constype"]);
-                }
-
-
-                if (p_vd != null)
-                {
-                    e.VisitOccurrenceId = p_vd.VisitOccurrenceId;
-                    e.VisitDetailId = p_vd.Id;
-                }
-
             }
         }
 

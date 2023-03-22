@@ -1,26 +1,23 @@
 ﻿<QueryDefinition>
 	<Query>
+		With ch AS(
+			SELECT person_id 
+			from {sc}.chunk_person 
+			order by person_id
+			limit {pagesize} offset {pagesize*page}
+		)
 		SELECT DISTINCT
 			a.patid,
-		case
-			when a.frd &gt; b.uts then a.frd
-				else b.uts 
-			end as observation_period_start_date,
-		case
-			when a.tod is null then b.lcd
-			when a.tod is not null and a.tod &lt; b.lcd  then a.tod
-			when a.tod is not null and a.tod &gt;= b.lcd  then b.lcd
-			else '23-DEC-2099' 
-		end as observation_period_end_date,
 			deathdate,
 			toreason,
 		CASE
 			WHEN toreason = 1 and deathdate is not null and deathdate &gt; '1987-01-01' THEN 1
 			ELSE 0
 		END as DIED
-		from pat as a
-		join {sc}.practice b on a.pracid = b.pracid
+		from ch
+		join {sc}.patient as a on ch.person_id = a.patid
 		where deathdate is not null
+		order by a.patid
 	</Query>
 	<Death>
 		<DeathDefinition>

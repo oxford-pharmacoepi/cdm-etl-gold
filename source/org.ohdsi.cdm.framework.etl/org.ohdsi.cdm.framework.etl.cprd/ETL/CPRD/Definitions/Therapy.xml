@@ -89,7 +89,7 @@
     left join {sc}.daysupply_modes dm on a.prodcode = dm.prodcode
     left join {sc}.consultation c on a.patid = c.patid and a.consid = c.consid
     where a.eventdate is not null
-    order by a.patid
+    order by a.patid, visit_occurrence_id
   </Query>
   <DrugExposure>
     <DrugExposureDefinition>
