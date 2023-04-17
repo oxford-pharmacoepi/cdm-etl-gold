@@ -34,7 +34,7 @@ namespace org.ohdsi.cdm.framework.common.Base
         //void Build(ChunkData chunkData);
         Attrition Build(ChunkData data, KeyMasterOffsetManager offset);
 
-        Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager offset);
+        Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager offset, long pkey);
 
         Death BuildDeath(Death[] death, Dictionary<long, VisitOccurrence> visitOccurrences,
             ObservationPeriod[] observationPeriods);

@@ -184,7 +184,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             foreach (var pb in PersonBuilders)
             {
                 //var result = pb.Value.Value.Build(ChunkData, OffsetManager);
-                var result = pb.Value.Value.BuildCdm(ChunkData, OffsetManager);
+                var result = pb.Value.Value.BuildCdm(ChunkData, OffsetManager, pb.Key);
                 ChunkData.AddAttrition(pb.Key, result);
             }
 

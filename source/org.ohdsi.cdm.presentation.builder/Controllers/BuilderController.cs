@@ -637,6 +637,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             var personCount = dbDestination.GetPersonCount();
             var n = (int)Math.Ceiling(personCount / pagesize);
 
+            Debug.WriteLine("personCount=" + personCount);
+            Debug.WriteLine("pagesize=" + pagesize);
             Debug.WriteLine("n=" + n);
 
             var dead = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Death != null);
@@ -657,14 +659,15 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     foreach (var d in deathRaw)
                     {
-
+                        //* In exisiting logic, observation period is ignored. 
                         // 1. clean death out of observation period
-                        var op = ops.Where(op => op.PersonId == d.PersonId).First();
+                        //var op = ops.Where(op => op.PersonId == d.PersonId).First();
 
-                        if (d.StartDate >= op.StartDate.Date && d.StartDate <= op.EndDate.Value.Date && d.StartDate.Year >= 1900)
-                        {
+                        //if (d.StartDate >= op.StartDate.Date && d.StartDate <= op.EndDate.Value.Date && d.StartDate.Year >= 1900 && d.Primary)
+                        //{
+                        if (d.StartDate.Year <= DateTime.Now.Year)
                             death.Add(d);
-                        }
+                        //}
 
 
                     }
@@ -674,8 +677,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     //Debug.WriteLine($"deathRaw={deathRaw.Count}");
                     //Debug.WriteLine($"death={death.Count}");
 
-
-                    Console.WriteLine("Saving locations and CareSite...");
                     var saver = Settings.Current.Building.DestinationEngine.GetSaver();
                     using (saver.Create(Settings.Current.Building.DestinationConnectionString,
                         Settings.Current.Building.Cdm,
