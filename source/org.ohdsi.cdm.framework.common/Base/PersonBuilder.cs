@@ -957,7 +957,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             return Attrition.None;
         }
 
-        public virtual Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om) {
+        public virtual Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager o, long pkey) {
             return Attrition.None;
         }
 

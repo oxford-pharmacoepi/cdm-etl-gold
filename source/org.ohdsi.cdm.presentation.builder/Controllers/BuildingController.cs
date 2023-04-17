@@ -190,6 +190,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     UpdateDate("BuildingEnd");
                 }
                 
+                
             }
             return allChunksComplete;
         }

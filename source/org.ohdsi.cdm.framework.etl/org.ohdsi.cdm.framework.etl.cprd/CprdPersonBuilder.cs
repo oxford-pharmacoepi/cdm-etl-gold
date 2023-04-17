@@ -76,6 +76,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 return Attrition.InvalidObservationTime;
 
             var op = ObservationPeriodsRaw.Where(op =>
+                    op.PersonId == person.PersonId &&
                     op.StartDate < op.EndDate &&
                     op.StartDate.Year >= person.YearOfBirth &&
                     op.EndDate.Value.Year >= person.YearOfBirth &&
@@ -125,8 +126,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
                 visitDetails.Add(vd.Id, vd);
                 visitDetIds.Add(vd.Id);
-
-
 
             }
 
@@ -245,19 +244,22 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         /// <summary>
         /// Build person entity and all person related entities like: DrugExposures, ConditionOccurrences, ProcedureOccurrences... from raw data sets 
         /// </summary>
-        public override Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om)
+        public override Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om, long pkey)
         {
             Offset = om;
             ChunkData = data;
 
-            PersonRecords = data.Persons;
+            PersonRecords = data.Persons.Where(p=>p.PersonId == pkey).ToList();
 
-            var result = BuildPerson(PersonRecords.ToList());
+            var result = BuildPerson(PersonRecords);
             var person = result.Key;
             if (person == null)
                 return result.Value;
-            
-            var observationPeriods = data.ObservationPeriods.ToArray();
+
+            //Debug.WriteLine($"person.PersonId={person.PersonId}");
+
+            //var observationPeriods = data.ObservationPeriods.ToArray();
+            var observationPeriods = data.ObservationPeriods.Where(op => op.PersonId == person.PersonId).ToArray();
 
             var visitDetails = new Dictionary<long, VisitDetail>();
             var visitDetIds = new List<long>();
@@ -267,7 +269,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             //set visit_occurrence_id in vo_raw
             var visitDetailIds = new Dictionary<string, long>();
             var grpby = VisitOccurrencesRaw.GroupBy(u => u.AdditionalFields["temp_visit_occurrence_id"]).Select(x => x.OrderBy(u => u.Id).First());
-
+            
             foreach (var obj in grpby)
             {
                 var key = obj.AdditionalFields["temp_visit_occurrence_id"];
@@ -286,10 +288,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     vd.Id = visitDetailIds[key];
 
             }
-            //set visit_occurrence_id in vo_raw
-            
-
-            //Debug.WriteLine($"VisitOccurrencesRaw.Count={VisitOccurrencesRaw.Count}");
 
             foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.Where(vo =>
                     vo.StartDate.Year >= person.YearOfBirth &&
@@ -301,6 +299,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
                     vd.StartDate.Month < person.MonthOfBirth ||
                     vd.StartDate.Year < person.YearOfBirth.Value)
+
                     if (vd.StartDate.Year < person.YearOfBirth.Value)
                     {
                         if (DateTime.TryParse(person.AdditionalFields["frd"], out var frd))
@@ -323,7 +322,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 tempVisitDetails.Add(vd.AdditionalFields["temp_visit_occurrence_id"], vd);
 
             }
-            
 
             long? prevVisitDetId = null;
             //foreach (var visitId in visitDetIds.OrderBy(v => v))
@@ -337,6 +335,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 prevVisitDetId = visitId;
             }
             
+
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
@@ -554,17 +553,20 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
         public override KeyValuePair<Person, Attrition> BuildPerson(List<Person> records)
         {
+
             if (records == null || records.Count == 0)
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnacceptablePatientQuality);
 
-            var ordered = records.OrderByDescending(p => p.StartDate).ToArray();
+            //var ordered = records.OrderByDescending(p => p.StartDate).ToArray();
+            var ordered = records.ToArray();
             var person = ordered.Take(1).First();
             /*
             if (person.AdditionalFields["accept"] != "1")
                 return new KeyValuePair<Person, Attrition>(null, Attrition.UnacceptablePatientQuality);
             */
-            person.StartDate = ordered.Take(1).Last().StartDate;
+            /*
 
+            person.StartDate = ordered.Take(1).Last().StartDate;
             var gender =
                 records.GroupBy(p => p.GenderConceptId).OrderByDescending(gp => gp.Count()).Take(1).First().First();
             var race = records.GroupBy(p => p.RaceConceptId).OrderByDescending(gp => gp.Count()).Take(1).First()
@@ -574,7 +576,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             person.GenderSourceValue = gender.GenderSourceValue;
             person.RaceConceptId = race.RaceConceptId;
             person.RaceSourceValue = race.RaceSourceValue;
-
+            */
             /*
             if (person.YearOfBirth < 1875)
                 return new KeyValuePair<Person, Attrition>(null, Attrition.ImplausibleYOBPast);
