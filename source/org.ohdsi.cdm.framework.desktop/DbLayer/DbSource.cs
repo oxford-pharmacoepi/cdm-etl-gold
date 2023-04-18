@@ -202,6 +202,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
             using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
             using var command = new OdbcCommand(sql, connection);
+            command.CommandTimeout = 0;
             using var reader = command.ExecuteReader();
             if (reader.Read())
             {
