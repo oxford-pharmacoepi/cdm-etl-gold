@@ -613,8 +613,8 @@ namespace org.ohdsi.cdm.framework.common.Base
         public virtual IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
             Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
         {
-            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
-            //return BuildEntities2(drugExposures, visitOccurrences.Values.ToList(), observationPeriods, false);
+            //return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
+            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, true);
         }
 
         /// <summary>
@@ -628,8 +628,8 @@ namespace org.ohdsi.cdm.framework.common.Base
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
             ObservationPeriod[] observationPeriods)
         {
-            return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, false);
-           // return BuildEntities2(conditionOccurrences, visitOccurrences.Values.ToList(), observationPeriods, false);
+            //return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, false);
+            return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, true);
         }
 
         /// <summary>
