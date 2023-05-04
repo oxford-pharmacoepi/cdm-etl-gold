@@ -5,7 +5,7 @@ declare
     n record;
 	vd record;
 begin
-	for chunk in select person_id from person
+	for chunk in select person_id from person order by person_id
 	loop
 		RAISE NOTICE 'person %', chunk.person_id;
 		
@@ -42,5 +42,6 @@ begin
 		end loop;
 		
 	end loop;
+	commit;
 end;
 $$;

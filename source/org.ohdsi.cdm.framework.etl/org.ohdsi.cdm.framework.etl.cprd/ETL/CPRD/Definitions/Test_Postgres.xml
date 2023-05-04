@@ -97,8 +97,8 @@
 	join {sc}.consultation con on t.patid = con.patid and t.consid = con.consid
 	JOIN {sc}.medical m ON t.medcode = m.medcode
 	left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 85 /*TQU - Test Qualifier*/
-	where t.eventdate is not null 
-	and con.eventdate is not null
+	-- where t.eventdate is not null 
+	-- and con.eventdate is not null
 	)
 	select x.*, nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
 	from x
@@ -217,8 +217,8 @@
 		left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 56 /*OPR - Operator*/
 		left JOIN {sc}.lookup l2 ON t.data3 = l2.code::text AND l2.lookup_type_id = 83 /*SUM - Specimen Unit of Measure*/
 		left JOIN {sc}.lookup l3 ON t.data4 = l2.code::text AND l3.lookup_type_id = 85 /*TQU - Test Qualifier*/
-		where t.eventdate is not null 
-		and con.eventdate is not null
+		-- where t.eventdate is not null 
+		-- and con.eventdate is not null
 	)
 	select x.*, nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
 	from x

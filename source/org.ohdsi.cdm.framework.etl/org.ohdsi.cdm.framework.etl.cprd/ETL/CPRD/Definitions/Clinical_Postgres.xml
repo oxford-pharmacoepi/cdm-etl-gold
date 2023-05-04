@@ -84,8 +84,8 @@
 	join {sc}.Clinical c on c.patid = ch.person_id
 	join {sc}.consultation con on c.patid = con.patid and c.consid = con.consid
 	left join {sc}.Medical m on (c.medcode = m.medcode)
-	where c.eventdate is not null 
-	and con.eventdate is not null
+	-- where c.eventdate is not null 
+	-- and con.eventdate is not null
 	)
 	select x.*, nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
 	from x

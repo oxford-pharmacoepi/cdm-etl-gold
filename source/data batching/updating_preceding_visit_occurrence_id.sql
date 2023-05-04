@@ -5,7 +5,7 @@ declare
     n record;
 	vo record;
 begin
-	for chunk in select person_id from source.chunk_person order by person_id
+	for chunk in select person_id from person order by person_id
 	loop
 		RAISE NOTICE 'person_id %', chunk.person_id;
 		
