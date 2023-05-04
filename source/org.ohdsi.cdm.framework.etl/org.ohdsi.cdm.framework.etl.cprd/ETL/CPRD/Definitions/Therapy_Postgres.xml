@@ -99,8 +99,8 @@
 																end, 0) 
 										and dd.numpacks = coalesce(a.numpacks, 0)
 	left join {sc}.daysupply_modes dm on a.prodcode = dm.prodcode
-	where a.eventdate is not null 
-	and c.eventdate is not null
+	-- where a.eventdate is not null 
+	-- and c.eventdate is not null
     order by a.patid
   </Query>
   <DrugExposure>

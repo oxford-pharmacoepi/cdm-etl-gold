@@ -16,7 +16,7 @@
 		c.staffid, c.consid, c.eventdate
 		from {sc}.clinical c
 		join w_additional a on c.patid = a.patid and c.adid = a.adid
-		where c.eventdate is not null
+		-- where c.eventdate is not null
 
 		), w_entity AS (
 		select t1.enttype, t1.category, t1.description, t1.data1, t1.data1_lkup, t1.data_fields
@@ -76,7 +76,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
 
 		left join {sc}.medical m on m.medcode::text = ac.data1 
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 
 		UNION
 		
@@ -108,7 +108,7 @@
 		join w_entity_p e on e.enttype = ac.enttype 
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
 		left join {sc}.product p on p.prodcode::text = ac.data1
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 	
 		UNION
 		
@@ -141,7 +141,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid
 
 		left join w_lookup ll on ll.code::text = ac.data1 and ll.name = e.data1_lkup
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 
 		order by patid
 		GO
@@ -161,7 +161,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 				
 		), w_entity AS (	
 			select t1.enttype, t1.category, t1.description, t1.data2, t1.data2_lkup, t1.data_fields
@@ -219,7 +219,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 												
 		left join {sc}.medical m on m.medcode::text = ac.data2
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -251,7 +251,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join {sc}.product p on p.prodcode::text = ac.data2
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 
 		UNION
 		
@@ -283,7 +283,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join w_lookup ll on ll.code::text = ac.data2 and ll.name = e.data2_lkup							
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 
 		order by patid
 		GO
@@ -303,7 +303,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 				
 		), w_entity AS (	
 			select t1.enttype, t1.category, t1.description, t1.data3, t1.data3_lkup, t1.data_fields
@@ -356,7 +356,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 								
 		left join {sc}.medical m on m.medcode::text = ac.data3 
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -383,7 +383,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 
 		left join {sc}.product p on p.prodcode::text = ac.data3 
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -410,7 +410,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 		
 		left join w_lookup ll on ll.code::text = ac.data3 and ll.name = e.data3_lkup							
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -429,7 +429,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 				
 		), w_entity AS (	
 			select t1.enttype, t1.category, t1.description, t1.data4, t1.data4_lkup, t1.data_fields
@@ -482,7 +482,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 									
 		left join {sc}.medical m on m.medcode::text = ac.data4
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -509,7 +509,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 			
 		left join {sc}.product p on p.prodcode::text = ac.data4
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -536,7 +536,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 			
 		left join w_lookup ll on ll.code::text = ac.data4 and ll.name = e.data4_lkup	
-		where con.eventdate is not null		
+		-- where con.eventdate is not null		
 
 		order by patid
 		GO
@@ -556,7 +556,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 				
 		), w_entity AS (	
 			select t1.enttype, t1.category, t1.description, t1.data5, t1.data5_lkup, t1.data_fields
@@ -609,7 +609,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 								
 		left join {sc}.medical m on m.medcode::text = ac.data5	
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -636,7 +636,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 			
 		left join {sc}.product p on p.prodcode::text = ac.data5
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -663,7 +663,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 		
 		left join w_lookup ll on ll.code::text = ac.data5 and ll.name = e.data5_lkup							
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -682,7 +682,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 				
 		), w_entity AS (	
 			select t1.enttype, t1.category, t1.description, t1.data6, t1.data6_lkup, t1.data_fields
@@ -735,7 +735,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 											
 		left join {sc}.medical m on m.medcode::text = ac.data6
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -762,7 +762,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join {sc}.product p on p.prodcode::text = ac.data6
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -789,7 +789,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join w_lookup ll on ll.code::text = ac.data6 and ll.name = e.data6_lkup							
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -808,7 +808,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 			
 		), w_lookup AS(
 			select lu.code, lu.text, lt.name  
@@ -860,7 +860,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 												
 		left join {sc}.medical m on m.medcode::text = ac.data7
-		where con.eventdate is not null		
+		-- where con.eventdate is not null		
 		
 		UNION
 		
@@ -887,7 +887,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 						
 		left join {sc}.product p on p.prodcode::text = ac.data7
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -914,7 +914,7 @@
 		join {sc}.consultation con on ac.patid = con.patid and ac.consid = con.consid 
 					
 		left join w_lookup ll on ll.code::text = ac.data7 and ll.name = e.data7_lkup							
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -933,7 +933,7 @@
 				c.staffid, c.consid, c.eventdate 
 			from {sc}.clinical c
 			join w_additional a on c.patid = a.patid and c.adid = a.adid
-			where c.eventdate is not null
+			-- where c.eventdate is not null
 			
 		), w_lookup AS(
 			select lu.code, lu.text, lt.name  
@@ -986,7 +986,7 @@
 
 		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup						
 		left join {sc}.medical m on m.medcode::text = ac.data3		
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -1014,7 +1014,7 @@
 					
 		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup							
 		left join {sc}.product p on p.prodcode::text = ac.data3
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -1042,7 +1042,7 @@
 					
 		left join w_lookup ll on ll.code::text = ac.data3 and ll.name = e.data3_lkup	
 		left join w_lookup ll2 on ll2.code::text = ac.data4 and ll2.name = e.data4_lkup						
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -1113,7 +1113,7 @@
 					
 		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup						
 		left join {sc}.medical m on m.medcode::text = ac.data5	
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -1141,7 +1141,7 @@
 						
 		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup							
 		left join {sc}.product p on p.prodcode::text = ac.data5
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		
 		UNION
 		
@@ -1169,7 +1169,7 @@
 					
 		left join w_lookup ll on ll.code::text = ac.data5 and ll.name = e.data5_lkup	
 		left join w_lookup ll2 on ll2.code::text = ac.data6 and ll2.name = e.data6_lkup						
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 		order by patid
 		GO
 		With ch AS(
@@ -1219,7 +1219,7 @@
 					
 		left join w_lookup ll on ll.code::text = ac.data4 and ll.name = e.data4_lkup		
 		left join {sc}.scoringmethod sm on ac.data3 = sm.code::text			
-		where con.eventdate is not null
+		-- where con.eventdate is not null
 
 		order by patid
 	</Query>
