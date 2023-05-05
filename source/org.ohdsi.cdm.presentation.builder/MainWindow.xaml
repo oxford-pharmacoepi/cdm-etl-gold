@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:org.ohdsi.cdm.presentation.builder"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="568.409" Width="1200" MinHeight="779" MinWidth="900">
+        Title="{Binding Title}" Height="568.409" Width="1100" MinHeight="779" MinWidth="1100">
     <Window.Resources>
         <Style x:Key="LinkButton" TargetType="ToggleButton">
             <Setter Property="Template">
@@ -206,7 +206,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="15,0,55,0">
                             <ToggleButton Style="{StaticResource PlayButton}" Margin="0,0,15,0" Command ="{Binding Path=StartBuildingCommand}" IsEnabled="{Binding ButtonEnabled}" IsChecked="{Binding Path=PlayButtonChecked, Mode=OneWay}" />
-                            <StackPanel Orientation="Vertical">
+ <!--                           <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding DataCleaningStarted, Converter={StaticResource boolToVisConverter}}" />
                                 </StackPanel>
@@ -218,7 +218,7 @@
                                 <ProgressBar Minimum="0" Maximum="100" Height="4" BorderThickness="0" IsIndeterminate="True" Visibility="{Binding DataCleaningWorking, Converter={StaticResource boolToVisConverter}}"/>
                                 <TextBlock Text="{Binding DataCleaningInfo}" TextAlignment="Center"/>
                             </StackPanel>
-
+--> 
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">
                                     <Polygon Points="0,0 2.5,5, 5,0" Stroke="Black" Fill="Black" HorizontalAlignment="Center" Visibility="{Binding DestinationStarted, Converter={StaticResource boolToVisConverter}}" />
