@@ -73,7 +73,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             if (_builderController.CurrentState == BuilderState.Running)
             {
 
-                DataCleaning();
+                //DataCleaning();
                 CreateDestination();
 
                 var vocabulary = new Vocabulary();
