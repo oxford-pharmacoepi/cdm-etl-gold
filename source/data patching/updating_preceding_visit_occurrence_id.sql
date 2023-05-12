@@ -36,7 +36,7 @@ begin
 			UPDATE visit_occurrence
 			SET preceding_visit_occurrence_id = n.new_preceding_visit_occurrence_id
 			WHERE visit_occurrence_id = n.visit_occurrence_id;
-			RAISE NOTICE 'visit_occurrence % found %, %', n.visit_occurrence_id, n.preceding_visit_occurrence_id, n.new_preceding_visit_occurrence_id;
+			-- RAISE NOTICE 'visit_occurrence % found %, %', n.visit_occurrence_id, n.preceding_visit_occurrence_id, n.new_preceding_visit_occurrence_id;
 		END IF;
 
 		end loop;
