@@ -761,12 +761,18 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                                       Id = Offset.GetKeyOffset(entity.PersonId).DrugExposureId
                                   };
 
-                        drg.TypeConceptId = 38000177;
+                        //38000177 = “Prescription written” =>  32838 = “EHR prescription” (STANDARD)
+                        //drg.TypeConceptId = 38000177; •	
+                        drg.TypeConceptId = 32838;
+
 
                         //Drug|CVX
                         if (entity.Domain != null && entity.Domain.EndsWith("CVX", StringComparison.OrdinalIgnoreCase))
                         {
-                            drg.TypeConceptId = 38000179; // Physician administered drug (identified as procedure)
+                            //38000179 = “Physician administered drug(identified as procedure)”  => 32818 = “EHR administration” (STANDARD)
+                            //drg.TypeConceptId = 38000179; // Physician administered drug (identified as procedure)
+                            drg.TypeConceptId = 32818;
+
                         }
 
                         DrugForEra.Add(drg);
