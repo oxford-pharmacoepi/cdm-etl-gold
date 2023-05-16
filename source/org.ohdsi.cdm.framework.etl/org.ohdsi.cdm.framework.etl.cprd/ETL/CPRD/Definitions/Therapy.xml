@@ -110,7 +110,9 @@
             </Mapper>
           </ConceptIdMappers>
           <Fields>
-            <Field key="gemscriptcode" defaultTypeId="38000177"/>
+            <!--<Field key="gemscriptcode" defaultTypeId="38000177"/> -->
+			  <!-- 38000177 = Prescription written => 32838 =“EHR prescription (STANDARD)-->
+			  <Field key="gemscriptcode" defaultTypeId="32838"/>
           </Fields>
         </Concept>
       </Concepts>
