@@ -164,7 +164,7 @@ namespace org.ohdsi.cdm.presentation.builder
             return scripts;
         }
 
-
+        /*
         public string CreateDaySupplyTablesScript => File.ReadAllText(
            Path.Combine(
                        BuilderFolder,
@@ -174,7 +174,7 @@ namespace org.ohdsi.cdm.presentation.builder
                        Building.SourceEngine.Database.ToString(),
                        "DataCleaning",
                        "04_Create_daysupply_tables.sql"));
-
+        */
         public List<string> CreateCdmPkIdxScripts()
         {
             List<string> scripts = new List<string>();
