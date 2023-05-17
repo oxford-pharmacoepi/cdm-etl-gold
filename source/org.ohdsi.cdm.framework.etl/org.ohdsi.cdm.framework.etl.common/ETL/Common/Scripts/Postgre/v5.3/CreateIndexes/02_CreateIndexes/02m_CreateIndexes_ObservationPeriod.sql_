@@ -1,2 +1,0 @@
-CREATE INDEX IF NOT EXISTS idx_observation_period_id  ON observation_period  (person_id ASC);
--- CLUSTER observation_period  USING idx_observation_period_id ;

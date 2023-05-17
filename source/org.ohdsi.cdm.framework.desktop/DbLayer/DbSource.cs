@@ -212,6 +212,25 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             return (double)i;
         }
 
+        public double GetPatientCount()
+        {
+            int i = 0;
+
+            var sql = "select count(1) from {sc}.Patient";
+            sql = sql.Replace("{sc}", _schemaName);
+
+            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
+            using var command = new OdbcCommand(sql, connection);
+            command.CommandTimeout = 0;
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                i = reader.GetInt32(0);
+            }
+
+            return (double)i;
+        }
+
         public int GetVisitOccurenceIdSeq()
         {
             int i = 0;
@@ -235,6 +254,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
                 query = query.Replace("{sc}", _destinationSchemaName);
+                Debug.WriteLine($"query={query}");
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
                 {

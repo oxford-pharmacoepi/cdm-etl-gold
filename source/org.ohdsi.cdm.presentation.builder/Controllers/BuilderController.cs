@@ -970,14 +970,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                             Settings.Current.Building.CdmSchema);
 
 
-            var personCount = dbDestination.GetPersonCount();
+            var patientCount = dbDestination.GetPatientCount();
 
-            var n = (int)Math.Ceiling(personCount / pagesize);
+            var n = (int)Math.Ceiling(patientCount / pagesize);
 
             Debug.WriteLine("n=" + n);
-
+            
             var ppl = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Persons != null);
-
 
             Parallel.For(0, n,
                 new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i) => {
@@ -996,7 +995,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 }
             );
 
-            //To-Do: Add PK in Person and Op
             Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
             var timer = new Stopwatch();
             timer.Start();
