@@ -34,7 +34,7 @@ namespace org.ohdsi.cdm.framework.common.Base
         //void Build(ChunkData chunkData);
         Attrition Build(ChunkData data, KeyMasterOffsetManager offset);
 
-        Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager offset, long pkey);
+        Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager offset, long pkey, bool withinTheObservationPeriod);
 
         Death BuildDeath(Death[] death, Dictionary<long, VisitOccurrence> visitOccurrences,
             ObservationPeriod[] observationPeriods);
@@ -44,10 +44,10 @@ namespace org.ohdsi.cdm.framework.common.Base
         void JoinToVocabulary(IVocabulary vocabulary);
 
         IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods);
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods);
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<ObservationPeriod> BuildObservationPeriods(int gap, EraEntity[] observationPeriods);
 
@@ -55,22 +55,22 @@ namespace org.ohdsi.cdm.framework.common.Base
             Dictionary<long, VisitOccurrence> visitOccurrences);
 
         IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposuresList,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<ConditionOccurrence> BuildConditionOccurrences(ConditionOccurrence[] conditionOccurrences,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(ProcedureOccurrence[] procedureOccurrences,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<Observation> BuildObservations(Observation[] observations,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
-        IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods);
-        IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods);
+        IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
+        IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
         IEnumerable<Cohort> BuildCohort(Cohort[] cohortRecords, ObservationPeriod[] observationPeriods);
 
         IEnumerable<EraEntity> BuildPregnancyEpisodes(ConditionOccurrence[] conditionOccurrences,
@@ -78,7 +78,7 @@ namespace org.ohdsi.cdm.framework.common.Base
 
 
         IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods);
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod);
 
         IEnumerable<DrugCost> BuildDrugCosts(DrugExposure[] drugExposuresList);
         IEnumerable<ProcedureCost> BuildProcedureCosts(ProcedureOccurrence[] procedureOccurrences);

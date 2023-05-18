@@ -67,7 +67,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
             var observationPeriodsFromVisits = new List<EraEntity>();
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), null))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), null, false))
             {
                 if (!visitOccurrences.ContainsKey(visitOccurrence.Id))
                     visitOccurrences.Add(visitOccurrence.Id, visitOccurrence);
@@ -166,26 +166,26 @@ namespace org.ohdsi.cdm.framework.etl.premier
                 CleanUp(BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), visitOccurrences), death).ToArray();
 
             var drugExposures =
-                CleanUp(BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
             var conditionOccurrences =
                 CleanUp(
-                    BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods),
+                    BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false),
                     death).ToArray();
             var procedureOccurrences =
                 CleanUp(
-                    BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods),
+                    BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false),
                     death).ToArray();
             var observations =
-                CleanUp(BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
 
             var measurements =
-                CleanUp(BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
 
             var deviceExposure =
-                CleanUp(BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
 
             // set corresponding ProviderIds
@@ -234,7 +234,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
                 observations,
                 measurements,
                 visitOccurrences.Values.ToArray(), null, new Cohort[0], deviceExposure,
-                new Note[0]);
+                new Note[0], false);
 
 
             var pg = new PregnancyAlgorithm();
@@ -463,7 +463,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
 
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-      ObservationPeriod[] observationPeriods)
+      ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             // Determinate max service day value for current person. 
             UpdateMaxServDays();
@@ -529,7 +529,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
 
         public override IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var uniqueEntities = new HashSet<DeviceExposure>(new PatbillDeviceExposureComparer());
             foreach (var de in devExposure)
@@ -566,7 +566,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of drug exposure entities</returns>
         public override IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var patbillEntities = new HashSet<DrugExposure>(new PatbillDrugExposureComparer());
             var otherEntities = new HashSet<DrugExposure>();
@@ -615,7 +615,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
         /// <returns>Enumeration of condition occurrence entities</returns>
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var patbillEntities = new HashSet<ConditionOccurrence>(new PatbillConditionOccurrenceComparer());
             var uniqueEntities = new HashSet<ConditionOccurrence>();
@@ -663,7 +663,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
         /// <returns>Enumeration of procedure occurrence entities</returns>
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var uniqueEntities = new HashSet<ProcedureOccurrence>(new PatbillProcedureOccurrenceComparer());
             foreach (var procedureOccurrence in procedureOccurrences)
@@ -820,7 +820,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of Observation from the raw set of Observation entities</returns>
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var uniqueEntities = new HashSet<Observation>();
             var patbillEntities = new HashSet<Observation>(new PatbillObservationComparer());
@@ -956,7 +956,7 @@ namespace org.ohdsi.cdm.framework.etl.premier
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var uniqueEntities = new HashSet<Measurement>(new PatbillMeasurementComparer());
             var surgeryEntities = new List<Measurement>();

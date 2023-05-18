@@ -121,7 +121,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var vo in PrepareVisitOccurrences(rawVisitOccurrences.ToArray(),
                 observationPeriods))
@@ -183,7 +183,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
         }
 
-        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var details = new HashSet<VisitDetail>();
             foreach (var visitOccurrence in visitOccurrences)
@@ -205,7 +205,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
         }
 
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var co = new List<ConditionOccurrence>();
             foreach (var row in conditionOccurrences.GroupBy(e => e.SourceRecordGuid))
@@ -250,7 +250,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
                 }
             }
 
-            return base.BuildConditionOccurrences(co.ToArray(), visitOccurrences, observationPeriods);
+            return base.BuildConditionOccurrences(co.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public void SetStartDate(IEntity e, Dictionary<long, VisitOccurrence> visitOccurrences)
@@ -271,7 +271,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
         }
 
         public override IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var de = new List<DrugExposure>();
             foreach (var row in drugExposures.GroupBy(e => e.SourceRecordGuid))
@@ -342,11 +342,11 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
 
             return base.BuildDrugExposures(de.Where(d => d.StartDate < DateTime.Now && d.StartDate.Year >= _yob.Value).ToArray(), visitOccurrences,
-                observationPeriods);
+                observationPeriods, withinTheObservationPeriod);
         }
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var m = new List<Measurement>();
             foreach (var row in measurements.GroupBy(e => e.SourceRecordGuid))
@@ -368,7 +368,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
                 }
             }
 
-            return base.BuildMeasurement(m.ToArray(), visitOccurrences, observationPeriods);
+            return base.BuildMeasurement(m.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         private void SetVisitId(IEntity e)
@@ -419,11 +419,11 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
 
 
-            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods).ToArray();
+            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods, false).ToArray();
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.IdUndefined)
                 {
@@ -495,7 +495,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
 
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var co in conditionOccurrences)
             {
@@ -503,7 +503,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
 
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var procedureOccurrence in procedureOccurrences)
             {
@@ -511,7 +511,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
                     Offset.GetKeyOffset(procedureOccurrence.PersonId).ProcedureOccurrenceId;
             }
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             foreach (var ob in observations)
             {
@@ -519,12 +519,12 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
             }
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
 
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods)
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
 
             // set corresponding ProviderIds
@@ -544,7 +544,7 @@ namespace org.ohdsi.cdm.framework.etl.symphonyemr
                 procedureOccurrences,
                 observations,
                 measurements,
-                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0]);
+                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0], false);
 
             Complete = true;
 

@@ -553,7 +553,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var medpar = visitOccurrences.Where(vo =>
                 vo.AdditionalFields["source"] == "medpar" && vo.ConceptId != 42898160 && vo.EndDate.HasValue).ToList();
@@ -777,7 +777,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var po in procedureOccurrences)
             {
@@ -786,7 +786,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
             var proc = new Dictionary<ProcedureOccurrence, HashSet<ProcedureCost>>();
             foreach (var po in base.BuildProcedureOccurrences(procedureOccurrences, visitOccurrences,
-                observationPeriods))
+                observationPeriods, withinTheObservationPeriod))
             {
                 if (po.TypeConceptId != 38000215 && po.ProcedureCosts != null)
                     po.ProcedureCosts.Clear();
@@ -819,7 +819,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
 
             foreach (var co in conditionOccurrences)
@@ -829,7 +829,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
             var cond = new HashSet<ConditionOccurrence>();
             foreach (var co in base.BuildConditionOccurrences(conditionOccurrences.ToArray(), visitOccurrences,
-                observationPeriods))
+                observationPeriods, withinTheObservationPeriod))
             {
                 cond.Add(co);
             }
@@ -839,7 +839,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
         public override IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var de in devExposure)
             {
@@ -847,7 +847,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
             }
 
             var dev = new Dictionary<DeviceExposure, HashSet<DeviceCost>>();
-            foreach (var d in base.BuildDeviceExposure(devExposure, visitOccurrences, observationPeriods))
+            foreach (var d in base.BuildDeviceExposure(devExposure, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (!dev.ContainsKey(d))
                 {
@@ -1132,9 +1132,9 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var m in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods))
+            foreach (var m in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 // HGB
                 if (m.ConceptId == 30000963 || m.ConceptId == 3009542)
@@ -1199,7 +1199,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
             var visitIds = new List<long>();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
-            foreach (var visitOccurrence in CleanUp(BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), null), death))
+            foreach (var visitOccurrence in CleanUp(BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), null, false), death))
             {
                 if (visitOccurrence.StartDate.Year < person.YearOfBirth ||
                     visitOccurrence.EndDate.Value.Year < person.YearOfBirth) continue;
@@ -1228,24 +1228,24 @@ namespace org.ohdsi.cdm.framework.etl.seer
 
             var conditionOccurrences =
                 CleanUp(
-                    BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods),
+                    BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false),
                     death).ToArray();
 
             var drugExposures =
-                CleanUp(BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
             var procedureOccurrences =
                 CleanUp(
-                    BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods),
+                    BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false),
                     death).ToArray();
             var observations =
-                CleanUp(BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
             var measurements =
-                CleanUp(BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
             var deviceExposures =
-                CleanUp(BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods), death)
+                CleanUp(BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false), death)
                     .ToArray();
 
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
@@ -1315,7 +1315,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
                 procedureOccurrences
                     .Where(p => p.ConceptId > 0 || p.ProcedureCosts != null && p.ProcedureCosts.Count > 0).ToArray(),
                 observations, measurements,
-                visitOccurrences.Values.ToArray(), null, cohort, deviceExposures, new Note[0]);
+                visitOccurrences.Values.ToArray(), null, cohort, deviceExposures, new Note[0], false);
 
             return Attrition.None;
         }
@@ -1348,7 +1348,7 @@ namespace org.ohdsi.cdm.framework.etl.seer
             DrugExposure[] drugExposures, ConditionOccurrence[] conditionOccurrences,
             ProcedureOccurrence[] procedureOccurrences, Observation[] observations,
             Measurement[] measurements, VisitOccurrence[] visitOccurrences, VisitDetail[] visitDetails, Cohort[] cohort,
-            DeviceExposure[] devExposure, Note[] notes)
+            DeviceExposure[] devExposure, Note[] notes, bool withinTheObservationPeriod)
         {
             ChunkData.AddData(person);
 
@@ -1412,8 +1412,8 @@ namespace org.ohdsi.cdm.framework.etl.seer
             AddToChunk("Measurement", measurements);
             AddToChunk("Device", devExposure);
 
-            var drugEra = BuildDrugEra(DrugForEra.ToArray(), observationPeriods).ToArray();
-            var conditionEra = BuildConditionEra(ConditionForEra.ToArray(), observationPeriods).ToArray();
+            var drugEra = BuildDrugEra(DrugForEra.ToArray(), observationPeriods, withinTheObservationPeriod).ToArray();
+            var conditionEra = BuildConditionEra(ConditionForEra.ToArray(), observationPeriods, withinTheObservationPeriod).ToArray();
 
             foreach (var eraEntity in drugEra)
             {

@@ -328,7 +328,7 @@ namespace org.ohdsi.cdm.framework.etl.nhanes
 
             AddToChunk(person, null, op.ToArray(), new PayerPlanPeriod[0], de.ToArray(),
                 co.ToArray(), new ProcedureOccurrence[0], o.ToArray(), new Measurement[0],
-                vo.ToArray(), new VisitDetail[0], new Cohort[0], new DeviceExposure[0], new Note[0]);
+                vo.ToArray(), new VisitDetail[0], new Cohort[0], new DeviceExposure[0], new Note[0], false);
 
             Complete = true;
 

@@ -80,7 +80,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var ipVisitsRaw = new List<VisitOccurrence>();
             var erVisitsRaw = new List<VisitOccurrence>();
@@ -276,7 +276,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
 
 
         public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails,
-            VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+            VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var mcVisits = new Dictionary<long, VisitDetail>();
             var inConfVisits = new Dictionary<string, long>();
@@ -531,7 +531,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
                     pp.StartDate.Year <= DateTime.Now.Year).ToArray(), null).ToArray();
 
             List<VisitDetail> visitDetails = new List<VisitDetail>();
-            foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods).Where(vd =>
+            foreach (var vd in BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods, false).Where(vd =>
                     vd.StartDate.Year >= person.YearOfBirth &&
                     vd.EndDate.Value.Year >= person.YearOfBirth &&
                     vd.StartDate.Year <= DateTime.Now.Year))
@@ -549,7 +549,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.StartDate.Year < person.YearOfBirth || visitOccurrence.StartDate.Year > DateTime.Now.Year)
                     continue;
@@ -606,7 +606,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
             }
 
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
 
             foreach (var co in conditionOccurrences)
@@ -615,7 +615,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
             }
 
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var procedureOccurrence in procedureOccurrences)
             {
@@ -623,13 +623,13 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
                     .ProcedureOccurrenceId;
             }
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var drugExposures = BuildDrugExposures(FilteroutDrugClaims(DrugExposuresRaw).ToArray(), visitOccurrences, observationPeriods)
+            var drugExposures = BuildDrugExposures(FilteroutDrugClaims(DrugExposuresRaw).ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods)
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
 
             var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
@@ -707,7 +707,7 @@ namespace org.ohdsi.cdm.framework.etl.optumextended
                 visitOccurrences.Values.Where(v => v.ConceptId >= 0).ToArray(),
                 visitDetails.Where(v => v.ConceptId >= 0).ToArray(), new Cohort[0],
                 Clean(deviceExposure, person).ToArray(),
-                new Note[0]);
+                new Note[0], false);
 
             var pg = new PregnancyAlgorithm();
             foreach (var episode in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,

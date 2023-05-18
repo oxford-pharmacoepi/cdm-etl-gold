@@ -93,7 +93,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
 
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var ipVisits = CollapseVisits(rawVisitOccurrences.Where(vo => vo.ConceptId == 9201), 1).ToList();
             var ltcpVisits = CollapseVisits(rawVisitOccurrences.Where(vo => vo.ConceptId == 42898160), 32).ToList();
@@ -214,7 +214,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
         }
 
         public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails,
-         VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+         VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var visitOccurrence in visitOccurrences)
             {
@@ -265,11 +265,11 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
             }
 
 
-            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods).ToArray();
+            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods, false).ToArray();
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 visitOccurrence.Id = Offset.GetKeyOffset(visitOccurrence.PersonId).VisitOccurrenceId;
 
@@ -306,7 +306,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
 
 
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var co in conditionOccurrences)
             {
@@ -314,7 +314,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
             }
 
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var procedureOccurrence in procedureOccurrences)
             {
@@ -322,7 +322,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
                     Offset.GetKeyOffset(procedureOccurrence.PersonId).ProcedureOccurrenceId;
             }
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             foreach (var ob in observations)
             {
@@ -330,12 +330,12 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
             }
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
 
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods)
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
 
             Console.WriteLine($"PeronsId={person.PersonSourceValue};" +
@@ -373,7 +373,7 @@ namespace org.ohdsi.cdm.framework.etl.healthverity
                 procedureOccurrences,
                 observations,
                 measurements,
-                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0]);
+                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0], false);
 
             Complete = true;
 

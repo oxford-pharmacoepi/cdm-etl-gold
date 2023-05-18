@@ -110,10 +110,10 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
 
         public override IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
 
         {
-            foreach (var drugExposure in base.BuildDrugExposures(PrepareDrugExposures(drugExposures).ToArray(), visitOccurrences, observationPeriods))
+            foreach (var drugExposure in base.BuildDrugExposures(PrepareDrugExposures(drugExposures).ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (!drugExposure.Quantity.HasValue && drugExposure.AdditionalFields != null)
                 {
@@ -169,9 +169,9 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods , bool withinTheObservationPeriod)
         {
-            foreach (var observation in base.BuildObservations(observations, visitOccurrences, observationPeriods))
+            foreach (var observation in base.BuildObservations(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (observation.AdditionalFields != null && observation.AdditionalFields.ContainsKey("test_result"))
                 {
@@ -187,9 +187,9 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var measurement in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods))
+            foreach (var measurement in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (measurement.AdditionalFields != null && measurement.AdditionalFields.ContainsKey("test_result"))
                 {
@@ -276,7 +276,7 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
             return Offset.GetKeyOffset(e.PersonId).VisitDetailId;
         }
 
-        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             List<VisitDetail> details = new List<VisitDetail>();
             foreach (var visitOccurrence in visitOccurrences)
@@ -358,7 +358,7 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-       ObservationPeriod[] observationPeriods)
+       ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var ipVisitsRaw = new List<VisitOccurrence>();
             var erVisitsRaw = new List<VisitOccurrence>();
@@ -528,11 +528,11 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
 
             var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var dedupVisits = VisitOccurrencesRaw.Where(v => v.AdditionalFields["sort_index"] == "1").ToArray();
-            var vDetails = BuildVisitDetails(null, dedupVisits, observationPeriods).ToArray();
+            var vDetails = BuildVisitDetails(null, dedupVisits, observationPeriods, false).ToArray();
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(dedupVisits, observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(dedupVisits, observationPeriods, false))
             {
                 visitOccurrence.Id = Offset.GetKeyOffset(visitOccurrence.PersonId).VisitOccurrenceId;
                 visitOccurrence.TypeConceptId = 44818517;
@@ -580,20 +580,20 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
             }
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
 
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             var deviceExposure =
-                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
 
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
             SetPayerPlanPeriodId(payerPlanPeriods, drugExposures, procedureOccurrences,
@@ -724,7 +724,7 @@ namespace org.ohdsi.cdm.framework.etl.optumpanther
             // push built entities to ChunkBuilder for further save to CDM database
             AddToChunk(person, death, observationPeriodsFinal.ToArray(), payerPlanPeriods, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
-                visitOccurrences.Values.ToArray(), visitDetails.Values.ToArray(), cohort, deviceExposure, notes);
+                visitOccurrences.Values.ToArray(), visitDetails.Values.ToArray(), cohort, deviceExposure, notes, false);
 
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriodsFinal.ToArray(),

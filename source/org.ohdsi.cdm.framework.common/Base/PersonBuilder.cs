@@ -576,15 +576,15 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of Visit Occurrence</returns>
         public virtual IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return Clean(visitOccurrences, observationPeriods, true).Distinct();
+            return Clean(visitOccurrences, observationPeriods, withinTheObservationPeriod).Distinct();
         }
 
         public virtual IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return Clean(visitDetails, observationPeriods, true).Distinct();
+            return Clean(visitDetails, observationPeriods, withinTheObservationPeriod).Distinct();
         }
 
         public IEnumerable<Note> BuildNote(Note[] notes, Dictionary<long, VisitOccurrence> visitOccurrences,
@@ -611,10 +611,10 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of drug exposure entities</returns>
         public virtual IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             //return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
-            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, true);
+            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -626,10 +626,10 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <returns>Enumeration of condition occurrence entities</returns>
         public virtual IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             //return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, false);
-            return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, true);
+            return BuildEntities(conditionOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -641,9 +641,9 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <returns>Enumeration of procedure occurrence entities</returns>
         public virtual IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, true);
+            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -654,16 +654,18 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of Observation from the raw set of Observation entities</returns>
         public virtual IEnumerable<Observation> BuildObservations(Observation[] observations,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(observations, visitOccurrences, observationPeriods, true);
+            //return BuildEntities(observations, visitOccurrences, observationPeriods, true);
+            return BuildEntities(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public virtual IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(measurements, visitOccurrences, observationPeriods, true);
+            //return BuildEntities(measurements, visitOccurrences, observationPeriods, true);
+            return BuildEntities(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -674,10 +676,10 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <param name="conditionOccurrences">Set of condition occurrence entities</param>
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of condition era</returns>
-        public virtual IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods)
+        public virtual IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var eraEntity in EraHelper.GetEras(
-                Clean(conditionOccurrences, observationPeriods, true).Where(c => string.IsNullOrEmpty(c.Domain) || c.Domain == "Condition"), 30,
+                Clean(conditionOccurrences, observationPeriods, withinTheObservationPeriod).Where(c => string.IsNullOrEmpty(c.Domain) || c.Domain == "Condition"), 30,
                 38000247))
             {
                 eraEntity.Id = Offset.GetKeyOffset(eraEntity.PersonId).ConditionEraId;
@@ -694,10 +696,10 @@ namespace org.ohdsi.cdm.framework.common.Base
         /// <param name="drugExposures">set of drug exposure entities</param>
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of drug era</returns>
-        public virtual IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods)
+        public virtual IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var eraEntity in EraHelper.GetEras(
-                Clean(drugExposures, observationPeriods, true).Where(d => string.IsNullOrEmpty(d.Domain) || d.Domain == "Drug"), 30, 38000182))
+                Clean(drugExposures, observationPeriods, withinTheObservationPeriod).Where(d => string.IsNullOrEmpty(d.Domain) || d.Domain == "Drug"), 30, 38000182))
             {
                 eraEntity.Id = Offset.GetKeyOffset(eraEntity.PersonId).DrugEraId;
                 yield return eraEntity;
@@ -724,9 +726,10 @@ namespace org.ohdsi.cdm.framework.common.Base
 
         public virtual IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(devExposure, visitOccurrences, observationPeriods, true);
+            //return BuildEntities(devExposure, visitOccurrences, observationPeriods, true);
+            return BuildEntities(devExposure, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -819,35 +822,6 @@ namespace org.ohdsi.cdm.framework.common.Base
             }
         }
 
-        public virtual IEnumerable<T> BuildEntities2<T>(IEnumerable<T> entitiesToBuild,
-            List<VisitOccurrence> visitOccurrences, IEnumerable<ObservationPeriod> observationPeriods, bool withinTheObservationPeriod)
-            where T : IEntity
-        {
-            var uniqueEntities = new HashSet<T>();
-
-            foreach (var e in Clean(entitiesToBuild, observationPeriods, withinTheObservationPeriod))
-            {
-
-                if (e.VisitOccurrenceId == null || (visitOccurrences.Exists(obj => obj.Id == e.VisitOccurrenceId)))
-                {
-
-                    if (e.IsUnique)
-                    {
-                        uniqueEntities.Add(e);
-                    }
-                    else
-                    {
-                        yield return e;
-                    }
-                }
-            }
-
-            foreach (var ue in uniqueEntities)
-            {
-                yield return ue;
-            }
-        }
-
         /// <summary>
         /// Build person entity and all person related entities like: DrugExposures, ConditionOccurrences, ProcedureOccurrences... from raw data sets 
         /// </summary>
@@ -880,7 +854,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             //var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
 
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.IdUndefined)
                     visitOccurrence.Id = Offset.GetKeyOffset(visitOccurrence.PersonId).VisitOccurrenceId;
@@ -889,23 +863,23 @@ namespace org.ohdsi.cdm.framework.common.Base
             }
 
             var visitDetails = BuildVisitDetails(VisitDetailsRaw.ToArray(), VisitOccurrencesRaw.ToArray(),
-                observationPeriods).ToArray();
+                observationPeriods, false).ToArray();
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             var deviceExposure =
-                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             
             /*
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
@@ -938,7 +912,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             */
             AddToChunk(person, death, observationPeriods, null, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
-                visitOccurrences.Values.ToArray(), visitDetails, null, deviceExposure, null);
+                visitOccurrences.Values.ToArray(), visitDetails, null, deviceExposure, null, false);
 
             Complete = true;
 
@@ -957,7 +931,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             return Attrition.None;
         }
 
-        public virtual Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager o, long pkey) {
+        public virtual Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager o, long pkey, bool withinTheObservationPeriod) {
             return Attrition.None;
         }
 
@@ -965,14 +939,14 @@ namespace org.ohdsi.cdm.framework.common.Base
             PayerPlanPeriod[] ppp, DrugExposure[] drugExposures,
             ConditionOccurrence[] conditionOccurrences,
             ProcedureOccurrence[] procedureOccurrences, Observation[] observations,
-            VisitOccurrence[] visitOccurrences, Cohort[] cohort)
+            VisitOccurrence[] visitOccurrences, Cohort[] cohort, bool withinTheObservationPeriod)
         {
             AddToChunk(person, death, observationPeriods,
                 ppp, drugExposures,
                 conditionOccurrences,
                 procedureOccurrences, observations, new Measurement[] { },
                 visitOccurrences, null, cohort, new DeviceExposure[] { },
-                new Note[] { });
+                new Note[] { }, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -994,7 +968,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             ConditionOccurrence[] conditionOccurrences,
             ProcedureOccurrence[] procedureOccurrences, Observation[] observations,
             Measurement[] measurements, VisitOccurrence[] visitOccurrences, VisitDetail[] visitDetails, Cohort[] cohort,
-            DeviceExposure[] devExposure, Note[] notes)
+            DeviceExposure[] devExposure, Note[] notes, bool withinTheObservationPeriod)
         {
             //ChunkData.AddData(person);
             /*
@@ -1060,8 +1034,8 @@ namespace org.ohdsi.cdm.framework.common.Base
             AddToChunk("Measurement", measurements);
             AddToChunk("Device", devExposure);
 
-            var drugEra = BuildDrugEra(DrugForEra.ToArray(), observationPeriods).ToArray();
-            var conditionEra = BuildConditionEra(ConditionForEra.ToArray(), observationPeriods).ToArray();
+            var drugEra = BuildDrugEra(DrugForEra.ToArray(), observationPeriods, withinTheObservationPeriod).ToArray();
+            var conditionEra = BuildConditionEra(ConditionForEra.ToArray(), observationPeriods, withinTheObservationPeriod).ToArray();
 
             foreach (var eraEntity in drugEra)
             {
