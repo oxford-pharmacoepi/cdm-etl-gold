@@ -25,33 +25,15 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         }
 
         public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails,
-            VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+            VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
 
-
-            foreach (var visitOccurrence in visitOccurrences)
+            foreach (var visitOccurrence in Clean(visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 var visitDetail =
                     new VisitDetail(visitOccurrence)
                     {
                         Id = visitOccurrence.Id,
-                        CareSiteId = visitOccurrence.CareSiteId,
-                    };
-
-                yield return visitDetail;
-            }
-        }
-
-        public IEnumerable<VisitDetail> BuildVisitDetails(Dictionary<string, long> grp,
-            VisitOccurrence[] visitOccurrences)
-        {
-
-            foreach (var visitOccurrence in visitOccurrences)
-            {
-                var visitDetail =
-                    new VisitDetail(visitOccurrence)
-                    {
-                        Id = grp[visitOccurrence.AdditionalFields["temp_visit_occurrence_id"]],
                         CareSiteId = visitOccurrence.CareSiteId,
                     };
 
@@ -102,7 +84,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     vo.StartDate.Year >= person.YearOfBirth &&
                     vo.EndDate.Value.Year >= person.YearOfBirth &&
                     vo.StartDate.Year <= DateTime.Now.Year &&
-                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray())
+                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods, false).ToArray())
             {
 
                 if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
@@ -187,13 +169,13 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             SetVisitOccurrenceId(ObservationsRaw, visitDetails);
             SetVisitOccurrenceId(MeasurementsRaw, visitDetails);
 
-            var drugExposures = BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var drugExposures = BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
+            var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
+            var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
 
             var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
 
@@ -223,7 +205,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 Clean(measurements, person).ToArray(),
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
-                Clean(deviceExposure, person).ToArray(), null);
+                Clean(deviceExposure, person).ToArray(), null, false);
 
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
@@ -244,7 +226,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         /// <summary>
         /// Build person entity and all person related entities like: DrugExposures, ConditionOccurrences, ProcedureOccurrences... from raw data sets 
         /// </summary>
-        public override Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om, long pkey)
+        public override Attrition BuildCdm(ChunkData data, KeyMasterOffsetManager om, long pkey, bool withinTheObservationPeriod)
         {
             Offset = om;
             ChunkData = data;
@@ -293,7 +275,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     vo.StartDate.Year >= person.YearOfBirth &&
                     vo.EndDate.Value.Year >= person.YearOfBirth &&
                     vo.StartDate.Year <= DateTime.Now.Year &&
-                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods).ToArray().OrderBy(u=>u.StartDate).ThenBy(u=>u.AdditionalFields["constype"]))
+                    vo.EndDate.Value.Year <= DateTime.Now.Year).ToArray(), observationPeriods, withinTheObservationPeriod).ToArray().OrderBy(u=>u.StartDate).ThenBy(u=>u.AdditionalFields["constype"]))
             {
 
                 if (person.MonthOfBirth.HasValue && vd.StartDate.Year < person.YearOfBirth.Value &&
@@ -364,13 +346,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitOccurrences.Add(visitOccurrence.Id, visitOccurrence);
                 visitIds.Add(visitOccurrence.Id);
             }
-
-            /*
-            foreach (var vo in visitOccurrences.Values.OrderBy(x => x.AdditionalFields["constype"]).ThenBy(x => x.StartDate))
-            {
-                visitIds.Add(vo.Id);
-            }
-            */
             
 
             long? prevVisitId = null;
@@ -392,34 +367,20 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             SetVisitOccurrenceId(ObservationsRaw, tempVisitDetails);
             SetVisitOccurrenceId(MeasurementsRaw, tempVisitDetails);
 
-            var drugExposures = BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+            var drugExposures = BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
+            var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
+            var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
 
-            //var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
-
-            /*
-            if (death != null)
-            {
-                person.TimeOfDeath = death.StartDate;
-
-                if (death.StartDate < observationPeriods.Min(op => op.StartDate))
-                    return Attrition.UnacceptablePatientQuality;
-
-                if (death.StartDate.Year < person.YearOfBirth || death.StartDate.Year > DateTime.Now.Year)
-                    death = null;
-            }
-            */
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
 
             // push built entities to ChunkBuilder for further save to CDM database
 
             AddToChunk(null,
                 null,
-                null,
+                observationPeriods,
                 null,
                 Clean(drugExposures, person).ToArray(),
                 Clean(conditionOccurrences, person).ToArray(),
@@ -428,7 +389,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 Clean(measurements, person).ToArray(),
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
-                Clean(deviceExposure, person).ToArray(), null);
+                Clean(deviceExposure, person).ToArray(), null, withinTheObservationPeriod);
             
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
@@ -466,38 +427,12 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             bool withinTheObservationPeriod)
         {
             var uniqueEntities = new HashSet<T>();
-            foreach (var e in entitiesToBuild)
+
+            //foreach (var e in entitiesToBuild)
+            foreach (var e in Clean(entitiesToBuild, observationPeriods, withinTheObservationPeriod))
             {
                 if (e.VisitOccurrenceId == null || visitOccurrences.ContainsKey(e.VisitOccurrenceId.Value))
                 {
-                    if (e.IsUnique)
-                    {
-                        uniqueEntities.Add(e);
-                    }
-                    else
-                    {
-                        yield return e;
-                    }
-                }
-            }
-
-            foreach (var ue in uniqueEntities)
-            {
-                yield return ue;
-            }
-        }
-
-        public override IEnumerable<T> BuildEntities2<T>(IEnumerable<T> entitiesToBuild, List<VisitOccurrence> visitOccurrences, IEnumerable<ObservationPeriod> observationPeriods,
-            bool withinTheObservationPeriod)
-        {
-            var uniqueEntities = new HashSet<T>();
-            foreach (var e in entitiesToBuild)
-            {
-
-                if (e.VisitOccurrenceId == null || (visitOccurrences.Exists(obj => obj.Id == e.VisitOccurrenceId)))
-                //if (e.VisitOccurrenceId == null || visitOccurrences.ContainsKey(e.VisitOccurrenceId.Value))
-                {
-
                     if (e.IsUnique)
                     {
                         uniqueEntities.Add(e);
@@ -786,10 +721,10 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, false);
-            //return BuildEntities2(procedureOccurrences, visitOccurrences.Values.ToList(), observationPeriods, false);
+            //return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, false);
+            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public override Death BuildDeath(Death[] death, Dictionary<long, VisitOccurrence> visitOccurrences,
@@ -811,18 +746,18 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         }
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(observations, visitOccurrences, observationPeriods, false);
-            //return BuildEntities2(observations, visitOccurrences.Values.ToList(), observationPeriods, false);
+            //return BuildEntities(observations, visitOccurrences, observationPeriods, false);
+            return BuildEntities(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var mes in BuildEntities(measurements, visitOccurrences, observationPeriods, false))
-            //foreach (var mes in BuildEntities2(measurements, visitOccurrences.Values.ToList(), observationPeriods, false))
+            //foreach (var mes in BuildEntities(measurements, visitOccurrences, observationPeriods, false))
+            foreach (var mes in BuildEntities(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 //if (!string.IsNullOrEmpty(mes.SourceValue))
                 //{
@@ -834,20 +769,23 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             }
         }
 
-        public override IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods)
+        public override IEnumerable<EraEntity> BuildConditionEra(ConditionOccurrence[] conditionOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var eraEntity in EraHelper.GetEras(
-                Clean(conditionOccurrences, observationPeriods, false), 30,
-                38000247))
+                //Clean(conditionOccurrences, observationPeriods, false), 30, 38000247)
+                Clean(conditionOccurrences, observationPeriods, withinTheObservationPeriod), 30, 38000247)
+             )
             {
                 eraEntity.Id = Offset.GetKeyOffset(eraEntity.PersonId).ConditionEraId;
                 yield return eraEntity;
             }
         }
-        public override IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods)
+        public override IEnumerable<EraEntity> BuildDrugEra(DrugExposure[] drugExposures, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var eraEntity in EraHelper.GetEras(
-                Clean(drugExposures, observationPeriods, false), 30, 38000182))
+                //Clean(drugExposures, observationPeriods, false), 30, 38000182)
+                Clean(drugExposures, observationPeriods, withinTheObservationPeriod), 30, 38000182)
+                )
             {
                 eraEntity.Id = Offset.GetKeyOffset(eraEntity.PersonId).DrugEraId;
                 yield return eraEntity;
@@ -856,10 +794,10 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
         public override IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            return BuildEntities(devExposure, visitOccurrences, observationPeriods, false);
-            //return BuildEntities2(devExposure, visitOccurrences.Values.ToList(), observationPeriods, false);
+            //return BuildEntities(devExposure, visitOccurrences, observationPeriods, false);
+            return BuildEntities(devExposure, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
     }

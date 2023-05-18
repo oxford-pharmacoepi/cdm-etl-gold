@@ -347,7 +347,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
         /// <param name="op">the observation period entities for current person</param>
         /// <returns>Enumeration of condition occurrence entities</returns>
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
-            ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> vo, ObservationPeriod[] op)
+            ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> vo, ObservationPeriod[] op, bool withinTheObservationPeriod)
         {
             var filteredConditionOccurrences = new List<ConditionOccurrence>();
 
@@ -422,7 +422,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
                 }
             }
 
-            return base.BuildConditionOccurrences(result.ToArray(), vo, op);
+            return base.BuildConditionOccurrences(result.ToArray(), vo, op, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -438,7 +438,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
         /// <returns>Enumeration of procedure occurrence entities</returns>
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> vo,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var result = new HashSet<ProcedureOccurrence>();
             var procedures = new List<ProcedureOccurrence>();
@@ -542,7 +542,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
                 }
             }
 
-            return base.BuildProcedureOccurrences(result.ToArray(), vo, observationPeriods);
+            return base.BuildProcedureOccurrences(result.ToArray(), vo, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>
@@ -903,7 +903,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var dstatusObservations = new HashSet<Observation>();
             var otherObservations = new List<Observation>();
@@ -933,7 +933,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
             }
         }
 
-        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
+        public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails, VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             HashSet<VisitDetail> details = new HashSet<VisitDetail>();
             foreach (var visitOccurrence in visitOccurrences)
@@ -1003,11 +1003,11 @@ namespace org.ohdsi.cdm.framework.etl.ibm
 
             var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
 
-            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods).ToArray();
+            var visitDetails = BuildVisitDetails(null, VisitOccurrencesRaw.ToArray(), observationPeriods, false).ToArray();
 
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
             var visitIds = new List<long>();
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.IdUndefined)
                 {
@@ -1037,7 +1037,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
             }
 
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var co in conditionOccurrences)
             {
@@ -1045,7 +1045,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
             }
 
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             foreach (var procedureOccurrence in procedureOccurrences)
             {
@@ -1057,7 +1057,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
                 }
             }
 
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             foreach (var ob in observations)
             {
@@ -1066,11 +1066,11 @@ namespace org.ohdsi.cdm.framework.etl.ibm
 
 
             var drugExposures =
-                BuildDrugExposure(DrugExposuresRaw, procedureOccurrences, visitOccurrences, observationPeriods)
+                BuildDrugExposure(DrugExposuresRaw, procedureOccurrences, visitOccurrences, observationPeriods, false)
                     .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods)
+            var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
 
             foreach (var de in deviceExposure)
@@ -1124,7 +1124,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
                 procedureOccurrences,
                 observations,
                 measurements,
-                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0]);
+                visitOccurrences.Values.ToArray(), visitDetails, new Cohort[0], deviceExposure, new Note[0], false);
 
             Complete = true;
 
@@ -1379,7 +1379,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
         /// <returns>Enumeration of drug exposure entities</returns>
         private IEnumerable<DrugExposure> BuildDrugExposure(IEnumerable<DrugExposure> drugExposure,
             IEnumerable<ProcedureOccurrence> procedureOccurrence, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var drugs = new Dictionary<Guid, List<DrugExposure>>();
             var drugClaims = new Dictionary<Guid, List<DrugExposure>>();
@@ -1432,7 +1432,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
             // Remove duplicate drug claim records as well as eliminate drug claims that have been administratively backed 
             // out with negative values and apply base logic for drug claims records
             foreach (var de in BuildDrugExposures(FilteroutDrugClaims(drugClaims).ToArray(), visitOccurrences,
-                observationPeriods))
+                observationPeriods, withinTheObservationPeriod))
             {
                 yield return de;
             }
@@ -1475,7 +1475,7 @@ namespace org.ohdsi.cdm.framework.etl.ibm
         /// <param name="observationPeriods">the observation periods entities for current person</param>
         /// <returns>Enumeration of Visit Occurrence</returns>
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             var visitsCost = new Dictionary<string, List<VisitCost>>();
             foreach (var vo in rawVisitOccurrences.Where(vo =>

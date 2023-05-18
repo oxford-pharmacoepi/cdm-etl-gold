@@ -175,7 +175,7 @@ namespace org.ohdsi.cdm.framework.etl.cerner
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] rawVisitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
 
             foreach (var v in rawVisitOccurrences)
@@ -258,12 +258,12 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             //if (conditionOccurrences.Any())
             //   Logger.Write(this.chunkData.ChunkId, LogMessageTypes.Debug, conditionOccurrences[0].PersonId + "; conditionOccurrences.Count=" + conditionOccurrences.Count());
             foreach (var ent in base.BuildConditionOccurrences(conditionOccurrences, visitOccurrences,
-                observationPeriods))
+                observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 if (visitOccurrence == null)
@@ -278,9 +278,9 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<DeviceExposure> BuildDeviceExposure(DeviceExposure[] devExposure,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var ent in base.BuildDeviceExposure(devExposure, visitOccurrences, observationPeriods))
+            foreach (var ent in base.BuildDeviceExposure(devExposure, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 if (visitOccurrence == null)
@@ -294,9 +294,9 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var ent in base.BuildDrugExposures(drugExposures, visitOccurrences, observationPeriods))
+            foreach (var ent in base.BuildDrugExposures(drugExposures, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 if (visitOccurrence == null)
@@ -311,9 +311,9 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var ent in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods))
+            foreach (var ent in base.BuildMeasurement(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 if (visitOccurrence == null)
@@ -328,9 +328,9 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var ent in base.BuildObservations(observations, visitOccurrences, observationPeriods))
+            foreach (var ent in base.BuildObservations(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 ent.VisitOccurrenceId = visitOccurrence == null ? 0 : visitOccurrence.Id;
@@ -341,10 +341,10 @@ namespace org.ohdsi.cdm.framework.etl.cerner
 
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var ent in base.BuildProcedureOccurrences(procedureOccurrences, visitOccurrences,
-                observationPeriods))
+                observationPeriods, withinTheObservationPeriod))
             {
                 var visitOccurrence = GetVisitOccurrence(ent, visitOccurrences);
                 if (visitOccurrence == null)
@@ -386,7 +386,7 @@ namespace org.ohdsi.cdm.framework.etl.cerner
             //var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
 
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.IdUndefined)
                     visitOccurrence.Id =
@@ -410,19 +410,19 @@ namespace org.ohdsi.cdm.framework.etl.cerner
                 return Attrition.ImplausibleYOBFuture;
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             var deviceExposure =
-                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             /*
             // set corresponding PlanPeriodIds to drug exposure entities and procedure occurrence entities
             SetPayerPlanPeriodId(payerPlanPeriods, drugExposures, procedureOccurrences,
@@ -453,7 +453,7 @@ namespace org.ohdsi.cdm.framework.etl.cerner
             */
             AddToChunk(person, death, observationPeriods, null, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
-                visitOccurrences.Values.ToArray(), null, null, deviceExposure, null);
+                visitOccurrences.Values.ToArray(), null, null, deviceExposure, null, false);
 
             var pg = new PregnancyAlgorithm();
             foreach (var pe in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,

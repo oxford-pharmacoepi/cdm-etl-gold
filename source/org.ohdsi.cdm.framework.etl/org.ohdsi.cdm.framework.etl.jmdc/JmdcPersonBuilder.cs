@@ -35,7 +35,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var visitOccurrence in visitOccurrences)
             {
@@ -63,7 +63,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
                 }
             }
 
-            foreach (var visitOccurrence in base.BuildVisitOccurrences(visitOccurrences, observationPeriods))
+            foreach (var visitOccurrence in base.BuildVisitOccurrences(visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (visitOccurrence.SourceValue.ToLower() == "pharmacy")
                 {
@@ -114,7 +114,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
           */
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var co in conditionOccurrences)
             {
@@ -187,14 +187,14 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
          */
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var po in procedureOccurrences)
             {
                 SetStartDate(visitOccurrences, po);
             }
 
-            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, true);
+            return BuildEntities(procedureOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /*
@@ -205,7 +205,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
           *	
           */
         public override IEnumerable<DrugExposure> BuildDrugExposures(DrugExposure[] drugExposures,
-            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods)
+            Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var de in drugExposures)
             {
@@ -214,7 +214,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
                 de.EndDate = de.StartDate.AddDays(de.DaysSupply.HasValue ? de.DaysSupply.Value : 0);
             }
 
-            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
+            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public override IEnumerable<VisitCost> BuildVisitCosts(VisitOccurrence[] visitOccurrences)
@@ -393,9 +393,9 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
-            foreach (var o in base.BuildObservations(observations, visitOccurrences, observationPeriods))
+            foreach (var o in base.BuildObservations(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod))
             {
                 if (string.IsNullOrEmpty(o.ValueAsString) && !o.ValueAsNumber.HasValue &&
                     o.ValueAsConceptId == 0) continue;
@@ -406,7 +406,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
 
         public override IEnumerable<Measurement> BuildMeasurement(Measurement[] measurements,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var measurement in measurements)
             {
@@ -416,7 +416,7 @@ namespace org.ohdsi.cdm.framework.etl.jmdc
                     measurement.ValueAsNumber = valueAsNumber;
             }
 
-            return base.BuildMeasurement(measurements, visitOccurrences, observationPeriods);
+            return base.BuildMeasurement(measurements, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public override void AddToChunk(string domain, IEnumerable<IEntity> entities)

@@ -22,14 +22,14 @@ namespace org.ohdsi.cdm.framework.etl.hcup
 
         public override IEnumerable<ConditionOccurrence> BuildConditionOccurrences(
             ConditionOccurrence[] conditionOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var co in conditionOccurrences)
             {
                 PopulateEntity(co);
             }
 
-            return base.BuildConditionOccurrences(conditionOccurrences, visitOccurrences, observationPeriods);
+            return base.BuildConditionOccurrences(conditionOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         private void PopulateEntity(IEntity co)
@@ -48,19 +48,19 @@ namespace org.ohdsi.cdm.framework.etl.hcup
 
         public override IEnumerable<Observation> BuildObservations(Observation[] observations,
             Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var o in observations)
             {
                 PopulateEntity(o);
             }
 
-            return base.BuildObservations(observations, visitOccurrences, observationPeriods);
+            return base.BuildObservations(observations, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         public override IEnumerable<ProcedureOccurrence> BuildProcedureOccurrences(
             ProcedureOccurrence[] procedureOccurrences, Dictionary<long, VisitOccurrence> visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var po in procedureOccurrences)
             {
@@ -83,7 +83,7 @@ namespace org.ohdsi.cdm.framework.etl.hcup
                     po.TypeConceptId = 38000251 + po.TypeConceptId;
             }
 
-            return base.BuildProcedureOccurrences(procedureOccurrences, visitOccurrences, observationPeriods);
+            return base.BuildProcedureOccurrences(procedureOccurrences, visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
 
@@ -104,7 +104,7 @@ namespace org.ohdsi.cdm.framework.etl.hcup
         }
 
         public override IEnumerable<VisitOccurrence> BuildVisitOccurrences(VisitOccurrence[] visitOccurrences,
-            ObservationPeriod[] observationPeriods)
+            ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             foreach (var vo in visitOccurrences)
             {
@@ -266,7 +266,7 @@ namespace org.ohdsi.cdm.framework.etl.hcup
             var payerPlanPeriods = BuildPayerPlanPeriods(PayerPlanPeriodsRaw.ToArray(), null).ToArray();
             var visitOccurrences = new Dictionary<long, VisitOccurrence>();
 
-            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods))
+            foreach (var visitOccurrence in BuildVisitOccurrences(VisitOccurrencesRaw.ToArray(), observationPeriods, false))
             {
                 if (visitOccurrence.IdUndefined)
                     visitOccurrence.Id = Offset.GetKeyOffset(visitOccurrence.PersonId).VisitOccurrenceId;
@@ -275,19 +275,19 @@ namespace org.ohdsi.cdm.framework.etl.hcup
             }
 
             var drugExposures =
-                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDrugExposures(DrugExposuresRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
             var conditionOccurrences =
-                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
             var procedureOccurrences =
-                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods)
+                BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, false)
                     .ToArray();
-            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
-            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods)
+            var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, false)
                 .ToArray();
             var deviceExposure =
-                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods).ToArray();
+                BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, false).ToArray();
 
 
             var death = BuildDeath(DeathRecords.ToArray(), visitOccurrences, observationPeriods);
@@ -317,7 +317,7 @@ namespace org.ohdsi.cdm.framework.etl.hcup
             // push built entities to ChunkBuilder for further save to CDM database
             AddToChunk(buildPerson, death, observationPeriods, payerPlanPeriods, drugExposures,
                 conditionOccurrences, procedureOccurrences, observations, measurements,
-                visitOccurrences.Values.ToArray(), null, cohort, deviceExposure, new Note[0]);
+                visitOccurrences.Values.ToArray(), null, cohort, deviceExposure, new Note[0], false);
 
             var pg = new PregnancyAlgorithm();
             foreach (var pe in pg.GetPregnancyEpisodes(Vocabulary, buildPerson, observationPeriods,

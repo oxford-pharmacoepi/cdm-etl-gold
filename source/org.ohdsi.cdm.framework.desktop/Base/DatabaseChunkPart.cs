@@ -183,8 +183,27 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
             foreach (var pb in PersonBuilders)
             {
-                //var result = pb.Value.Value.Build(ChunkData, OffsetManager);
-                var result = pb.Value.Value.BuildCdm(ChunkData, OffsetManager, pb.Key);
+                var result = pb.Value.Value.Build(ChunkData, OffsetManager);
+                ChunkData.AddAttrition(pb.Key, result);
+            }
+
+            PersonBuilders.Clear();
+            PersonBuilders = null;
+
+            Console.WriteLine($"Building CDM chunkId={ChunkId} - complete");
+            Debug.WriteLine($"Building CDM chunkId={ChunkId} - complete");
+        }
+
+        public void Build(bool withinTheObservationPeriod)
+        {
+            Console.WriteLine($"Building CDM chunkId={ChunkId} ...");
+            Debug.WriteLine($"Building CDM chunkId={ChunkId} ...");
+
+            Debug.WriteLine($"withinTheObservationPeriod={withinTheObservationPeriod} ...");
+
+            foreach (var pb in PersonBuilders)
+            {
+                var result = pb.Value.Value.BuildCdm(ChunkData, OffsetManager, pb.Key, withinTheObservationPeriod);
                 ChunkData.AddAttrition(pb.Key, result);
             }
 
