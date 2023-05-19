@@ -1,4 +1,5 @@
 ﻿using org.ohdsi.cdm.framework.common.Builder;
+using org.ohdsi.cdm.framework.common.Definitions;
 using org.ohdsi.cdm.framework.common.Enums;
 using org.ohdsi.cdm.framework.common.Extensions;
 using org.ohdsi.cdm.framework.common.Helpers;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 
 namespace org.ohdsi.cdm.framework.common.Base
 {
@@ -687,6 +689,8 @@ namespace org.ohdsi.cdm.framework.common.Base
             }
         }
 
+        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0900", "65F0A00", "65F0B00" };
+
         /// <summary>
         /// A Drug Era is defined as a span of time when the Person is assumed to be exposed to a particular drug. 
         /// Successive periods of Drug Exposures are combined under certain rules to produce continuous Drug Eras.  
@@ -701,6 +705,7 @@ namespace org.ohdsi.cdm.framework.common.Base
             foreach (var eraEntity in EraHelper.GetEras(
                 Clean(drugExposures, observationPeriods, withinTheObservationPeriod).Where(d => string.IsNullOrEmpty(d.Domain) || d.Domain == "Drug"), 30, 38000182))
             {
+
                 eraEntity.Id = Offset.GetKeyOffset(eraEntity.PersonId).DrugEraId;
                 yield return eraEntity;
             }
@@ -1190,6 +1195,12 @@ namespace org.ohdsi.cdm.framework.common.Base
             if (Vocabulary == null)
                 Vocabulary = vocabulary;
         }
+
+        public virtual int UpdateConceptIdByCov19VaxBrandName(IEntity e)
+        {
+            return e.ConceptId;
+        }
+
 
         #endregion
     }
