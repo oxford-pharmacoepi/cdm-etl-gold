@@ -2,12 +2,15 @@
 using org.ohdsi.cdm.framework.common.Omop;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace org.ohdsi.cdm.framework.common.Helpers
 {
     public class EraHelper
     {
+        static string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0900", "65F0A00", "65F0B00" };
+
         public static IEnumerable<EraEntity> GetEras(IEnumerable<IEntity> entities, int gap1, int type1)
         {
             var filterdEntities = entities.Where(e => e.IncludeInEra()).ToList();
@@ -15,6 +18,7 @@ namespace org.ohdsi.cdm.framework.common.Helpers
 
             foreach (var entity in filterdEntities)
             {
+
                 if (entity.Ingredients != null && entity.Ingredients.Count > 0)
                 {
                     foreach (var ingredient in entity.Ingredients)

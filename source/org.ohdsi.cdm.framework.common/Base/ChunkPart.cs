@@ -46,8 +46,7 @@ namespace org.ohdsi.cdm.framework.common.Base
 
             if(queryDefinition.Death != null) {
                 AddEntity(queryDefinition, queryDefinition.Death, reader, recordGuid, "Death");
-            }
-            
+            }          
 
             if(queryDefinition.VisitOccurrence != null)
             {

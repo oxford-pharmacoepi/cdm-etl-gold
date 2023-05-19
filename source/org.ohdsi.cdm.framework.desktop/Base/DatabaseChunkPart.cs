@@ -150,10 +150,10 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                                 }
                             }
                         }
-                        
+
                     }
-                    
                 }
+                    
 
                 timer.Stop();
             }

@@ -18,7 +18,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
     /// </summary>
     public class CprdPersonBuilder : PersonBuilder
     {
-
+        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0900", "65F0A00", "65F0B00" };
         public override string GetFolder()
         {
             return "ETL\\CPRD";
@@ -373,6 +373,19 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
             var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
 
+            /*
+            //Covid-19 vaccine brand name mapping
+            foreach (var obj in ObservationsRaw) {
+                if (obj.Domain == "Drug" && Array.IndexOf(covid19_vax_read_code, obj.ConceptIdKey) >= 0) { 
+                    int new_concept_id = UpdateConceptIdByCov19VaxBrandName(obj);
+
+                    if (obj.ConceptId != new_concept_id)
+                        obj.ConceptId = new_concept_id;
+                }
+
+            }
+            */
+ 
             var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
             var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
 
@@ -710,6 +723,26 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
                         }
 
+                        //Covid-19 vaccine brand name mapping
+                        //*** if the immunisation records came from Clinical not Immunisation, there is no immstype
+                        //the concept id remains unchanged
+                        if (Array.IndexOf(covid19_vax_read_code, drg.ConceptIdKey) >= 0 && entity.AdditionalFields.ContainsKey("immstype"))
+                        {
+                            Debug.WriteLine($"Before: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
+
+                            int new_concept_id = UpdateConceptIdByCov19VaxBrandName(entity);
+
+                            if (drg.ConceptId != new_concept_id)
+                            {
+                                //if(drg.ConceptId == entity.Ingredients[0])
+                                drg.ConceptId = new_concept_id;
+                                entity.Ingredients[0] = new_concept_id;
+                            }
+
+                            Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
+                        }
+
+
                         DrugForEra.Add(drg);
                         ChunkData.AddData(drg);
                         break;
@@ -798,6 +831,22 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         {
             //return BuildEntities(devExposure, visitOccurrences, observationPeriods, false);
             return BuildEntities(devExposure, visitOccurrences, observationPeriods, withinTheObservationPeriod);
+        }
+
+        public override int UpdateConceptIdByCov19VaxBrandName(IEntity e)
+        {
+            switch (e.AdditionalFields["immstype"])
+            {
+                case "132": //COVOXFORD -> 724905 SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL
+                    return 724905;
+                case "133": //COVPFIZER -> 37003436 SARS-CoV-2 (COVID-19) vaccine, mRNA-BNT162b2 0.1 MG/ML Injectable Suspension
+                    return 37003436;
+                case "134": //COVJANSSEN -> 739906 SARS-COV-2 (COVID-19) vaccine, vector - Ad26 100000000000 UNT/ML Injectable Suspension
+                    return 739906;
+                case "135": //COVMODERNA -> 37003518 SARS-CoV-2 (COVID-19) vaccine, mRNA-1273 0.2 MG/ML Injectable Suspension
+                    return 37003518;
+            }
+            return e.ConceptId;
         }
 
     }

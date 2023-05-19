@@ -133,7 +133,6 @@
       <AdditionalFields>
         <string>constype</string>
 		<string>temp_visit_occurrence_id</string>
-		<string>immstype</string>
       </AdditionalFields>
       <Concepts>
         <Concept>
