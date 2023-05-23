@@ -663,12 +663,23 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                         // 1. clean death out of observation period
                         //var op = ops.Where(op => op.PersonId == d.PersonId).First();
 
-                        //if (d.StartDate >= op.StartDate.Date && d.StartDate <= op.EndDate.Value.Date && d.StartDate.Year >= 1900 && d.Primary)
-                        //{
-                        if (d.StartDate.Year <= DateTime.Now.Year)
-                            death.Add(d);
-                        //}
 
+                        if (d.StartDate.Year <= DateTime.Now.Year)
+                        {
+                            // If WithinTheObservationPeriod = true
+                            // Death outside the observation period only if after max threshold and within 3 months
+                            if (Settings.Current.WithinTheObservationPeriod)
+                            {
+                                var op = ops.FirstOrDefault(op => op.PersonId == d.PersonId);
+
+                                if (d.StartDate >= op.StartDate && d.StartDate.Date <= op.EndDate.Value.Date.AddMonths(3))
+                                    death.Add(d);
+
+                            }
+                            else {
+                                death.Add(d);
+                            }
+                        }
 
                     }
 

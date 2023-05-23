@@ -714,9 +714,14 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                         drg.TypeConceptId = 32838;
 
 
-                        //Drug|CVX
-                        if (entity.Domain != null && entity.Domain.EndsWith("CVX", StringComparison.OrdinalIgnoreCase))
+                        //Drug|CVX                                                                                          
+                        if ((entity.Domain != null && entity.Domain.EndsWith("CVX", StringComparison.OrdinalIgnoreCase))
+                            //From immunisation -> vaccines
+                            || entity.AdditionalFields.ContainsKey("immstype")
+                            //Covid 19 Vaccination from others event (not immunisation) e.g. Clinical
+                            || Array.IndexOf(covid19_vax_read_code, drg.ConceptIdKey) >= 0)
                         {
+
                             //38000179 = “Physician administered drug(identified as procedure)”  => 32818 = “EHR administration” (STANDARD)
                             //drg.TypeConceptId = 38000179; // Physician administered drug (identified as procedure)
                             drg.TypeConceptId = 32818;
