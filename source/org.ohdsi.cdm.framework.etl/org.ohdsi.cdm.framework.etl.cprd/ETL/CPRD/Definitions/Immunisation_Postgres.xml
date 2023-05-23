@@ -4,19 +4,20 @@
 				select person_id
 				from {sc}.chunk_person
 				where chunk_id = {0}			
-	), covid_vax_brand AS(
-		SELECT code FROM {sc}.lookup
-		where lookup_type_id = 39
-		and LEFT("text", 3) = 'COV' and "text" != 'COVCOURAGEOUS'
+	-- ), covid_vax_brand AS(
+	--	SELECT code FROM {sc}.lookup
+	--	where lookup_type_id = 39
+	--	and LEFT("text", 3) = 'COV' and "text" != 'COVCOURAGEOUS'
 	),x AS(
 		SELECT distinct  
 				i.eventdate,
 				i.patid,
 				i.staffid,
-				case 
-					when covid_vax_brand.code is null then null
-					else i.immstype
-				end as immstype,
+				i.immstype,
+				-- case 
+				--	when covid_vax_brand.code is null then null
+				--	else i.immstype
+				-- end as immstype,
 				m.readcode,
 				concat(i.patid,to_char(i.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 				-- nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
@@ -90,7 +91,7 @@
 		join {sc}.immunisation i on i.patid = ch.person_id
 		join {sc}.consultation con on i.patid = con.patid and i.consid = con.consid
 		left join {sc}.Medical m on (i.medcode = m.medcode)
-		left join covid_vax_brand on covid_vax_brand.code = i.immstype
+		-- left join covid_vax_brand on covid_vax_brand.code = i.immstype
 		-- where i.eventdate is not null 
 		-- and con.eventdate is not null
 	)
