@@ -733,7 +733,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                         //the concept id remains unchanged
                         if (Array.IndexOf(covid19_vax_read_code, drg.ConceptIdKey) >= 0 && entity.AdditionalFields.ContainsKey("immstype"))
                         {
-                            Debug.WriteLine($"Before: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
+                            //Debug.WriteLine($"Before: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
 
                             int new_concept_id = UpdateConceptIdByCov19VaxBrandName(entity);
 
@@ -744,7 +744,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                                 entity.Ingredients[0] = new_concept_id;
                             }
 
-                            Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
+                            //Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
                         }
 
 
@@ -842,6 +842,8 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         {
             switch (e.AdditionalFields["immstype"])
             {
+                case "130": //COVTALENT -> 724905 SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL
+                    return 724905;
                 case "132": //COVOXFORD -> 724905 SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL
                     return 724905;
                 case "133": //COVPFIZER -> 37003436 SARS-CoV-2 (COVID-19) vaccine, mRNA-BNT162b2 0.1 MG/ML Injectable Suspension
@@ -850,6 +852,16 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     return 739906;
                 case "135": //COVMODERNA -> 37003518 SARS-CoV-2 (COVID-19) vaccine, mRNA-1273 0.2 MG/ML Injectable Suspension
                     return 37003518;
+                case "143": //COVVALNEVA -> 702666 SARS-COV-2 COVID-19 Inactivated Virus Non-US Vaccine Product (COVAXIN)
+                    return 702666;
+                case "145": //COVNOVAVAX -> 36119721 COVID-19 vaccine, recombinant, full-length nanoparticle spike (S) protein, adjuvanted with Matrix-M Injectable Suspension
+                    return 36119721;
+                //To-Do: new immstype 
+                //COVMEDICAGO -> 36119722	COVID-19 vaccine, recombinant, plant-derived Virus-Like Particle (VLP) spike (S) protein, adjuvanted with AS03 Injectable Suspension
+                default:
+                    Debug.WriteLine($"PersonId={e.PersonId}, immstype={e.AdditionalFields["immstype"]}");  // 127 COVOTHER -> 724904 (SARS-COV-2 (COVID-19) vaccine, UNSPECIFIED)
+                    break;
+
             }
             return e.ConceptId;
         }
