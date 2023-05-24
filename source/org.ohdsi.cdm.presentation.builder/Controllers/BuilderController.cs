@@ -659,15 +659,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     foreach (var d in deathRaw)
                     {
-                        //* In exisiting logic, observation period is ignored. 
-                        // 1. clean death out of observation period
-                        //var op = ops.Where(op => op.PersonId == d.PersonId).First();
-
-
                         if (d.StartDate.Year <= DateTime.Now.Year)
                         {
                             // If WithinTheObservationPeriod = true
-                            // Death outside the observation period only if after max threshold and within 3 months
+                            // Reject Death if coming before the start of observation period
+                            // and after 3 months from the end of it
                             if (Settings.Current.WithinTheObservationPeriod)
                             {
                                 var op = ops.FirstOrDefault(op => op.PersonId == d.PersonId);
@@ -684,9 +680,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     }
 
                     Console.WriteLine("Death was loaded");
-
-                    //Debug.WriteLine($"deathRaw={deathRaw.Count}");
-                    //Debug.WriteLine($"death={death.Count}");
 
                     var saver = Settings.Current.Building.DestinationEngine.GetSaver();
                     using (saver.Create(Settings.Current.Building.DestinationConnectionString,
