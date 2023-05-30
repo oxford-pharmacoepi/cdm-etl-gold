@@ -736,7 +736,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 MapLocationAndCareSite(vocabulary);
                 MapProvider(vocabulary);
-                /*
+                
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
                 var providerConcepts = new List<Provider>();
@@ -793,9 +793,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 careSiteConcepts = null;
                 providerConcepts = null;
 
-
-
-                */
 
                 GC.Collect();
 
