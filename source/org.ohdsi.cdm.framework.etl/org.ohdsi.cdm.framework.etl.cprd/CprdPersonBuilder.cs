@@ -859,7 +859,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 //To-Do: new immstype 
                 //COVMEDICAGO -> 36119722	COVID-19 vaccine, recombinant, plant-derived Virus-Like Particle (VLP) spike (S) protein, adjuvanted with AS03 Injectable Suspension
                 default:
-                    Debug.WriteLine($"PersonId={e.PersonId}, immstype={e.AdditionalFields["immstype"]}");  // 127 COVOTHER -> 724904 (SARS-COV-2 (COVID-19) vaccine, UNSPECIFIED)
+                    //Debug.WriteLine($"PersonId={e.PersonId}, immstype={e.AdditionalFields["immstype"]}");  // 127 COVOTHER -> 724904 (SARS-COV-2 (COVID-19) vaccine, UNSPECIFIED)
                     break;
 
             }
