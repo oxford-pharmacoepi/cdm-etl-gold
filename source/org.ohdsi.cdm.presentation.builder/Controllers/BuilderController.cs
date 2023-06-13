@@ -611,7 +611,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
            });
 
-
         }
 
         public void MapDeath(IVocabulary vocabulary)
@@ -736,7 +735,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 MapLocationAndCareSite(vocabulary);
                 MapProvider(vocabulary);
-                
+                /*
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
                 var providerConcepts = new List<Provider>();
@@ -763,6 +762,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     careSiteConcepts.Add(new CareSite { Id = 0, LocationId = 0, OrganizationId = 0, PlaceOfSvcSourceValue = null });
                 Console.WriteLine("Care sites was loaded");
 
+
                 Console.WriteLine("Loading providers...");
                 var provider = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Providers != null);
                 if (provider != null)
@@ -780,19 +780,20 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 {
                     saver.SaveEntityLookup(Settings.Current.Building.Cdm, locationConcepts, careSiteConcepts, providerConcepts, null);
                 }
-
+                */
                 Console.WriteLine("Lookups was saved ");
                 timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
                     $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins");
 
+                /*
                 locationConcepts.Clear();
                 careSiteConcepts.Clear();
                 providerConcepts.Clear();
                 locationConcepts = null;
                 careSiteConcepts = null;
                 providerConcepts = null;
-
+                */
 
                 GC.Collect();
 
@@ -995,6 +996,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 }
             );
+
+
 
             Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
             var timer = new Stopwatch();
