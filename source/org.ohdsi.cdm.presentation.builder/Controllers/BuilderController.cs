@@ -436,6 +436,23 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
+        public void CreateScratchSchema()
+        {
+            PerformAction(() =>
+            {
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Scratch Schema Started ====================");
+
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
+                    Settings.Current.Building.CdmSchema);
+
+                dbDestination.CreateDatabase("scratch");
+
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Scratch Schema Ended ====================");
+            });
+        }
+
         public void CreateTablesStep()
         {
             var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
