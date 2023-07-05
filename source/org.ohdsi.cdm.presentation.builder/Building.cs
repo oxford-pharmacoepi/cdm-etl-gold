@@ -13,6 +13,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? DataCleaningEnd { get; set; }
         public DateTime? CreateDestinationDbStart { get; set; }
         public DateTime? CreateDestinationDbEnd { get; set; }
+        public DateTime? CreateSchemaSchemaStart { get; set; }
+        public DateTime? CreateSchemaSchemaEnd { get; set; }
         public DateTime? CreateChunksStart { get; set; }
         public DateTime? CreateChunksEnd { get; set; }
         public DateTime? CreateLookupStart { get; set; }
@@ -140,6 +142,34 @@ namespace org.ohdsi.cdm.presentation.builder
                 return CreateDestinationDbEnd.Value != DateTime.MinValue;
             }
         }
+
+        [XmlIgnore]
+        public bool ScratchSchemaStarted
+        {
+            get
+            {
+                if (ScratchSchemaCreated)
+                    return false;
+
+                if (!CreateSchemaSchemaStart.HasValue)
+                    return false;
+
+                return CreateSchemaSchemaStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool ScratchSchemaCreated
+        {
+            get
+            {
+                if (!CreateSchemaSchemaEnd.HasValue)
+                    return false;
+
+                return CreateSchemaSchemaEnd.Value != DateTime.MinValue;
+            }
+        }
+
 
         [XmlIgnore]
         public bool MapAllPatientsStarted

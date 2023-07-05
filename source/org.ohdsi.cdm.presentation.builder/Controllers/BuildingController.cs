@@ -91,6 +91,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 //Map other cdm 
                 Build(vocabulary);
 
+                CreateScratchSchema();
+
             }
         }
 
@@ -146,6 +148,15 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateDestinationDbStart");
             _builderController.CreateDestination();
             UpdateDate("CreateDestinationDbEnd");
+        }
+
+        private void CreateScratchSchema()
+        {
+            if (Settings.Current.Building.BuildingState.ScratchSchemaCreated) return;
+
+            UpdateDate("CreateSchemaSchemaStart");
+            _builderController.CreateScratchSchema();
+            UpdateDate("CreateSchemaSchemaEnd");
         }
 
         private void CreateLookup(IVocabulary vocabulary)
