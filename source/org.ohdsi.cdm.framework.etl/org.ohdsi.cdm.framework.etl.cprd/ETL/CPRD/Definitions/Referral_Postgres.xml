@@ -1,89 +1,30 @@
 ﻿<QueryDefinition>
-  <Query>
-	  With ch AS(
-		  select person_id
-		  from {sc}.chunk_person
-		  where chunk_id = {0}
-	  ), x AS(
-	  SELECT distinct 
-			  a.eventdate,
-			  a.patid,
-			  a.staffid,
-			  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
-			  -- nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
-			  MOD(a.patid, 100000) as care_site_id,
-			  m.readcode,
-			  case
-			  when con.constype = 0 then 'Data Not Entered'
-			  when con.constype = 1 then 'Clinic'
-			  when con.constype = 2 then 'Night visit, Deputising service'
-			  when con.constype = 3 then 'Follow-up/routine visit'
-			  when con.constype = 4 then 'Night visit, Local rota'
-			  when con.constype = 5 then 'Mail from patient'
-			  when con.constype = 6 then 'Night visit , practice'
-			  when con.constype = 7 then 'Out of hours, Practice'
-			  when con.constype = 8 then 'Out of hours, Non Practice'
-			  when con.constype = 9 then 'Surgery consultation'
-			  when con.constype = 10 then 'Telephone call from a patient'
-			  when con.constype = 11 then 'Acute visit'
-			  when con.constype = 12 then 'Discharge details'
-			  when con.constype = 13 then 'Letter from Outpatients'
-			  when con.constype = 14 then 'Repeat Issue'
-			  when con.constype = 15 then 'Other'
-			  when con.constype = 16 then 'Results recording'
-			  when con.constype = 17 then 'Mail to patient'
-			  when con.constype = 18 then 'Emergency Consultation'
-			  when con.constype = 19 then 'Administration'
-			  when con.constype = 20 then 'Casualty Attendance'
-			  when con.constype = 21 then 'Telephone call to a patient'
-			  when con.constype = 22 then 'Third Party Consultation'
-			  when con.constype = 23 then 'Hospital Admission'
-			  when con.constype = 24 then 'Children''s Home Visit'
-			  when con.constype = 25 then 'Day Case Report'
-			  when con.constype = 26 then 'GOS18 Report'
-			  when con.constype = 27 then 'Home Visit'
-			  when con.constype = 28 then 'Hotel Visit'
-			  when con.constype = 29 then 'NHS Direct Report'
-			  when con.constype = 30 then 'Nursing Home Visit'
-			  when con.constype = 31 then 'Residential Home Visit'
-			  when con.constype = 32 then 'Twilight Visit'
-			  when con.constype = 33 then 'Triage'
-			  when con.constype = 34 then 'Walk-in Centre'
-			  when con.constype = 35 then 'Co-op Telephone advice'
-			  when con.constype = 36 then 'Co-op Surgery Consultation'
-			  when con.constype = 37 then 'Co-op Home Visit'
-			  when con.constype = 38 then 'Minor Injury Service'
-			  when con.constype = 39 then 'Medicine Management'
-			  when con.constype = 40 then 'Community Clinic'
-			  when con.constype = 41 then 'Community Nursing Note'
-			  when con.constype = 42 then 'Community Nursing Report'
-			  when con.constype = 43 then 'Data Transferred from other system'
-			  when con.constype = 44 then 'Health Authority Entry'
-			  when con.constype = 45 then 'Health Visitor Note'
-			  when con.constype = 46 then 'Health Visitor Report'
-			  when con.constype = 47 then 'Hospital Inpatient Report'
-			  when con.constype = 48 then 'Initial Post Discharge Review'
-			  when con.constype = 49 then 'Laboratory Request'
-			  when con.constype = 50 then 'Night Visit'
-			  when con.constype = 51 then 'Radiology Request'
-			  when con.constype = 52 then 'Radiology Result'
-			  when con.constype = 53 then 'Referral Letter'
-			  when con.constype = 54 then 'Social Services Report'
-			  when con.constype = 55 then 'Telephone Consultation'
-			  when con.constype = 56 then 'Template Entry'
-			  when con.constype = 57 then 'GP to GP communication transaction'
-			  when con.constype = 58 then 'Non-consultation medication data'
-			  when con.constype = 59 then 'Non-consultation data'
-			  when con.constype = 60 then 'ePharmacy message'
-			  when con.constype = 61 then 'Extended Hours'
-		  end as description,
-		  con.constype
-	  from ch
-	  join {sc}.Referral a on a.patid = ch.person_id
-	  join {sc}.consultation con on a.patid = con.patid and a.consid = con.consid
-	  left join {sc}.Medical m on (a.medcode = m.medcode)
-	  -- where a.eventdate is not null 
-	  -- and con.eventdate is not null
+  <Query>	
+	With ch AS(
+		select person_id
+		from {sc}.chunk_person
+		where chunk_id = {0}
+	), constype AS(
+		select code, text 
+		from {sc}.lookup
+		where lookup_type_id = 18
+	),x AS(
+		  SELECT distinct 
+				  a.eventdate,
+				  a.patid,
+				  a.staffid,
+				  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
+				  MOD(a.patid, 100000) as care_site_id,
+				  m.readcode,
+				  constype.text as description,
+			  con.constype
+		  from ch
+		  join {sc}.Referral a on a.patid = ch.person_id
+		  join {sc}.consultation con on a.patid = con.patid and a.consid = con.consid
+		  left join constype on constype.code = con.constype	
+		  left join {sc}.Medical m on (a.medcode = m.medcode)
+		  -- where a.eventdate is not null 
+		  -- and con.eventdate is not null
 	)
 	select x.*, nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id
 	from x

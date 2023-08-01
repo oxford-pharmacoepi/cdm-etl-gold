@@ -27,12 +27,13 @@
 		when a.frd &gt; b.uts then a.frd
 				else b.uts 
 			end as observation_period_start_date,
-			case
-				when a.tod is null then b.lcd
-				when a.tod is not null and a.tod &lt; b.lcd  then a.tod
-				when a.tod is not null and a.tod &gt;= b.lcd  then b.lcd
-				else '23-DEC-2099' 
-			end as observation_period_end_date,
+			-- case
+			-- 	when a.tod is null then b.lcd
+			--	when a.tod is not null and a.tod &lt; b.lcd  then a.tod
+			--	when a.tod is not null and a.tod &gt;= b.lcd  then b.lcd
+			--	else '23-DEC-2099' 
+			-- end as observation_period_end_date,	
+			LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) as observation_period_end_date,
 			deathdate,
 			toreason,
 			CASE
