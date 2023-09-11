@@ -10,5 +10,8 @@ assignees: ''
 **Describe the problem**
 - Explain the involved codes (if some) and which is the behavior that you would have expected.
 
+**Affected databases**
+List the releases where you have detected this issue.
+
 **Tag for awareness**
 Please tag other people working in the same database that may be affected.
