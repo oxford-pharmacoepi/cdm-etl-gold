@@ -97,7 +97,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         }
 
         private void MapDeath(IVocabulary vocabulary) {
-            if (Settings.Current.Building.BuildingState.MapAllDeathDone) return;
+            if (!Settings.Current.Building.BuildingState.ChunksCreated || Settings.Current.Building.BuildingState.MapAllDeathDone) return;
 
             UpdateDate("MapAllDeathStart");
             _builderController.MapDeath(vocabulary);
@@ -124,7 +124,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private void MapAllPatients(IVocabulary vocabulary) {
 
-            if (Settings.Current.Building.BuildingState.MapAllPatientsDone) return;
+            if (!Settings.Current.Building.BuildingState.LookupCreated || Settings.Current.Building.BuildingState.MapAllPatientsDone) return;
 
             UpdateDate("MapAllPatientsStart");
             _builderController.MapAllPatients(vocabulary);
@@ -134,7 +134,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private void CreateChunks()
         {
-            if (Settings.Current.Building.BuildingState.ChunksCreated) return;
+            if (!Settings.Current.Building.BuildingState.MapAllPatientsDone || Settings.Current.Building.BuildingState.ChunksCreated) return;
 
             UpdateDate("CreateChunksStart");
             _builderController.CreatChunks();
@@ -162,7 +162,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         private void CreateLookup(IVocabulary vocabulary)
         {
 
-            if (Settings.Current.Building.BuildingState.LookupCreated) return;
+            if (!Settings.Current.Building.BuildingState.DestinationCreated || Settings.Current.Building.BuildingState.LookupCreated) return;
 
             UpdateDate("CreateLookupStart");
             _builderController.CreateLookup(vocabulary);
@@ -172,7 +172,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private bool Build(IVocabulary vocabulary)
         {
-            while (!Settings.Current.Building.BuildingState.LookupCreated)
+            while (!Settings.Current.Building.BuildingState.LookupCreated || !Settings.Current.Building.BuildingState.MapAllDeathDone)
             {
                 if (_builderController.CurrentState == BuilderState.Error)
                     return false;
