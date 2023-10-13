@@ -372,19 +372,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             var deviceExposure = BuildDeviceExposure(DeviceExposureRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
             var conditionOccurrences = BuildConditionOccurrences(ConditionOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
             var procedureOccurrences = BuildProcedureOccurrences(ProcedureOccurrencesRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
-
-            /*
-            //Covid-19 vaccine brand name mapping
-            foreach (var obj in ObservationsRaw) {
-                if (obj.Domain == "Drug" && Array.IndexOf(covid19_vax_read_code, obj.ConceptIdKey) >= 0) { 
-                    int new_concept_id = UpdateConceptIdByCov19VaxBrandName(obj);
-
-                    if (obj.ConceptId != new_concept_id)
-                        obj.ConceptId = new_concept_id;
-                }
-
-            }
-            */
  
             var observations = BuildObservations(ObservationsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
             var measurements = BuildMeasurement(MeasurementsRaw.ToArray(), visitOccurrences, observationPeriods, withinTheObservationPeriod).ToArray();
@@ -403,6 +390,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
                 Clean(deviceExposure, person).ToArray(), null, withinTheObservationPeriod);
+            
             
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
@@ -601,6 +589,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         {
             foreach (var entity in entities)
             {
+                //Debug.WriteLine($"domain=" + domain + " entity.Domain =" + entity.Domain);
                 var entityDomain = GetDomain2(domain, entity.Domain);
 
                 switch (entityDomain)
@@ -612,7 +601,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                                    {
                                        Id = Offset.GetKeyOffset(entity.PersonId).ConditionOccurrenceId
                                    };
-                        cond.TypeConceptId = 32020; //EHR encounter diagnosis
+                        cond.TypeConceptId = 32817; //32020 EHR encounter diagnosis -> 32817 EHR
                         ConditionForEra.Add(cond);
                         ChunkData.AddData(cond);
 
@@ -624,7 +613,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                             Id = Offset.GetKeyOffset(entity.PersonId).MeasurementId
                         };
 
-                        mes.TypeConceptId = 44818702; //Lab result;
+                        mes.TypeConceptId = 32856; //44818702 Lab result -> 32856 Lab
 
                         if (!string.IsNullOrEmpty(mes.SourceValue))
                         {
@@ -675,7 +664,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                         {
                             Id = Offset.GetKeyOffset(entity.PersonId).ObservationId
                         };
-                        obs.TypeConceptId = 38000280; //Observation recorded from EHR
+                        obs.TypeConceptId = 32817; //38000280 Observation recorded from EHR -> 32817 EHR
                         var valueAsConceptId = GetValueAsConceptId(obs, obs.ValueAsString);
                         if (valueAsConceptId.HasValue)
                             obs.ValueAsConceptId = valueAsConceptId.Value;
@@ -728,6 +717,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
                         }
 
+                        
                         //Covid-19 vaccine brand name mapping
                         //*** if the immunisation records came from Clinical not Immunisation, there is no immstype
                         //the concept id remains unchanged
@@ -737,15 +727,9 @@ namespace org.ohdsi.cdm.framework.etl.cprd
 
                             int new_concept_id = UpdateConceptIdByCov19VaxBrandName(entity);
 
-                            if (drg.ConceptId != new_concept_id)
-                            {
-                                //if(drg.ConceptId == entity.Ingredients[0])
-                                drg.ConceptId = new_concept_id;
-                                entity.Ingredients[0] = new_concept_id;
-                            }
-
                             //Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
                         }
+                        
 
 
                         DrugForEra.Add(drg);
