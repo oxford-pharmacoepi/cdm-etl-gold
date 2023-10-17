@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS {sc}.care_site
    care_site_id                   bigint         NOT NULL,
    care_site_name                 varchar(255),
    place_of_service_concept_id    integer,
-   location_id                    bigint,
+   location_id                    integer,
    care_site_source_value         varchar(50),
    place_of_service_source_value  varchar(50)
 );
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
-   cdm_source_name                 varchar(255)   PRIMARY KEY,
+   cdm_source_name                 varchar(255) NOT NULL,,
    cdm_source_abbreviation         varchar(25),
    cdm_holder                      varchar(255),
    source_description              text,
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    visit_detail_id               bigint,
    drug_source_value             varchar(250),
    drug_source_concept_id        integer,
-   route_source_value            varchar(50),
+   route_source_value            varchar(100),	-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
    dose_unit_source_value        varchar(50)
 );
 
@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
 
 CREATE TABLE IF NOT EXISTS {sc}.location
 (
-   location_id            bigint        NOT NULL,
+   location_id            integer        NOT NULL,
    address_1              varchar(50),
    address_2              varchar(50),
    city                   varchar(50),
@@ -365,7 +365,7 @@ CREATE TABLE IF NOT EXISTS {sc}.person
    birth_datetime               timestamp,
    race_concept_id              integer       NOT NULL,
    ethnicity_concept_id         integer       NOT NULL,
-   location_id                  bigint,
+   location_id                  integer,
    provider_id                  bigint,
    care_site_id                 bigint,
    person_source_value          varchar(50),
