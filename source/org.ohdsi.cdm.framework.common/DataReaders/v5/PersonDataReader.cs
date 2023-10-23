@@ -210,11 +210,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
                 case 7:
                     return typeof(int?);
                 case 8:
-                    return typeof(long?);
+                    return typeof(int);
                 case 9:
                     return typeof(long?);
                 case 10:
-                    return typeof(long?);
+                    return typeof(int);
                 case 11:
                     return typeof(string);
                 case 12:
