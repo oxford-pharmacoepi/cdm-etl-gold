@@ -265,7 +265,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 8:
                     return typeof(long?);
                 case 9:
-                    return typeof(int);
+                    return typeof(long?);
                 case 10:
                     return typeof(int);
 

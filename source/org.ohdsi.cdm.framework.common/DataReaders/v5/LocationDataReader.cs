@@ -169,7 +169,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
             switch (i)
             {
                 case 0:
-                    return typeof(int);
+                    return typeof(long);
 
                 case 1:
                     return typeof(string);
