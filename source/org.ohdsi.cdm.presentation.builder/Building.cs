@@ -15,6 +15,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? CreateDestinationDbEnd { get; set; }
         public DateTime? CreateSchemaSchemaStart { get; set; }
         public DateTime? CreateSchemaSchemaEnd { get; set; }
+        public DateTime? CdmPkIdxForVisitStart { get; set; }
+        public DateTime? CdmPkIdxForVisitEnd { get; set; }
         public DateTime? CreateChunksStart { get; set; }
         public DateTime? CreateChunksEnd { get; set; }
         public DateTime? CreateLookupStart { get; set; }
@@ -23,7 +25,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? MapAllPatientsEnd { get; set; }
         public DateTime? BuildingStart { get; set; }
         public DateTime? BuildingEnd { get; set; }
-
+        public DateTime? PopulateCdmSourceStart { get; set; }
+        public DateTime? PopulateCdmSourceEnd { get; set; }
         public DateTime? CreateCdmIndexesStart { get; set; }
         public DateTime? CreateCdmIndexesEnd { get; set; }
         public DateTime? MapAllDeathStart { get; set; }
@@ -170,6 +173,33 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
+        [XmlIgnore]
+        public bool CdmPkIdxForVisitStarted
+        {
+            get
+            {
+                if (CdmPkIdxForVisitCreated)
+                    return false;
+
+                if (!CdmPkIdxForVisitStart.HasValue)
+                    return false;
+
+                return CdmPkIdxForVisitStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool CdmPkIdxForVisitCreated
+        {
+            get
+            {
+                if (!CdmPkIdxForVisitEnd.HasValue)
+                    return false;
+
+                return CdmPkIdxForVisitEnd.Value != DateTime.MinValue;
+            }
+        }
+
 
         [XmlIgnore]
         public bool MapAllPatientsStarted
@@ -275,6 +305,30 @@ namespace org.ohdsi.cdm.presentation.builder
                     return false;
 
                 return BuildingEnd.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool PopulateCdmSourceStarted
+        {
+            get
+            {
+                if (!PopulateCdmSourceStart.HasValue)
+                    return false;
+
+                return PopulateCdmSourceStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool PopulateCdmSourceDone
+        {
+            get
+            {
+                if (!PopulateCdmSourceEnd.HasValue)
+                    return false;
+
+                return PopulateCdmSourceEnd.Value != DateTime.MinValue;
             }
         }
 

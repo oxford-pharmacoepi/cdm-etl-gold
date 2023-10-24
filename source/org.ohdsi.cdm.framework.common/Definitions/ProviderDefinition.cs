@@ -82,7 +82,8 @@ namespace org.ohdsi.cdm.framework.common.Definitions
                 int? specialtySourceConceptId = null;
 
                 //(Unknown Physician Specialty)
-                var defaultConceptId = 38004514;
+                //var defaultConceptId = 38004514;  //38004514 is non-standard 
+                var defaultConceptId = 0;
 
                 if (conceptField.DefaultConceptId.HasValue)
                 {

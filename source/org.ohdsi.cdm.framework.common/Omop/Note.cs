@@ -34,6 +34,10 @@ namespace org.ohdsi.cdm.framework.common.Omop
 
         public int EventFieldConceptId { get; set; }
 
+        // CDM v5.4 props
+        public long NoteEventId { get; set; }
+        public int NoteEventFieldConceptId { get; set; }
+
         public Dictionary<string, string> AdditionalFields { get; set; }
 
         public Note()
@@ -49,7 +53,9 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    this.VisitOccurrenceId.Equals(other.VisitOccurrenceId) &&
                    //this.SourceConceptId.Equals(other.SourceConceptId) &&
                    this.TypeConceptId.Equals(other.TypeConceptId) &&
-                   this.SourceValue.Equals(other.SourceValue);
+                   this.SourceValue.Equals(other.SourceValue) &&
+                   this.NoteEventId.Equals(other.NoteEventId) &&
+                   this.NoteEventFieldConceptId.Equals(other.NoteEventFieldConceptId);
         }
 
         public override int GetHashCode()
@@ -61,12 +67,15 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    TypeConceptId.GetHashCode() ^
                    //SourceConceptId.GetHashCode() ^
                    VisitOccurrenceId.GetHashCode() ^
-                   (SourceValue != null ? SourceValue.GetHashCode() : 0);
+                   (SourceValue != null ? SourceValue.GetHashCode() : 0) ^
+                   (NoteEventId != null ? NoteEventId.GetHashCode() : 0) ^
+                   (NoteEventFieldConceptId != null ? NoteEventFieldConceptId.GetHashCode() : 0);
         }
-
-        //public override EntityType GeEntityType()
-        //{
-        //   return EntityType.Note;
-        //}
+        /*
+        public override EntityType GeEntityType()
+        {
+           return EntityType.Note;
+        }
+        */
     }
 }

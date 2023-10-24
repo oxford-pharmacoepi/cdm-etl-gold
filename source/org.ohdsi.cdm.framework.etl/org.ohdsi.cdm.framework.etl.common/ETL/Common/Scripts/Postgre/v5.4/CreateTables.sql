@@ -1,11 +1,4 @@
-CREATE TABLE IF NOT EXISTS {sc}.attribute_definition
-(
-   attribute_definition_id    integer        NOT NULL,
-   attribute_name             varchar(255)   NOT NULL,
-   attribute_description      text,
-   attribute_type_concept_id  integer        NOT NULL,
-   attribute_syntax           text
-);
+-- CDM v5.4.1
 
 CREATE TABLE IF NOT EXISTS {sc}.care_site
 (
@@ -25,46 +18,17 @@ CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
-   cdm_source_name                 varchar(255) NOT NULL,
-   cdm_source_abbreviation         varchar(25),
-   cdm_holder                      varchar(255),
+   cdm_source_name                 varchar(255)   	NOT NULL,
+   cdm_source_abbreviation         varchar(25)		NOT NULL,
+   cdm_holder                      varchar(255)   	NOT NULL,
    source_description              text,
    source_documentation_reference  varchar(255),
    cdm_etl_reference               varchar(255),
-   source_release_date             date,
-   cdm_release_date                date,
+   source_release_date             date 			NOT NULL,
+   cdm_release_date                date 			NOT NULL,
    cdm_version                     varchar(10),
-   vocabulary_version              varchar(20)
-);
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort
-(
-   cohort_definition_id  integer   NOT NULL,
-   subject_id            integer   NOT NULL,
-   cohort_start_date     date      NOT NULL,
-   cohort_end_date       date      NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort_attribute
-(
-   cohort_definition_id     integer   NOT NULL,
-   subject_id               integer   NOT NULL,
-   cohort_start_date        date      NOT NULL,
-   cohort_end_date          date      NOT NULL,
-   attribute_definition_id  integer   NOT NULL,
-   value_as_number          numeric,
-   value_as_concept_id      integer
-);
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort_definition
-(
-   cohort_definition_id           integer        NOT NULL,
-   cohort_definition_name         varchar(255)   NOT NULL,
-   cohort_definition_description  text,
-   definition_type_concept_id     integer        NOT NULL,
-   cohort_definition_syntax       text,
-   subject_concept_id             integer        NOT NULL,
-   cohort_initiation_date         date
+   cdm_version_concept_id 			integer 		NOT NULL,
+   vocabulary_version              varchar(20)		NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_era
@@ -95,7 +59,6 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
    condition_source_value         varchar(250),
    condition_source_concept_id    integer,
    condition_status_source_value  varchar(50)
-  
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.cost
@@ -145,15 +108,18 @@ CREATE TABLE IF NOT EXISTS {sc}.device_exposure
    device_exposure_end_date        date,
    device_exposure_end_datetime    timestamp,
    device_type_concept_id          integer        NOT NULL,
-   unique_device_id                varchar(50),
+   unique_device_id                varchar(255),
+   production_id 				   varchar(255),
    quantity                        integer,
    provider_id                     bigint,
    visit_occurrence_id             bigint,
    visit_detail_id                 bigint,
    device_source_value             varchar(250),
-   device_source_concept_id        integer
+   device_source_concept_id        integer,
+   unit_concept_id 				   integer,
+   unit_source_value 			   varchar(50),
+   unit_source_concept_id		   integer
 );
-
 
 CREATE TABLE IF NOT EXISTS {sc}.dose_era
 (
@@ -162,8 +128,8 @@ CREATE TABLE IF NOT EXISTS {sc}.dose_era
    drug_concept_id      integer   		NOT NULL,
    unit_concept_id      integer  		NOT NULL,
    dose_value           numeric   		NOT NULL,
-   dose_era_start_date  timestamp 		NOT NULL,		--from date to timestamp
-   dose_era_end_date    timestamp 		NOT NULL		--from date to timestamp
+   dose_era_start_date  date 			NOT NULL,		
+   dose_era_end_date    date 			NOT NULL		
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.drug_era
@@ -200,7 +166,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    visit_detail_id               bigint,
    drug_source_value             varchar(250),
    drug_source_concept_id        integer,
-   route_source_value            varchar(100),	-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
+   route_source_value            varchar(100),		-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
    dose_unit_source_value        varchar(50)
 );
 
@@ -216,49 +182,58 @@ CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
 
 CREATE TABLE IF NOT EXISTS {sc}.location
 (
-   location_id            integer        NOT NULL,
-   address_1              varchar(50),
-   address_2              varchar(50),
-   city                   varchar(50),
-   state                  varchar(2),
-   zip                    varchar(9),
-   county                 varchar(20),
-   location_source_value  varchar(50)
+   location_id            	integer        NOT NULL,
+   address_1              	varchar(50),
+   address_2              	varchar(50),
+   city                   	varchar(50),
+   state                  	varchar(2),
+   zip                    	varchar(9),
+   county                 	varchar(20),
+   location_source_value  	varchar(50),
+   country_concept_id 		integer,
+   country_source_value 	varchar(80),
+   latitude 				numeric,
+   longitude 				numeric
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.measurement
 (
-   measurement_id                 BIGSERIAL       NOT NULL,
-   person_id                      bigint          NOT NULL,
-   measurement_concept_id         integer         NOT NULL,
-   measurement_date               date            NOT NULL,
-   measurement_datetime           timestamp,
-   measurement_time               varchar(10),
-   measurement_type_concept_id    integer         NOT NULL,
-   operator_concept_id            integer,
-   value_as_number                numeric,
-   value_as_concept_id            integer,
-   unit_concept_id                integer,
-   range_low                      numeric,
-   range_high                     numeric,
-   provider_id                    bigint,
-   visit_occurrence_id            bigint,
-   visit_detail_id                bigint,
-   measurement_source_value       varchar(250),
-   measurement_source_concept_id  integer,
-   unit_source_value              varchar(50),
-   value_source_value             varchar(50)		-- from 2500 to 50
+   measurement_id                 	BIGSERIAL       NOT NULL,
+   person_id                      	bigint          NOT NULL,
+   measurement_concept_id         	integer         NOT NULL,
+   measurement_date               	date            NOT NULL,
+   measurement_datetime           	timestamp,
+   measurement_time               	varchar(10),
+   measurement_type_concept_id    	integer         NOT NULL,
+   operator_concept_id            	integer,
+   value_as_number                	numeric,
+   value_as_concept_id            	integer,
+   unit_concept_id                	integer,
+   range_low                      	numeric,
+   range_high                     	numeric,
+   provider_id                    	bigint,
+   visit_occurrence_id            	bigint,
+   visit_detail_id                	bigint,
+   measurement_source_value       	varchar(250),
+   measurement_source_concept_id  	integer,
+   unit_source_value              	varchar(50),
+   unit_source_concept_id			integer,
+   value_source_value             	varchar(50),  
+   measurement_event_id 		  	bigint,		--integer in 5.4.1 but not works for GOLD
+   meas_event_field_concept_id 	  	integer
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.metadata
 (
-   metadata_concept_id       integer        NOT NULL,
-   metadata_type_concept_id  integer        NOT NULL,
-   name                      varchar(250)   NOT NULL,
-   value_as_string           varchar(250),			-- from text to varchar(250)
-   value_as_concept_id       integer,
-   metadata_date             date,
-   metadata_datetime         timestamp
+   metadata_id 					SERIAL  		NOT NULL,
+   metadata_concept_id       	integer        	NOT NULL,
+   metadata_type_concept_id  	integer        	NOT NULL,
+   name                      	varchar(250)   	NOT NULL,
+   value_as_string           	varchar(250),			
+   value_as_concept_id       	integer,
+   value_as_number 				numeric,
+   metadata_date             	date,
+   metadata_datetime         	timestamp
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.metadata_tmp
@@ -269,20 +244,22 @@ CREATE TABLE IF NOT EXISTS {sc}.metadata_tmp
 
 CREATE TABLE IF NOT EXISTS {sc}.note
 (
-   note_id                integer        NOT NULL,
-   person_id              bigint         NOT NULL,
-   note_date              date           NOT NULL,
-   note_datetime          timestamp,
-   note_type_concept_id   integer        NOT NULL,
-   note_class_concept_id  integer        NOT NULL,
-   note_title             varchar(250),
-   note_text              text,
-   encoding_concept_id    integer        NOT NULL,
-   language_concept_id    integer        NOT NULL,
-   provider_id            bigint,
-   visit_occurrence_id    bigint,
-   visit_detail_id        bigint,
-   note_source_value      varchar(50)
+   note_id                			integer        NOT NULL,
+   person_id              			bigint         NOT NULL,
+   note_date              			date           NOT NULL,
+   note_datetime          			timestamp,
+   note_type_concept_id   			integer        NOT NULL,
+   note_class_concept_id  			integer        NOT NULL,
+   note_title             			varchar(250),
+   note_text              			text,
+   encoding_concept_id    			integer        NOT NULL,
+   language_concept_id    			integer        NOT NULL,
+   provider_id            			bigint,
+   visit_occurrence_id    			bigint,
+   visit_detail_id        			bigint,
+   note_source_value      			varchar(50),
+   note_event_id 					bigint,			--integer in 5.4.1 but not works for GOLD
+   note_event_field_concept_id 		integer
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.note_nlp
@@ -291,7 +268,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note_nlp
    note_id                     integer         NOT NULL,
    section_concept_id          integer,
    snippet                     varchar(250),
-   "offset"                    varchar(50),		-- from 250 to 50
+   "offset"                    varchar(50),	
    lexical_variant             varchar(250)    NOT NULL,
    note_nlp_concept_id         integer,
    note_nlp_source_concept_id  integer,
@@ -312,7 +289,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
    observation_datetime           timestamp,
    observation_type_concept_id    integer         NOT NULL,
    value_as_number                numeric,
-   value_as_string                varchar(60),		-- from 2000 to 60
+   value_as_string                varchar(60),		
    value_as_concept_id            integer,
    qualifier_concept_id           integer,
    unit_concept_id                integer,
@@ -321,9 +298,13 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
    visit_detail_id                bigint,
    observation_source_value       varchar(250),
    observation_source_concept_id  integer,
-   unit_source_value              varchar(50),		-- from 250 to 50 
-   qualifier_source_value         varchar(50)		-- from 250 to 50 
+   unit_source_value              varchar(50),		
+   qualifier_source_value         varchar(50),
+   value_source_value			  varchar(50),
+   observation_event_id			  bigint,			--integer in 5.4.1 but not works for GOLD
+   obs_event_field_concept_id 	  integer
 );
+
 
 CREATE TABLE IF NOT EXISTS {sc}.observation_period
 (
@@ -383,7 +364,9 @@ CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
    person_id                    bigint        NOT NULL,
    procedure_concept_id         integer       NOT NULL,
    procedure_date               date          NOT NULL,
-   procedure_datetime           timestamp,
+   procedure_datetime           timestamp,	
+   procedure_end_date			date,
+   procedure_end_datetime		timestamp,
    procedure_type_concept_id    integer       NOT NULL,
    modifier_concept_id          integer,
    quantity                     integer,
@@ -443,14 +426,14 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
    visit_detail_type_concept_id    integer       NOT NULL,
    provider_id                     bigint,
    care_site_id                    integer,
-   admitting_source_concept_id     integer,
-   discharge_to_concept_id         integer,
+   admitted_from_concept_id		   integer,
+   discharged_to_concept_id        integer,
    preceding_visit_detail_id       bigint,
    visit_detail_source_value       varchar(50),
    visit_detail_source_concept_id  integer,
-   admitting_source_value          varchar(50),
-   discharge_to_source_value       varchar(50),
-   visit_detail_parent_id          bigint,
+   admitted_from_source_value      varchar(50),
+   discharged_to_source_value      varchar(50),
+   parent_visit_detail_id          bigint,
    visit_occurrence_id             bigint        NOT NULL
 );
 
@@ -468,10 +451,31 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
    care_site_id                   integer,
    visit_source_value             varchar(50),
    visit_source_concept_id        integer,
-   admitting_source_concept_id    integer,
-   admitting_source_value         varchar(50),
-   discharge_to_concept_id        integer,
-   discharge_to_source_value      varchar(50),
+   admitted_from_concept_id		  integer,
+   admitted_from_source_value      varchar(50),
+   discharged_to_concept_id        integer,
+   discharged_to_source_value      varchar(50),
    preceding_visit_occurrence_id  bigint
 );
 
+CREATE TABLE IF NOT EXISTS {sc}.EPISODE (
+	episode_id 					bigint 		NOT NULL,
+	person_id 					bigint 		NOT NULL,
+	episode_concept_id 			integer 	NOT NULL,
+	episode_start_date 			date 		NOT NULL,
+	episode_start_datetime 		timestamp,
+	episode_end_date 			date,
+	episode_end_datetime 		timestamp,
+	episode_parent_id 			bigint,
+	episode_number 				integer,
+	episode_object_concept_id 	integer 	NOT NULL,
+	episode_type_concept_id 	integer 	NOT NULL,
+	episode_source_value 		varchar(50),
+	episode_source_concept_id 	integer 
+);
+
+CREATE TABLE IF NOT EXISTS {sc}.EPISODE_EVENT (
+	episode_id 							bigint 		NOT NULL,
+	event_id 							bigint 		NOT NULL,
+	episode_event_field_concept_id 		integer 	NOT NULL 
+);

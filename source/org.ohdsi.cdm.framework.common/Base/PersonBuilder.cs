@@ -921,6 +921,9 @@ namespace org.ohdsi.cdm.framework.common.Base
 
             Complete = true;
 
+            //It will create extra condition_era for pregnancy episodes.
+            //Comment out since Gold 202307
+            /*
             var pg = new PregnancyAlgorithm.PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
                 ChunkData.ConditionOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
@@ -932,6 +935,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
                 ChunkData.ConditionEra.Add(r);
             }
+            */
 
             return Attrition.None;
         }

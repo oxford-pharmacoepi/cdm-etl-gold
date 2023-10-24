@@ -43,7 +43,7 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    this.StartDate == other.StartDate &&
                    this.VisitOccurrenceId == other.VisitOccurrenceId &&
                    this.SourceValue == other.SourceValue;
-            //&& this.ReleventConditionConceptId == other.ReleventConditionConceptId;
+                   //&& this.ReleventConditionConceptId == other.ReleventConditionConceptId;
         }
 
         public override int GetHashCode()

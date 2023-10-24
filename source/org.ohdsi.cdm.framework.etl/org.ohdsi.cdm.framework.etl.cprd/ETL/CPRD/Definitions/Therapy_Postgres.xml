@@ -15,6 +15,7 @@
 		a.issueseq,
 		a.eventdate,
 		product.gemscriptcode,
+		product.route,
 		round(case when a.qty &lt; 0 then null else a.qty end, 0) qty,
 		concat(a.patid,to_char(a.eventdate,'YYYYMMDD'), coalesce(c.constype, 99)) as temp_visit_occurrence_id,
 		nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
@@ -31,7 +32,7 @@
 	left join constype on constype.code = c.constype	
 
 	left join {sc}.Product product on a.prodcode = product.prodcode
-	left join {sc}.commondosages d on a.dosageid = d.dosageid
+	left join {sc}.common_dosages d on a.dosageid = d.dosageid
 	left join {sc}.daysupply_decodes dd on 	a.prodcode = dd.prodcode 
 										and dd.daily_dose = coalesce(d.daily_dose, 0) 
 										and dd.qty = coalesce(case 
@@ -63,7 +64,17 @@
             </Mapper>
           </ConceptIdMappers>
           <Fields>
-            <Field key="gemscriptcode" defaultTypeId="38000177"/>
+            <Field key="gemscriptcode" defaultTypeId="32838"/>
+          </Fields>
+        </Concept>
+		<Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>Routes</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="route" defaultTypeId="0" />
           </Fields>
         </Concept>
       </Concepts>
@@ -87,7 +98,7 @@
       <Concepts>
         <Concept>
           <Fields>
-            <Field defaultConceptId="9202" sourceKey="description" defaultTypeId="44818518"/>
+            <Field defaultConceptId="9202" sourceKey="description" defaultTypeId="32817"/>
           </Fields>
         </Concept>
       </Concepts>

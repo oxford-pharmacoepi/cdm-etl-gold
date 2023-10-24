@@ -160,6 +160,8 @@ namespace org.ohdsi.cdm.presentation.builder
         /// <param name="forLookup">true - fill vocab. for: CareSites, Providers, Locations; false - rest of us</param>
         public void Fill(bool forLookup, bool readFromS3)
         {
+            Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Loading vocabulary started====================");
             _genderConcepts = new GenderLookup();
             _genderConcepts.Load();
 
@@ -196,6 +198,8 @@ namespace org.ohdsi.cdm.presentation.builder
                 }
             }
             LoadPregnancyDrug();
+            Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Loading vocabulary ended ====================");
         }
 
 

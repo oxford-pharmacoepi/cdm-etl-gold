@@ -66,10 +66,11 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
         public void CreateDatabase(string query)
         {
+            /*
             var sqlConnectionStringBuilder = new OdbcConnectionStringBuilder(_connectionString);
             var database = sqlConnectionStringBuilder["database"];
 
-
+            
             // TMP
             var mySql = _connectionString.ToLower().Contains("mysql");
 
@@ -81,6 +82,9 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 sqlConnectionStringBuilder["database"] = "postgres";
             else
                 sqlConnectionStringBuilder["database"] = "master";
+            
+
+            sqlConnectionStringBuilder["database"] = "postgres";
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(sqlConnectionStringBuilder.ConnectionString))
             {
@@ -106,12 +110,12 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 }
 
             }
+            */
 
-
-            if (!mySql && _schemaName.ToLower().Trim() != "dbo")
-            {
+            //if (!mySql && _schemaName.ToLower().Trim() != "dbo")
+            //{
                 CreateSchema();
-            }
+            //}
 
         }
 
@@ -141,14 +145,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         {
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
-                var query = "";
-
-                if (_connectionString.ToLower().Contains("postgres"))
-                    query = $"CREATE SCHEMA IF NOT EXISTS {_schemaName}";
-                else
-                {
-                    query = $"create schema [{_schemaName}]";
-                }
+                var query = $"CREATE SCHEMA IF NOT EXISTS " + _schemaName;
 
                 using (var command = new OdbcCommand(query, connection))
                 {
@@ -166,6 +163,8 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
                 {
+                    Debug.WriteLine("subQuery = " + subQuery);
+
                     if (string.IsNullOrEmpty(subQuery))
                         continue;
 

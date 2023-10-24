@@ -16,16 +16,29 @@ namespace org.ohdsi.cdm.presentation.builder
         public string BuilderFolder { get; set; }
 
         public int DegreeOfParallelism => int.Parse(ConfigurationManager.AppSettings["DegreeOfParallelism"]);
-
-        public bool OnlyEvenChunks => bool.Parse(ConfigurationManager.AppSettings["OnlyEvenChunks"]);
         public bool WithinTheObservationPeriod => bool.Parse(ConfigurationManager.AppSettings["WithinTheObservationPeriod"]);
-        public bool OnlyOddChunks => bool.Parse(ConfigurationManager.AppSettings["OnlyOddChunks"]);
 
-        public int ChunksFrom => int.Parse(ConfigurationManager.AppSettings["ChunksFrom"]);
-        public int ChunksTo => int.Parse(ConfigurationManager.AppSettings["ChunksTo"]);
+        public string CdmVersion = ConfigurationManager.AppSettings["CDM"];
+        public string CdmMainVersion
+        {
+            get
+            {
+                var v = CdmVersion;
 
+                int vf = v.IndexOf('.');
+                int vL = v.LastIndexOf('.');
 
-        static Settings()
+                if (vf != vL)
+                {
+                    v = v.Substring(0, vL);
+                }
+
+                return v;
+
+            }
+        }
+
+    static Settings()
         {
             Current = new Settings();
         }
@@ -47,6 +60,9 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public string CreateCdmTablesScript => File.ReadAllText(
             Path.Combine(BuilderFolder, "ETL", "Common", "Scripts", Building.DestinationEngine.Database.ToString(), GetCdmVersionFolder(), "CreateTables.sql"));
+
+        public string PopulateCdmSourceScript => File.ReadAllText(
+            Path.Combine(BuilderFolder, "ETL", "Common", "Scripts", Building.DestinationEngine.Database.ToString(), GetCdmVersionFolder(), "Populate_CdmSource.sql"));
 
         public string CreateCdmDatabaseScript => File.ReadAllText(
             Path.Combine(new[] {
@@ -164,18 +180,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
             return scripts;
         }
-
         /*
-        public string CreateDaySupplyTablesScript => File.ReadAllText(
-           Path.Combine(
-                       BuilderFolder,
-                       "ETL",
-                       "Common",
-                       "Scripts",
-                       Building.SourceEngine.Database.ToString(),
-                       "DataCleaning",
-                       "04_Create_daysupply_tables.sql"));
-        */
         public List<string> CreateCdmPkIdxScripts()
         {
             List<string> scripts = new List<string>();
@@ -193,7 +198,67 @@ namespace org.ohdsi.cdm.presentation.builder
             }
 
             return scripts;
+        }*/
+        
+
+        public List<string> CreateCdmPkIdxForMappingScripts()
+        {
+            List<string> scripts = new List<string>();
+
+            scripts.Add(File.ReadAllText(
+                       Path.Combine(
+                                   BuilderFolder,
+                                   "ETL",
+                                   "Common",
+                                   "Scripts",
+                                   Building.SourceEngine.Database.ToString(),
+                                   "CreateIndexes",
+                                   "pk_idx_in_Person.sql"))
+            );
+
+            scripts.Add(File.ReadAllText(
+                       Path.Combine(
+                                   BuilderFolder,
+                                   "ETL",
+                                   "Common",
+                                   "Scripts",
+                                   Building.SourceEngine.Database.ToString(),
+                                   "CreateIndexes",
+                                   "pk_idx_in_ObservationPeriod.sql"))
+            );
+
+            return scripts;
         }
+
+        public List<string> CreateCdmPkIdxForVisitScripts()
+        {
+            List<string> scripts = new List<string>();
+
+            scripts.Add(File.ReadAllText(
+                       Path.Combine(
+                                   BuilderFolder,
+                                   "ETL",
+                                   "Common",
+                                   "Scripts",
+                                   Building.SourceEngine.Database.ToString(),
+                                   "CreateIndexes",
+                                   "pk_idx_visit_detail.sql"))
+            );
+
+            scripts.Add(File.ReadAllText(
+                       Path.Combine(
+                                   BuilderFolder,
+                                   "ETL",
+                                   "Common",
+                                   "Scripts",
+                                   Building.SourceEngine.Database.ToString(),
+                                   "CreateIndexes",
+                                   "pk_idx_visit_occurrence.sql"))
+            );
+
+            return scripts;
+        }
+
 
         #endregion
 
@@ -216,7 +281,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         private string GetCdmVersionFolder()
         {
-            return ConfigurationManager.AppSettings["CDM"];
+            return CdmMainVersion;
         }
 
         #endregion

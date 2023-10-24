@@ -9,6 +9,12 @@ namespace org.ohdsi.cdm.framework.common.Omop
         public string UniqueDeviceId { get; set; }
         public int Quantity { get; set; }
 
+        // CDM v5.4 props
+        public string ProductionId { get; set; }
+        public int UnitConceptId { get; set; }
+        public string UnitSourceValue { get; set; }
+        public int UnitSourceConceptId { get; set; }
+
         public List<DeviceCost> DeviceCosts { get; set; }
 
         public DeviceExposure(IEntity ent)
@@ -27,7 +33,11 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    this.UniqueDeviceId == other.UniqueDeviceId &&
                    this.Quantity == other.Quantity &&
                    this.ProviderId == other.ProviderId &&
-                   this.EndDate == other.EndDate;
+                   this.EndDate == other.EndDate &&
+                   this.ProductionId == other.ProductionId &&
+                   this.UnitConceptId == other.UnitConceptId &&
+                   this.UnitSourceValue == other.UnitSourceValue &&
+                   this.UnitSourceConceptId == other.UnitSourceConceptId;
 
         }
 
@@ -42,7 +52,11 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    SourceConceptId.GetHashCode() ^
                    (UniqueDeviceId != null ? UniqueDeviceId.GetHashCode() : 0) ^
                    (StartDate.GetHashCode()) ^
-                   (EndDate.GetHashCode());
+                   (EndDate.GetHashCode()) ^
+                   (ProductionId.GetHashCode()) ^
+                   (UnitConceptId.GetHashCode()) ^
+                   (UnitSourceValue.GetHashCode()) ^
+                   (UnitSourceConceptId.GetHashCode());
         }
 
         public override EntityType GeEntityType()

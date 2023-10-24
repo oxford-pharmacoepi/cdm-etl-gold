@@ -63,6 +63,9 @@
     <!-- <None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateIndexes.sql" /> -->
 	<None Remove="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_in_Person.sql" />
 	<None Remove="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_in_ObservationPeriod.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_visit_detail.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_visit_occurrence.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.3\Populate_CdmSource.sql" />
 	<None Remove="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\DropTables.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v5.3\DropVocabularyTables.sql" />
@@ -97,6 +100,8 @@
     <None Remove="ETL\Common\Scripts\Postgre\v6.0\Vocabulary\relationship.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v6.0\Vocabulary\source_to_concept_map.sql" />
     <None Remove="ETL\Common\Scripts\Postgre\v6.0\Vocabulary\vocabulary.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.4\CreateTables.sql" />
+	<None Remove="ETL\Common\Scripts\Postgre\v5.4\Populate_CdmSource.sql" />
     <None Remove="ETL\Common\Scripts\Redshift\AddUsers.sql" />
     <None Remove="ETL\Common\Scripts\Redshift\CreateChunkTable.sql" />
     <None Remove="ETL\Common\Scripts\Redshift\CreateDestination.sql" />
@@ -326,6 +331,15 @@
 	<Content Include="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_in_ObservationPeriod.sql">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_visit_detail.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\CreateIndexes\pk_idx_visit_occurrence.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.3\Populate_CdmSource.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
     <Content Include="ETL\Common\Scripts\Postgre\v5.3\CreateTables.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -428,7 +442,13 @@
     <Content Include="ETL\Common\Scripts\Postgre\v6.0\Vocabulary\vocabulary.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\Common\Scripts\Redshift\AddUsers.sql">
+	<Content Include="ETL\Common\Scripts\Postgre\v5.4\CreateTables.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\Common\Scripts\Postgre\v5.4\Populate_CdmSource.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	  <Content Include="ETL\Common\Scripts\Redshift\AddUsers.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\Common\Scripts\Redshift\CreateChunkTable.sql">

@@ -27,7 +27,7 @@
 			<Concepts>
 				<Concept>
 					<Fields>
-						<Field key="toreason" defaultConceptId = "1" defaultTypeId = "38003569"/>
+						<Field key="toreason" defaultConceptId = "1" defaultTypeId = "32817"/>
 					</Fields>
 				</Concept>
 			</Concepts>

@@ -16,6 +16,12 @@ namespace org.ohdsi.cdm.framework.common.Omop
         public string UnitSourceValue { get; set; }
         public string ValueSourceValue { get; set; }
 
+        // CDM v5.4 props
+        public int UnitSourceConceptId { get; set; }
+        public long MeasurementEventId { get; set; }
+        public int MeasEventFieldConceptId { get; set; }
+
+
         public List<MeasurementCost> MeasurementCost { get; set; }
 
         public Measurement(IEntity ent)
@@ -56,7 +62,11 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    this.VisitOccurrenceId == other.VisitOccurrenceId &&
                    this.Time == other.Time &&
                    this.UnitSourceValue == other.UnitSourceValue &&
-                   this.SourceValue == other.SourceValue;
+                   this.SourceValue == other.SourceValue &&
+                   this.UnitSourceConceptId == other.UnitSourceConceptId &&
+                   this.MeasurementEventId == other.MeasurementEventId &&
+                   this.MeasEventFieldConceptId == other.MeasEventFieldConceptId
+                   ;
         }
 
         public override int GetHashCode()
@@ -79,7 +89,11 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    SourceConceptId.GetHashCode() ^
                    UnitConceptId.GetHashCode() ^
                    (UnitSourceValue != null ? UnitSourceValue.GetHashCode() : 0) ^
-                   (SourceValue != null ? SourceValue.GetHashCode() : 0);
+                   (SourceValue != null ? SourceValue.GetHashCode() : 0) ^
+                   (UnitSourceConceptId != null ? UnitSourceConceptId.GetHashCode() : 0) ^
+                   (MeasurementEventId != null ? MeasurementEventId.GetHashCode() : 0) ^
+                   (MeasEventFieldConceptId != null ? MeasEventFieldConceptId.GetHashCode() : 0)
+                   ;
         }
 
         public override EntityType GeEntityType()

@@ -35,6 +35,9 @@ namespace org.ohdsi.cdm.framework.common.Builder
 
         public List<FactRelationship> FactRelationships { get; private set; }
 
+        // CDM v54 props
+        public List<Episode> Episodes { get; private set; }
+        public List<EpisodeEvent> EpisodeEvents { get; private set; }
 
         public ChunkData(int chunkId, int subChunkId, int chunkSize)
         //public ChunkData(int chunkId, int subChunkId)

@@ -109,11 +109,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             }
         }
 
-        public List<Action> CreateCdmPkIdxActionList(DbSource db)
+        public List<Action> CreateCdmPkIdxActionList(DbSource db, List<string> queries)
         {
 
             var actions = new List<Action>();
-            var queries = Settings.Current.CreateCdmPkIdxScripts();
+            //var queries = Settings.Current.CreateCdmPkIdxScripts();
 
             foreach (var query in queries)
             {
@@ -232,76 +232,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             }
 
             return actions;
-
-        }
-
-        public void CreateCdmIndexes() {
-
-            PerformAction(() =>
-            {
-                var timer = new Stopwatch();
-                timer.Start();
-
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Cdm Indexes Creation Started ====================");
-
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema);
-                var createCdmPKConstraintsActions = CreateCdmPKConstraintsActionList(dbDestination);
-                var createCdmIndexesActions = CreateCdmIndexesActionList(dbDestination);
-                var createCdmFKConstraintsActions = CreateCdmFKConstraintsActionList(dbDestination);
-
-                //1. Create PK
-                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_PK_CREATED))
-                {
-                    Logger.Write(null, LogMessageTypes.Info, $"Cdm PK Constraints are already created");
-                }
-                else
-                {
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm PK Constraints Creation Started ====================");
-                    Parallel.ForEach(createCdmPKConstraintsActions, action => action());
-                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_PK_CREATED);
-
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm PK Constraints Creation Ended ====================");
-                }
-
-                //2. Create Index
-                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_IDX_CREATED))
-                {
-                    Logger.Write(null, LogMessageTypes.Info, $"Cdm Indexes Constraints are already created");
-                }
-                else {
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm Indexed Constraints Creation Started ====================");
-                    Parallel.ForEach(createCdmIndexesActions, action => action());
-                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_IDX_CREATED);
-
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm Indexed Constraints Creation Ended ====================");
-                }
-
-                //3. Create FK
-                if (Settings.Current.Building.CreateCdmIndexesSteps.Contains(CDM_FK_CREATED))
-                {
-                    Logger.Write(null, LogMessageTypes.Info, $"Cdm FK Constraints are already created");
-                }
-                else
-                {
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm FK Constraints Creation Started ====================");
-                    Parallel.ForEach(createCdmFKConstraintsActions, action => action());
-                    Settings.Current.Building.CreateCdmIndexesSteps.Add(CDM_FK_CREATED);
-
-                    Logger.Write(null, LogMessageTypes.Info,
-                       $"==================== Cdm FK Constraints Creation Ended ====================");
-                }
-
-                timer.Stop();
-
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Cdm Indexes Creation Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
-            });
 
         }
 
@@ -436,20 +366,48 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
-        public void CreateScratchSchema()
-        {
+        public void PopulateCdmSource() {
             PerformAction(() =>
             {
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Scratch Schema Started ====================");
+                   $"==================== Populate CDM SOURCE Started ====================");
+
+                var timer = new Stopwatch();
+                timer.Start();
 
                 var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
                     Settings.Current.Building.CdmSchema);
+                dbDestination.ExecuteQuery(Settings.Current.PopulateCdmSourceScript.Replace("{CdmVersion}", Settings.Current.CdmVersion));
 
-                dbDestination.CreateDatabase("scratch");
 
+                timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Scratch Schema Ended ====================");
+                    $"==================== Populate CDM SOURCE Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+            });
+        }
+
+        public void CreateCdmPkIdxForVisit() {
+            PerformAction(() =>
+            {
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create PK and Indexes in Visit_Occurrence and Visit Details Started ====================");
+
+                var timer = new Stopwatch();
+                timer.Start();
+
+                var dbDestination = new DbSource(Settings.Current.Building.DestinationConnectionString,
+                                            "",
+                                            Settings.Current.Building.SourceSchema,
+                                            Settings.Current.Building.ChunkSize,
+                                            Settings.Current.Building.CdmSchema);
+
+                var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.CreateCdmPkIdxForVisitScripts());
+
+                Parallel.ForEach(createCdmPkIdxActions, action => action());
+
+                timer.Stop();
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create PK and Indexes in Visit_Occurrence and Visit Details Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
             });
         }
 
@@ -513,8 +471,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 FillList<Location>(locationConcepts, location, location.Locations[0], -1);
             }
 
-            if (locationConcepts.Count == 0)
-                locationConcepts.Add(new Location { Id = Entity.GetId(null) });
+            //if (locationConcepts.Count == 0)
+            //    locationConcepts.Add(new Location { Id = Entity.GetId(null) });
             Console.WriteLine("Locations was loaded");
 
             Console.WriteLine("Loading care sites...");
@@ -524,8 +482,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 FillList<CareSite>(careSiteConcepts, careSite, careSite.CareSites[0], -1);
             }
 
-            if (careSiteConcepts.Count == 0)
-                careSiteConcepts.Add(new CareSite { Id = 0, LocationId = 0, OrganizationId = 0, PlaceOfSvcSourceValue = null });
+            //if (careSiteConcepts.Count == 0)
+            //    careSiteConcepts.Add(new CareSite { Id = 0, LocationId = 0, OrganizationId = 0, PlaceOfSvcSourceValue = null });
             Console.WriteLine("Care sites was loaded");
 
             Console.WriteLine("Saving locations and CareSite...");
@@ -537,6 +495,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             {
                 try
                 {
+
                     saver.SaveEntity(locationConcepts, "LOCATION");
                     saver.SaveEntity(careSiteConcepts, "CARE_SITE");
                     saver.Commit();
@@ -623,8 +582,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     timer.Stop();
 
-                    Logger.Write(null, LogMessageTypes.Info,
-                        $"==================== PROVIDER Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    //Logger.Write(null, LogMessageTypes.Info,
+                    //    $"==================== PROVIDER Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
 
            });
 
@@ -632,10 +591,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void MapDeath(IVocabulary vocabulary)
         {
-            Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Load vocab ====================");
-
-            vocabulary.Fill(false, false);
+            //vocabulary.Fill(false, false);
 
             Logger.Write(null, LogMessageTypes.Info,
                    $"==================== Map ALL Death started ====================");
@@ -727,12 +683,14 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     timer.Stop();
 
-                    Logger.Write(null, LogMessageTypes.Info,
-                        $"==================== Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    //Logger.Write(null, LogMessageTypes.Info,
+                    //    $"==================== Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
 
                 }
             );
-
+            
+            Logger.Write(null, LogMessageTypes.Info,
+                $"==================== Map ALL Death ended ====================");
 
         }
 
@@ -743,79 +701,20 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Load vocab ====================");
-
                 vocabulary.Fill(true, false);
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Lookup Started ====================");
+                    $"==================== Mapping Care site, Location and Provider Started ====================");
 
                 MapLocationAndCareSite(vocabulary);
                 MapProvider(vocabulary);
-                /*
-                var locationConcepts = new List<Location>();
-                var careSiteConcepts = new List<CareSite>();
-                var providerConcepts = new List<Provider>();
 
-                Console.WriteLine("Loading locations...");
-                var location = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Locations != null);
-                if (location != null)
-                {
-                    FillList<Location>(locationConcepts, location, location.Locations[0], -1);
-                }
-
-                if (locationConcepts.Count == 0)
-                    locationConcepts.Add(new Location { Id = Entity.GetId(null) });
-                Console.WriteLine("Locations was loaded");
-
-                Console.WriteLine("Loading care sites...");
-                var careSite = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.CareSites != null);
-                if (careSite != null)
-                {
-                    FillList<CareSite>(careSiteConcepts, careSite, careSite.CareSites[0], -1);
-                }
-
-                if (careSiteConcepts.Count == 0)
-                    careSiteConcepts.Add(new CareSite { Id = 0, LocationId = 0, OrganizationId = 0, PlaceOfSvcSourceValue = null });
-                Console.WriteLine("Care sites was loaded");
-
-
-                Console.WriteLine("Loading providers...");
-                var provider = Settings.Current.Building.SourceQueryDefinitions.FirstOrDefault(qd => qd.Providers != null);
-                if (provider != null)
-                {
-                    FillList<Provider>(providerConcepts, provider, provider.Providers[0], -1);
-                }
-                Console.WriteLine("Providers was loaded");
-
-                Console.WriteLine("Saving lookups...");
-                var saver = Settings.Current.Building.DestinationEngine.GetSaver();
-                using (saver.Create(Settings.Current.Building.DestinationConnectionString,
-                    Settings.Current.Building.Cdm,
-                    Settings.Current.Building.SourceSchema,
-                    Settings.Current.Building.CdmSchema))
-                {
-                    saver.SaveEntityLookup(Settings.Current.Building.Cdm, locationConcepts, careSiteConcepts, providerConcepts, null);
-                }
-                */
                 Console.WriteLine("Lookups was saved ");
                 timer.Stop();
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"Care site, Location and Provider tables were saved to CDM database - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins");
-
-                /*
-                locationConcepts.Clear();
-                careSiteConcepts.Clear();
-                providerConcepts.Clear();
-                locationConcepts = null;
-                careSiteConcepts = null;
-                providerConcepts = null;
-                */
 
                 GC.Collect();
 
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create Lookup Ended ====================");
+                    $"==================== Mapping Care site, Location and Provider Ended ====================");
             });
         }
 
@@ -842,8 +741,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             //timer.Start();
             PatientData data = new PatientData();
 
-            Logger.Write(null, LogMessageTypes.Info,
-                $"==================== Loading Patients... ====================");
+            //Logger.Write(null, LogMessageTypes.Info,
+            //    $"==================== Loading Patients... ====================");
             Console.WriteLine("Loading Patients...");
 
             if (qd != null)
@@ -922,8 +821,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             //var timer = new Stopwatch();
             //timer.Start();
 
-            Logger.Write(null, LogMessageTypes.Info,
-                $"==================== Saving Patients ====================");
+            //Logger.Write(null, LogMessageTypes.Info,
+            //    $"==================== Saving Patients ====================");
 
             Console.WriteLine("Saving Person...");
             Console.WriteLine("Saving Observation Period...");
@@ -970,16 +869,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void MapAllPatients(IVocabulary vocabulary) {
 
-            Logger.Write(null, LogMessageTypes.Info,
-                $"==================== Mapping ALL Patients to CDM database Started ====================");
+            //vocabulary.Fill(false, false);
 
             Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Load vocab ====================");
-
-            vocabulary.Fill(false, false);
-
-            Logger.Write(null, LogMessageTypes.Info,
-                   $"==================== Map ALL Patients started ====================");
+                   $"==================== Mapping ALL Patients started ====================");
             //var pagesize = 50000;
 
             var dbDestination = new DbSource(Settings.Current.Building.DestinationConnectionString,
@@ -1008,20 +901,18 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                     timer.Stop();
 
-                    Logger.Write(null, LogMessageTypes.Info,
-                        $"==================== Page {i} ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
-
                 }
             );
 
-
+            Logger.Write(null, LogMessageTypes.Info,
+                   $"==================== Mapping ALL Patients ended ====================");
 
             Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
             var timer = new Stopwatch();
             timer.Start();
 
             //var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema);
-            var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination);
+            var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.CreateCdmPkIdxForMappingScripts());
 
             Parallel.ForEach(createCdmPkIdxActions, action => action());
 
@@ -1221,9 +1112,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                     Logger.Write(null, LogMessageTypes.Info, "==================== Chunks are already created ====================");
                 }
                 */
-                Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary started ====================");
-                vocabulary.Fill(false, false);
-                Logger.Write(null, LogMessageTypes.Info, "==================== Loading Vocabulary ended ====================");
+                //vocabulary.Fill(false, false);
                 
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Conversion to CDM was started ====================");
@@ -1331,6 +1220,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 save.Wait();
             });
+
         }
 
         public static bool IsOdd(int value)

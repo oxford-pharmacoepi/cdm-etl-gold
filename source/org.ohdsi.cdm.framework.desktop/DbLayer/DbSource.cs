@@ -231,24 +231,6 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             return (double)i;
         }
 
-        public int GetVisitOccurenceIdSeq()
-        {
-            int i = 0;
-
-            var sql = $"select nextval('{_schemaName}.visit_detail_id_seq')";
-
-            using var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString);
-            using var command = new OdbcCommand(sql, connection);
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                i = reader.GetInt32(0);
-            }
-
-            connection.Close();
-            return i;
-        }
-
         public void ExecuteQuery(string query)
         {
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
