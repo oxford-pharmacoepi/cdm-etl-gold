@@ -11,17 +11,21 @@
 
         public string Country { get; set; }
 
+        // CDM v5.4 props
+        public int CountryConceptId { get; set; }
+        public string CountrySourceValue { get; set; }
         public decimal? Latitude { get; set; }
-
         public decimal? Longitude { get; set; }
 
+        
         public override string GetKey()
         {
-            if (string.IsNullOrEmpty(SourceValue))
-                return Address1 + " " + Address2;
+            //if (string.IsNullOrEmpty(SourceValue))
+            //    return Address1 + " " + Address2;
 
             return SourceValue;
         }
+        
 
     }
 }

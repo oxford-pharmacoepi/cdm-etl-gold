@@ -25,6 +25,8 @@
     <None Remove="ETL\CPRD\Lookups\Specialty.sql" />
     <None Remove="ETL\CPRD\Lookups\Test_Ent.sql" />
     <None Remove="ETL\CPRD\Lookups\Units.sql" />
+	<None Remove="ETL\CPRD\Lookups\Route.sql" />
+	<None Remove="ETL\CPRD\Lookups\Country.sql" />
     <None Remove="ETL\CPRD\Lookups\ValueAsConceptId.sql" />
   </ItemGroup>
 
@@ -89,6 +91,12 @@
     <Content Include="ETL\CPRD\Lookups\Units.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="ETL\CPRD\Lookups\Routes.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="ETL\CPRD\Lookups\Country.sql">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>

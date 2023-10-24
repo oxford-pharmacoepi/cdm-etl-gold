@@ -29,6 +29,16 @@ namespace org.ohdsi.cdm.framework.common.Omop
         public int EventFieldConceptId { get; set; }
         public DateTime? ValueAsDatetime { get; set; }
 
+        // CDM v5.4 props
+        public string ValueSourceValue { get; set; }
+        public long ObservationEventId { get; set; }
+        public int ObsEventFieldConceptId { get; set; }
+
+        //v5.4  Measument
+        public int UnitSourceConceptId { get; set; }
+        public long MeasurementEventId { get; set; }
+        public int MeasEventFieldConceptId { get; set; }
+
         public Observation(IEntity ent)
         {
             Init(ent);
@@ -38,6 +48,10 @@ namespace org.ohdsi.cdm.framework.common.Omop
             {
                 QualifierConceptId = obs.QualifierConceptId;
                 QualifierSourceValue = obs.QualifierSourceValue;
+
+                ValueSourceValue = obs.ValueSourceValue;
+                ObservationEventId = obs.ObservationEventId;
+                ObsEventFieldConceptId = obs.ObsEventFieldConceptId;
             }
 
             var mes = ent as Measurement;
@@ -51,6 +65,11 @@ namespace org.ohdsi.cdm.framework.common.Omop
                 UnitsConceptId = mes.UnitConceptId;
                 UnitsSourceValue = mes.UnitSourceValue;
                 ValueAsString = mes.ValueSourceValue;
+
+                // CDM v5.4 props
+                UnitSourceConceptId = mes.UnitSourceConceptId;
+                MeasurementEventId = mes.MeasurementEventId;
+                MeasEventFieldConceptId = mes.MeasEventFieldConceptId;
             }
         }
 
@@ -75,7 +94,10 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    this.QualifierSourceValue == other.QualifierSourceValue &&
                    this.VisitOccurrenceId == other.VisitOccurrenceId &&
                    this.UnitsSourceValue == other.UnitsSourceValue &&
-                   this.SourceValue == other.SourceValue;
+                   this.SourceValue == other.SourceValue &&
+                   this.ValueSourceValue == other.ValueSourceValue &&
+                   this.ObservationEventId == other.ObservationEventId &&
+                   this.ObsEventFieldConceptId == other.ObsEventFieldConceptId;
         }
 
         public override int GetHashCode()
@@ -99,7 +121,10 @@ namespace org.ohdsi.cdm.framework.common.Omop
                    (ValueAsString != null ? ValueAsString.GetHashCode() : 0) ^
                    (UnitsSourceValue != null ? UnitsSourceValue.GetHashCode() : 0) ^
                    (QualifierSourceValue != null ? QualifierSourceValue.GetHashCode() : 0) ^
-                   (SourceValue != null ? SourceValue.GetHashCode() : 0);
+                   (SourceValue != null ? SourceValue.GetHashCode() : 0) ^
+                   (ValueSourceValue != null ? ValueSourceValue.GetHashCode() : 0) ^
+                   (ObservationEventId != null ? ObservationEventId.GetHashCode() : 0) ^
+                   (ObsEventFieldConceptId != null ? ObsEventFieldConceptId.GetHashCode() : 0);
         }
 
         public override EntityType GeEntityType()

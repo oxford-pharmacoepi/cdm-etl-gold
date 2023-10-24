@@ -20,6 +20,8 @@
         ObservationPeriod,
         ConditionEra,
         DrugEra,
-        Note
+        Note,
+        Episode,        //New added in CDM v5.4
+        EpisodeEvent    //New added in CDM v5.4
     }
 }

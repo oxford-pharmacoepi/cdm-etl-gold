@@ -60,7 +60,6 @@ namespace org.ohdsi.cdm.framework.common.Base
             if (queryDefinition.ConditionOccurrence != null)
             {
                 AddEntity(queryDefinition, queryDefinition.ConditionOccurrence, reader, recordGuid, "ConditionOccurrence");
-
             }
 
             if (queryDefinition.DrugExposure != null)
@@ -72,22 +71,16 @@ namespace org.ohdsi.cdm.framework.common.Base
                 AddEntity(queryDefinition, queryDefinition.Measurement, reader, recordGuid, "Measurement");
             }
 
-            /*
-
-            AddEntity(queryDefinition, queryDefinition.Persons, reader, recordGuid, "Persons");
+            // No Definition in GOLD
             //AddEntity(queryDefinition, queryDefinition.PayerPlanPeriods, reader, recordGuid, "PayerPlanPeriods");
-            AddEntity(queryDefinition, queryDefinition.Death, reader, recordGuid, "Death");
-            AddEntity(queryDefinition, queryDefinition.VisitOccurrence, reader, recordGuid, "VisitOccurrence");
-            AddEntity(queryDefinition, queryDefinition.VisitDetail, reader, recordGuid, "VisitDetail");
-            AddEntity(queryDefinition, queryDefinition.Observation, reader, recordGuid, "Observation");
-            AddEntity(queryDefinition, queryDefinition.ConditionOccurrence, reader, recordGuid, "ConditionOccurrence");
-            AddEntity(queryDefinition, queryDefinition.ProcedureOccurrence, reader, recordGuid, "ProcedureOccurrence");
-            AddEntity(queryDefinition, queryDefinition.DrugExposure, reader, recordGuid, "DrugExposure");
+            //AddEntity(queryDefinition, queryDefinition.VisitDetail, reader, recordGuid, "VisitDetail");
             //AddEntity(queryDefinition, queryDefinition.Cohort, reader, recordGuid, "Cohort");
-            AddEntity(queryDefinition, queryDefinition.Measurement, reader, recordGuid, "Measurement");
-            AddEntity(queryDefinition, queryDefinition.DeviceExposure, reader, recordGuid, "DeviceExposure");
             //AddEntity(queryDefinition, queryDefinition.Note, reader, recordGuid, "Note");
-            */
+
+            //v5.4
+            //AddEntity(queryDefinition, queryDefinition.Episode, reader, recordGuid, "Episode");
+            //AddEntity(queryDefinition, queryDefinition.EpisodeEvent, reader, recordGuid, "EpisodeEvent");
+
         }
 
 

@@ -71,10 +71,22 @@ namespace org.ohdsi.cdm.presentation.builder
         {
             get
             {
-                if (ConfigurationManager.AppSettings["CDM"] == "v5.3")
-                    return CdmVersions.V53;
+                var v = ConfigurationManager.AppSettings["CDM"];
 
-                return CdmVersions.V6;
+                int vf = v.IndexOf('.');
+                int vL = v.LastIndexOf('.');
+
+                if (vf != vL) {
+                    v = v.Substring(0, vL);
+                }
+
+
+                if (v == "v5.3")
+                    return CdmVersions.V53;
+                else if (v == "v5.4")
+                    return CdmVersions.V54;
+
+                    return CdmVersions.V6;
             }
         }
 

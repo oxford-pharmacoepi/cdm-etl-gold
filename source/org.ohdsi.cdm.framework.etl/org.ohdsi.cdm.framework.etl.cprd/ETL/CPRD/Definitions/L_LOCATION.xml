@@ -1,5 +1,5 @@
 ﻿<QueryDefinition>
-   <Query>
+	<Query>
 		With lk AS(
 			select code, text from {sc}.lookup
 			where lookup_type_id = 66
@@ -13,11 +13,23 @@
 		left join lk on lk.code = p.region
 		where p.region is not null
 		order by region
-   </Query>
-   <Locations>
-      <LocationDefinition>
-         <Id>region</Id>
-         <SourceValue>LOCATION_SOURCE_VALUE</SourceValue>
-      </LocationDefinition>
-   </Locations>
+		</Query>
+	<Locations>
+		<LocationDefinition>
+			<Id>region</Id>
+			<SourceValue>LOCATION_SOURCE_VALUE</SourceValue>
+			<Concepts>
+				<Concept>
+					<ConceptIdMappers>
+						<Mapper>
+						  <Lookup>Country</Lookup>
+						</Mapper>
+					</ConceptIdMappers>
+					<Fields>
+						<Field key="region" sourceKey="LOCATION_SOURCE_VALUE"/>
+					</Fields>
+				</Concept>
+			</Concepts>
+		</LocationDefinition>
+	</Locations>
 </QueryDefinition>
