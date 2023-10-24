@@ -43,7 +43,7 @@
 		null as RACE_CONCEPT_ID,
 		null as RACE_SOURCE_VALUE,
 		accept,
-		44814725 PeriodTypeConceptId
+		32880 PeriodTypeConceptId -- 44814725 Period inferred by algorithm -> 32880 Standard algorithm
 		from pat join {sc}.patient a on a.patid=pat.patid
 		join {sc}.practice b on MOD(a.patid, 100000) = b.pracid
 	</Query>

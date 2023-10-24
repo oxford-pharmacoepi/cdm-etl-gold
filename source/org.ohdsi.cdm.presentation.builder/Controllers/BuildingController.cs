@@ -79,6 +79,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var vocabulary = new Vocabulary();
                 CreateLookup(vocabulary);
 
+                vocabulary.Fill(false, false);
                 //Map Patient to Person First before create a chunk
                 MapAllPatients(vocabulary);
 
@@ -89,10 +90,15 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 MapDeath(vocabulary);
 
                 //Map other cdm 
-                Build(vocabulary);
+                bool done = Build(vocabulary);
 
-                CreateScratchSchema();
+                if (done)
+                {
+                    PopulateCdmSource();
 
+                    //Create PK and idx in Visit_Occurrence and Visit_Details
+                    CreateCdmPkIdx();
+                }
             }
         }
 
@@ -102,15 +108,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("MapAllDeathStart");
             _builderController.MapDeath(vocabulary);
             UpdateDate("MapAllDeathEnd");
-        }
-
-        private void CreateCdmIndexes()
-        {
-            if (Settings.Current.Building.BuildingState.CreateCdmIndexesDone) return;
-
-            UpdateDate("CreateCdmIndexesStart");
-            _builderController.CreateCdmIndexes();
-            UpdateDate("CreateCdmIndexesEnd");
         }
 
         private void DataCleaning()
@@ -150,13 +147,24 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             UpdateDate("CreateDestinationDbEnd");
         }
 
-        private void CreateScratchSchema()
+        private void PopulateCdmSource()
         {
-            if (Settings.Current.Building.BuildingState.ScratchSchemaCreated) return;
 
-            UpdateDate("CreateSchemaSchemaStart");
-            _builderController.CreateScratchSchema();
-            UpdateDate("CreateSchemaSchemaEnd");
+            if (Settings.Current.Building.BuildingState.PopulateCdmSourceDone) return;
+            UpdateDate("PopulateCdmSourceStart");
+            _builderController.PopulateCdmSource ();
+            UpdateDate("PopulateCdmSourceEnd");
+
+        }
+
+        private void CreateCdmPkIdx() {
+
+            if (Settings.Current.Building.BuildingState.CdmPkIdxForVisitCreated) return;
+
+            UpdateDate("CdmPkIdxForVisitStart");
+            _builderController.CreateCdmPkIdxForVisit();
+            UpdateDate("CdmPkIdxForVisitEnd");
+
         }
 
         private void CreateLookup(IVocabulary vocabulary)

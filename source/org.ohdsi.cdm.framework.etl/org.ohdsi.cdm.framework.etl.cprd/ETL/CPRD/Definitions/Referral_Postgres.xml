@@ -44,7 +44,7 @@
             </Mapper>
           </ConceptIdMappers>
           <Fields>
-            <Field key="readcode" defaultTypeId="38000280" caseSensitive="true"/>
+            <Field key="readcode" defaultTypeId="32817" caseSensitive="true"/>
           </Fields>
         </Concept>
       </Concepts>
@@ -68,7 +68,7 @@
       <Concepts>
         <Concept>
           <Fields>
-            <Field defaultConceptId="9202" sourceKey="description" defaultTypeId="44818518"/>
+            <Field defaultConceptId="9202" sourceKey="description" defaultTypeId="32817"/>
           </Fields>
         </Concept>
       </Concepts>
