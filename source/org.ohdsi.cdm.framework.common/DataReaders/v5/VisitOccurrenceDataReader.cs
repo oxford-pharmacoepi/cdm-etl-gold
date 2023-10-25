@@ -206,17 +206,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
                 case 3:
                     return typeof(DateTime);
                 case 4:
-                    return typeof(string);
+                    return typeof(DateTime);
                 case 5:
                     return typeof(DateTime);
                 case 6:
-                    return typeof(string);
+                    return typeof(DateTime);
                 case 7:
                     return typeof(int?);
                 case 8:
                     return typeof(long?);
                 case 9:
-                    return typeof(int?);
+                    return typeof(int);
                 case 10:
                     return typeof(string);
                 case 11:
