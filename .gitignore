@@ -349,27 +349,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-executable/Building/
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/1/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/16958/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/16959/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/2/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/8162/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/log.txt
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/log.txt_
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/log.txt__
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/log.txt___
-source/cdm_gold_202201_new_cdm_gold_202201_new_cdm_gold_202201_new/Settings.xml
-reference/CPRD-Oxford MSL confirmation letter.pdf
-reference/frequently used SQL/cheetcheat.sql
-
-
 
 # Testing only
-source/cdm_gold_202301_cdm_gold_202301_cdm_gold_202301
-reference/frequently used SQL/icd10cm_to_standard_concept.sql
 reference/
 source/data patching/
 
-
-##  Testing conflict with dev 2
+#edit in main
