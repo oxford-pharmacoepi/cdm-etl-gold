@@ -15,8 +15,10 @@ namespace org.ohdsi.cdm.presentation.builder
         public DateTime? CreateDestinationDbEnd { get; set; }
         public DateTime? CreateSchemaSchemaStart { get; set; }
         public DateTime? CreateSchemaSchemaEnd { get; set; }
-        public DateTime? CdmPkIdxForVisitStart { get; set; }
-        public DateTime? CdmPkIdxForVisitEnd { get; set; }
+        public DateTime? CdmPkIdxForVisitEraStart { get; set; }
+        public DateTime? CdmPkIdxForVisitEraEnd { get; set; }
+        public DateTime? CdmFksForEraStart { get; set; }
+        public DateTime? CdmFksForEraEnd { get; set; }
         public DateTime? CreateChunksStart { get; set; }
         public DateTime? CreateChunksEnd { get; set; }
         public DateTime? CreateLookupStart { get; set; }
@@ -174,29 +176,56 @@ namespace org.ohdsi.cdm.presentation.builder
         }
 
         [XmlIgnore]
-        public bool CdmPkIdxForVisitStarted
+        public bool CdmPkIdxForVisitEraStarted
         {
             get
             {
-                if (CdmPkIdxForVisitCreated)
+                if (CdmPkIdxForVisitEraCreated)
                     return false;
 
-                if (!CdmPkIdxForVisitStart.HasValue)
+                if (!CdmPkIdxForVisitEraStart.HasValue)
                     return false;
 
-                return CdmPkIdxForVisitStart.Value != DateTime.MinValue;
+                return CdmPkIdxForVisitEraStart.Value != DateTime.MinValue;
             }
         }
 
         [XmlIgnore]
-        public bool CdmPkIdxForVisitCreated
+        public bool CdmFksForEraStarted
         {
             get
             {
-                if (!CdmPkIdxForVisitEnd.HasValue)
+                if (CdmEraFksDone)
                     return false;
 
-                return CdmPkIdxForVisitEnd.Value != DateTime.MinValue;
+                if (!CdmFksForEraStart.HasValue)
+                    return false;
+
+                return CdmFksForEraStart.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool CdmPkIdxForVisitEraCreated
+        {
+            get
+            {
+                if (!CdmPkIdxForVisitEraEnd.HasValue)
+                    return false;
+
+                return CdmPkIdxForVisitEraEnd.Value != DateTime.MinValue;
+            }
+        }
+
+        [XmlIgnore]
+        public bool CdmEraFksDone
+        {
+            get
+            {
+                if (!CdmFksForEraEnd.HasValue)
+                    return false;
+
+                return CdmFksForEraEnd.Value != DateTime.MinValue;
             }
         }
 

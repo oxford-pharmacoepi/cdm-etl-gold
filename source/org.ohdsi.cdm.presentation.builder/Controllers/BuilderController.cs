@@ -386,11 +386,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
-        public void CreateCdmPkIdxForVisit() {
+        public void CreateCdmPkIdxForVisitEra() {
             PerformAction(() =>
             {
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create PK and Indexes in Visit_Occurrence and Visit Details Started ====================");
+                    $"==================== Create PK and Indexes in Visit and Era Tables Started ====================");
 
                 var timer = new Stopwatch();
                 timer.Start();
@@ -401,13 +401,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                             Settings.Current.Building.ChunkSize,
                                             Settings.Current.Building.CdmSchema);
 
-                var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.CreateCdmPkIdxForVisitScripts());
+                var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.PostCreateCdmPkIdx());
 
                 Parallel.ForEach(createCdmPkIdxActions, action => action());
 
                 timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create PK and Indexes in Visit_Occurrence and Visit Details Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Create PK and Indexes in Visit and Era Tables Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
             });
         }
 
