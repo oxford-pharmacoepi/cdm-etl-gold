@@ -96,8 +96,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 {
                     PopulateCdmSource();
 
-                    //Create PK and idx in Visit_Occurrence and Visit_Details
+                    //Create PKs and idx in Visit and Era Tables
                     CreateCdmPkIdx();
+
+                    //Create FKs in Era tables
+                    CreateEraFks();
                 }
             }
         }
@@ -159,12 +162,21 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         private void CreateCdmPkIdx() {
 
-            if (Settings.Current.Building.BuildingState.CdmPkIdxForVisitCreated) return;
+            if (Settings.Current.Building.BuildingState.CdmPkIdxForVisitEraCreated) return;
 
-            UpdateDate("CdmPkIdxForVisitStart");
-            _builderController.CreateCdmPkIdxForVisit();
-            UpdateDate("CdmPkIdxForVisitEnd");
+            UpdateDate("CdmPkIdxForVisitEraStart");
+            _builderController.CreateCdmPkIdxForVisitEra();
+            UpdateDate("CdmPkIdxForVisitEraEnd");
 
+        }
+
+        private void CreateEraFks() {
+
+            if (Settings.Current.Building.BuildingState.CdmEraFksDone) return;
+
+            UpdateDate("CdmFksForEraStart");
+            _builderController.CreateCdmFksForEra();
+            UpdateDate("CdmFksForEraEnd");
         }
 
         private void CreateLookup(IVocabulary vocabulary)

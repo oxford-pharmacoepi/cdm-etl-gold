@@ -180,25 +180,6 @@ namespace org.ohdsi.cdm.presentation.builder
 
             return scripts;
         }
-        /*
-        public List<string> CreateCdmPkIdxScripts()
-        {
-            List<string> scripts = new List<string>();
-            var path = Path.Combine(
-                        BuilderFolder,
-                        "ETL",
-                        "Common",
-                        "Scripts",
-                        Building.SourceEngine.Database.ToString(),
-                        "CreateIndexes");
-
-            foreach (string file in Directory.EnumerateFiles(path, "*.sql"))
-            {
-                scripts.Add(File.ReadAllText(file));
-            }
-
-            return scripts;
-        }*/
         
 
         public List<string> CreateCdmPkIdxForMappingScripts()
@@ -230,7 +211,7 @@ namespace org.ohdsi.cdm.presentation.builder
             return scripts;
         }
 
-        public List<string> CreateCdmPkIdxForVisitScripts()
+        public List<string> PostCreateCdmPkIdx()
         {
             List<string> scripts = new List<string>();
 
@@ -256,9 +237,43 @@ namespace org.ohdsi.cdm.presentation.builder
                                    "pk_idx_visit_occurrence.sql"))
             );
 
+            scripts.Add(File.ReadAllText(
+                       Path.Combine(
+                                   BuilderFolder,
+                                   "ETL",
+                                   "Common",
+                                   "Scripts",
+                                   Building.SourceEngine.Database.ToString(),
+                                   "CreateIndexes",
+                                   "pk_idx_drug_era.sql"))
+            );
+
+            scripts.Add(File.ReadAllText(
+                      Path.Combine(
+                                  BuilderFolder,
+                                  "ETL",
+                                  "Common",
+                                  "Scripts",
+                                  Building.SourceEngine.Database.ToString(),
+                                  "CreateIndexes",
+                                  "pk_idx_condition_era.sql"))
+           );
+
             return scripts;
         }
 
+        
+        public string CreateCdmEraFksScript => File.ReadAllText(
+            Path.Combine(new[] {
+                BuilderFolder,
+                "ETL",
+                "Common",
+                "Scripts",
+                Building.DestinationEngine.Database.ToString(),
+                "CreateIndexes",
+                "fk_era_tables.sql"
+            })
+        );
 
         #endregion
 
