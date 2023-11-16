@@ -164,9 +164,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             if (Settings.Current.Building.BuildingState.CdmPkIdxForVisitEraCreated) return;
 
-            UpdateDate("CdmPkIdxForVisitStart");
+            UpdateDate("CdmPkIdxForVisitEraStart");
             _builderController.CreateCdmPkIdxForVisitEra();
-            UpdateDate("CdmPkIdxForVisitEnd");
+            UpdateDate("CdmPkIdxForVisitEraEnd");
 
         }
 

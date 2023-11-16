@@ -411,6 +411,26 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             });
         }
 
+        public void CreateCdmFksForEra() {
+            PerformAction(() =>
+            {
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create Fks in Era Tables Started ====================");
+
+                var timer = new Stopwatch();
+                timer.Start();
+
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
+                   Settings.Current.Building.CdmSchema);
+
+                dbDestination.ExecuteQuery(Settings.Current.CreateCdmEraFksScript);
+
+                timer.Stop();
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Create PK and Indexes in Visit and Era Tables Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+            });
+        }
+
         public void CreateTablesStep()
         {
             var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
