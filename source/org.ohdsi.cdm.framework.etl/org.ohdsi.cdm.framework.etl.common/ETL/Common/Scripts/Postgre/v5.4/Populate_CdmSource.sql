@@ -8,6 +8,6 @@ CONCAT('CPRD GOLD ', RIGHT(current_database(), 6)),
 'https://github.com/oxford-pharmacoepi/cdm-etl-gold/',
 TO_DATE(RIGHT(current_database(), 6),'YYYYMM'), 
 NOW(),
-CONCAT('CDM ', '{CdmVersion}'),
+CONCAT(SPLIT_PART(LTRIM('{CdmVersion}', 'v'), '.', 1), '.', SPLIT_PART('{CdmVersion}', '.', 2)),
 (SELECT concept_id FROM CONCEPT WHERE VOCABULARY_ID = 'CDM' AND CONCEPT_CLASS_ID = 'CDM' AND concept_code = CONCAT('CDM ','{CdmVersion}')),
 (SELECT vocabulary_version FROM public.vocabulary WHERE vocabulary_id = 'None');
