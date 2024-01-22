@@ -589,7 +589,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         {
             foreach (var entity in entities)
             {
-                //Debug.WriteLine($"domain=" + domain + " entity.Domain =" + entity.Domain);
                 var entityDomain = GetDomain2(domain, entity.Domain);
 
                 switch (entityDomain)
@@ -679,7 +678,8 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                                        Id = Offset.GetKeyOffset(entity.PersonId)
                                            .ProcedureOccurrenceId
                                    };
-                        proc.TypeConceptId = 38000275; //EHR order list entry
+                        //proc.TypeConceptId = 38000275; //EHR order list entry
+                        proc.TypeConceptId = 32817; //EHR
                         ChunkData.AddData(proc);
                         break;
 
