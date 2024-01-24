@@ -9,7 +9,7 @@ v.3.0
     - (backward compatible to CDM v.5.3)
 * Map route in drugs (+)
 * Bug fixed the incorrect observation_end_date
-* [Tentative] No vaccinations in drug_era (sue to the CVX issues)
+* [Tentative] No vaccinations in drug_era (sue to the CVX issues) (-)
 * Applied to **GOLD 202307 release**
   
 v.2.0
