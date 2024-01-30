@@ -2,6 +2,9 @@ The .Net CDM Builder was initially developed by Janssen Research & Development a
 You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
+v.3.1
+=============
+Fixed Security issues: 
 
 v.3.0
 =============
