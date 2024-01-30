@@ -355,8 +355,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create Destination Started ====================");
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                    Settings.Current.Building.CdmSchema);
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
                 dbDestination.CreateDatabase(Settings.Current.CreateCdmDatabaseScript);
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmTablesScript);
@@ -375,8 +374,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                    Settings.Current.Building.CdmSchema);
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
                 dbDestination.ExecuteQuery(Settings.Current.PopulateCdmSourceScript.Replace("{CdmVersion}", Settings.Current.CdmVersion));
 
 
@@ -395,11 +393,13 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                var dbDestination = new DbSource(Settings.Current.Building.DestinationConnectionString,
-                                            "",
-                                            Settings.Current.Building.SourceSchema,
-                                            Settings.Current.Building.ChunkSize,
-                                            Settings.Current.Building.CdmSchema);
+                var dbDestination = new DbSource(   Settings.Current.Building.DestinationConnectionString,
+                                                    "",
+                                                    Settings.Current.Building.SourceSchema,
+                                                    Settings.Current.Building.ChunkSize,
+                                                    Settings.Current.Building.CdmSchema,
+                                                    Settings.Current.Tablespace
+                                                );
 
                 var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.PostCreateCdmPkIdx());
 
@@ -420,8 +420,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                   Settings.Current.Building.CdmSchema);
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmEraFksScript);
 
@@ -433,48 +432,42 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void CreateTablesStep()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.CreateCdmTablesScript);
         }
 
         public void DropDestination()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.DropTablesScript);
         }
 
         public void TruncateLookup()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateLookupScript);
         }
 
         public void TruncateTables()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateTablesScript);
         }
 
         public void TruncateWithoutLookupTables()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateWithoutLookupTablesScript);
         }
 
         public void ResetVocabularyStep()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,
-                Settings.Current.Building.CdmSchema);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace);
 
             dbDestination.ExecuteQuery(Settings.Current.DropVocabularyTablesScript);
         }
@@ -550,7 +543,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                             "",
                                             Settings.Current.Building.SourceSchema,
                                             Settings.Current.Building.ChunkSize,
-                                            Settings.Current.Building.CdmSchema);
+                                            Settings.Current.Building.CdmSchema,
+                                            Settings.Current.Tablespace);
 
 
             var staffCount = dbDestination.GetStaffCount();
@@ -622,7 +616,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                             "",
                                             Settings.Current.Building.SourceSchema,
                                             Settings.Current.Building.ChunkSize,
-                                            Settings.Current.Building.CdmSchema);
+                                            Settings.Current.Building.CdmSchema,
+                                            Settings.Current.Tablespace);
 
 
 
@@ -899,7 +894,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                             "",
                                             Settings.Current.Building.SourceSchema,
                                             Settings.Current.Building.ChunkSize,
-                                            Settings.Current.Building.CdmSchema);
+                                            Settings.Current.Building.CdmSchema,
+                                            Settings.Current.Tablespace);
 
 
             var patientCount = dbDestination.GetPatientCount();

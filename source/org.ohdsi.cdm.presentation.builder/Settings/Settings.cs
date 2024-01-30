@@ -18,6 +18,8 @@ namespace org.ohdsi.cdm.presentation.builder
         public int DegreeOfParallelism => int.Parse(ConfigurationManager.AppSettings["DegreeOfParallelism"]);
         public bool WithinTheObservationPeriod => bool.Parse(ConfigurationManager.AppSettings["WithinTheObservationPeriod"]);
 
+        public string Tablespace = ConfigurationManager.AppSettings["Tablespace"];
+
         public string CdmVersion = ConfigurationManager.AppSettings["CDM"];
         public string CdmMainVersion
         {

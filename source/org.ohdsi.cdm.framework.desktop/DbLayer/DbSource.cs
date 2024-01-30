@@ -24,14 +24,16 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         private readonly string _schemaName;
         private readonly int _chunkSize;
         private readonly string _destinationSchemaName;
+        private readonly string _tablespace;
 
-        public DbSource(string connectionString, string folder, string schemaName, int chuckSize, string destinationSchemaName)
+        public DbSource(string connectionString, string folder, string schemaName, int chuckSize, string destinationSchemaName, string tablespace)
         {
             _connectionString = connectionString;
             _folder = folder;
             _schemaName = schemaName;
             _chunkSize = chuckSize;
             _destinationSchemaName = destinationSchemaName;
+            _tablespace = tablespace;
         }
 
         public int CreateChunkTable()
@@ -104,6 +106,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         public IEnumerable<IDataReader> GetPersonKeys(string batchScript, long batches, int batchSize)
         {
             batchScript = batchScript.Replace("{sc}", _schemaName);
+            batchScript = batchScript.Replace("{tablespace}", _tablespace);
 
             Debug.WriteLine("batches=" + batches);
 
@@ -236,6 +239,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
                 query = query.Replace("{sc}", _destinationSchemaName);
+                query = query.Replace("{tablespace}", _tablespace);
                 Debug.WriteLine($"query={query}");
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))

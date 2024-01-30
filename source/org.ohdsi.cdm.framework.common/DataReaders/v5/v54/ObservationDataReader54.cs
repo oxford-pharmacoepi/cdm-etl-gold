@@ -54,9 +54,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                 case 7:
                     return _enumerator.Current.ValueAsConceptId;
                 case 8:
-                    return _enumerator.Current.QualifierConceptId;
+                    //return _enumerator.Current.QualifierConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.QualifierSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.QualifierConceptId;
                 case 9:
-                    return _enumerator.Current.UnitsConceptId;
+                    //return _enumerator.Current.UnitsConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.UnitsSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.UnitsConceptId;
                 case 10:
                     return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
                 case 11:

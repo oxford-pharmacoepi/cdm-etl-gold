@@ -64,7 +64,12 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 12:
                     return _enumerator.Current.Sig;
                 case 13:
-                    return _enumerator.Current.RouteConceptId;
+                    //return _enumerator.Current.RouteConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.RouteSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.RouteConceptId;
+
                 case 14:
                     return _enumerator.Current.LotNumber;
                 case 15:
