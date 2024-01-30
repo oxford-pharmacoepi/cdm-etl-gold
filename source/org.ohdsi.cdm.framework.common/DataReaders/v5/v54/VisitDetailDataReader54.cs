@@ -61,11 +61,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                     return _enumerator.Current.CareSiteId == 0 ? null : _enumerator.Current.CareSiteId;
 
                 case 10:
-                    return _enumerator.Current.AdmittingSourceConceptId;
-
+                    //return _enumerator.Current.AdmittingSourceConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.AdmittingSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.AdmittingSourceConceptId;
                 case 11:
-                    return _enumerator.Current.DischargeToConceptId;
-
+                    //return _enumerator.Current.DischargeToConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.DischargeToSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.DischargeToConceptId;
                 case 12:
                     if (_enumerator.Current.PrecedingVisitDetailId.HasValue)
                     {

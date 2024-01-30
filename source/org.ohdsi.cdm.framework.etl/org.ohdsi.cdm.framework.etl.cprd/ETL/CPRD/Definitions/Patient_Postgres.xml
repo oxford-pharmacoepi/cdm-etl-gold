@@ -6,14 +6,14 @@
 			limit {pagesize} offset {pagesize*page}
 		)
 		SELECT DISTINCT
-			a.patid,
-			a.frd,
-			case
-				when yob &gt; 1800 then yob
-				else yob + 1800
-				end YEAR_OF_BIRTH,
-			case
-				when mob &gt; 0 then mob
+		a.patid,
+		a.frd,
+		case
+			when yob &gt; 1800 then yob
+			else yob + 1800
+			end YEAR_OF_BIRTH,
+		case
+			when mob &gt; 0 then mob
 		else null
 		end as MONTH_OF_BIRTH,
 		null DAY_OF_BIRTH,
@@ -23,21 +23,18 @@
 		else null
 		end as gender,
 		MOD(a.patid, 100000)  CARE_SITE_ID,
-		case
-		when a.frd &gt; b.uts then a.frd
-				else b.uts 
-			end as observation_period_start_date,
-			LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) as observation_period_end_date,
-			deathdate,
-			toreason,
-			CASE
-				WHEN toreason = 1 and deathdate is not null and deathdate &gt; '1987-01-01' THEN 1
-		ELSE 0
+		MAX(a.frd, b.uts) as observation_period_start_date,
+		LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) as observation_period_end_date,
+		deathdate,
+		toreason,
+		CASE
+			WHEN toreason = 1 and deathdate is not null and deathdate &gt; '1987-01-01' THEN 1
+			ELSE 0
 		END as DIED,
 		null as RACE_CONCEPT_ID,
 		null as RACE_SOURCE_VALUE,
 		accept,
-		32880 PeriodTypeConceptId -- 44814725 Period inferred by algorithm -> 32880 Standard algorithm
+		32880 PeriodTypeConceptId 			-- 44814725 Period inferred by algorithm -> 32880 Standard algorithm
 		from pat join {sc}.patient a on a.patid=pat.patid
 		join {sc}.practice b on MOD(a.patid, 100000) = b.pracid
 	</Query>

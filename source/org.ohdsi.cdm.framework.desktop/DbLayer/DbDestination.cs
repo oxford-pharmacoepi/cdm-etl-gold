@@ -15,11 +15,13 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
     {
         private readonly string _connectionString;
         private readonly string _schemaName;
+        private readonly string _tablespace;
 
-        public DbDestination(string connectionString, string schemaName)
+        public DbDestination(string connectionString, string schemaName, string tablespace)
         {
             _connectionString = connectionString;
             _schemaName = schemaName;
+            _tablespace = tablespace;
         }
 
         public void CreateIndexes(string query)
@@ -31,6 +33,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
                 try
                 {
                     query = query.Replace("{sc}", _schemaName);
+                    query = query.Replace("{tablespace}", _tablespace);
 
                     transaction = connection.BeginTransaction();
 
@@ -160,6 +163,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
                 query = query.Replace("{sc}", _schemaName);
+                query = query.Replace("{tablespace}", _tablespace);
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
                 {

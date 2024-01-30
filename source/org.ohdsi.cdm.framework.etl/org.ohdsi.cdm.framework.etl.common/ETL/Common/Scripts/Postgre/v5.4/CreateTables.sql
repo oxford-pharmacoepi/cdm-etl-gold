@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS {sc}.care_site
    location_id                    integer,
    care_site_source_value         varchar(50),
    place_of_service_source_value  varchar(50)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
 (
    domain_id    varchar(20),
    description  varchar(4000)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS {sc}.cdm_source
    cdm_version                     varchar(10),
    cdm_version_concept_id 			integer 		NOT NULL,
    vocabulary_version              varchar(20)		NOT NULL
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_era
 (
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_era
    condition_era_start_date    date		 NOT NULL,		
    condition_era_end_date      date		 NOT NULL,		
    condition_occurrence_count  integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
 (
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
    condition_source_value         varchar(250),
    condition_source_concept_id    integer,
    condition_status_source_value  varchar(50)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cost
 (
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS {sc}.cost
    revenue_code_source_value  varchar(50),
    drg_concept_id             integer,
    drg_source_value           varchar(3)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.death
 (
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS {sc}.death
    cause_concept_id         integer,
    cause_source_value       varchar(50),
    cause_source_concept_id  integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.device_exposure
 (
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS {sc}.device_exposure
    unit_concept_id 				   integer,
    unit_source_value 			   varchar(50),
    unit_source_concept_id		   integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.dose_era
 (
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS {sc}.dose_era
    dose_value           numeric   		NOT NULL,
    dose_era_start_date  date 			NOT NULL,		
    dose_era_end_date    date 			NOT NULL		
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.drug_era
 (
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_era
    drug_era_end_date    date	  		NOT NULL,		
    drug_exposure_count  integer,
    gap_days             integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
 (
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    drug_source_concept_id        integer,
    route_source_value            varchar(100),		-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
    dose_unit_source_value        varchar(50)
-);
+)TABLESPACE {tablespace};
 
 
 CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
    domain_concept_id_2      integer   NOT NULL,
    fact_id_2                integer   NOT NULL,
    relationship_concept_id  integer   NOT NULL
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.location
 (
@@ -194,7 +194,7 @@ CREATE TABLE IF NOT EXISTS {sc}.location
    country_source_value 	varchar(80),
    latitude 				numeric,
    longitude 				numeric
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.measurement
 (
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS {sc}.measurement
    value_source_value             	varchar(50),  
    measurement_event_id 		  	bigint,		--integer in 5.4.1 but not works for GOLD
    meas_event_field_concept_id 	  	integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.metadata
 (
@@ -234,13 +234,13 @@ CREATE TABLE IF NOT EXISTS {sc}.metadata
    value_as_number 				numeric,
    metadata_date             	date,
    metadata_datetime         	timestamp
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.metadata_tmp
 (
    person_id  bigint         NOT NULL,
    name       varchar(250)   NOT NULL
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.note
 (
@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note
    note_source_value      			varchar(50),
    note_event_id 					bigint,			--integer in 5.4.1 but not works for GOLD
    note_event_field_concept_id 		integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.note_nlp
 (
@@ -278,7 +278,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note_nlp
    term_exists                 varchar(1),
    term_temporal               varchar(50),
    term_modifiers              varchar(2000)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.observation
 (
@@ -303,7 +303,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
    value_source_value			  varchar(50),
    observation_event_id			  bigint,			--integer in 5.4.1 but not works for GOLD
    obs_event_field_concept_id 	  integer
-);
+)TABLESPACE {tablespace};
 
 
 CREATE TABLE IF NOT EXISTS {sc}.observation_period
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation_period
    observation_period_start_date  date      NOT NULL,
    observation_period_end_date    date      NOT NULL,
    period_type_concept_id         integer   NOT NULL
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.payer_plan_period
 (
@@ -334,7 +334,7 @@ CREATE TABLE IF NOT EXISTS {sc}.payer_plan_period
    stop_reason_concept_id         integer,
    stop_reason_source_value       varchar(50),
    stop_reason_source_concept_id  integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.person
 (
@@ -356,7 +356,7 @@ CREATE TABLE IF NOT EXISTS {sc}.person
    race_source_concept_id       integer,
    ethnicity_source_value       varchar(50),
    ethnicity_source_concept_id  integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
 (
@@ -376,7 +376,7 @@ CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
    procedure_source_value       varchar(250),
    procedure_source_concept_id  integer,
    modifier_source_value        varchar(50)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.provider
 (
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS {sc}.provider
    specialty_source_concept_id  integer,
    gender_source_value          varchar(50),
    gender_source_concept_id     integer
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.specimen
 (
@@ -412,7 +412,7 @@ CREATE TABLE IF NOT EXISTS {sc}.specimen
    unit_source_value            varchar(50),
    anatomic_site_source_value   varchar(50),
    disease_status_source_value  varchar(50)
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.visit_detail
 (
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
    discharged_to_source_value      varchar(50),
    parent_visit_detail_id          bigint,
    visit_occurrence_id             bigint        NOT NULL
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
 (
@@ -456,7 +456,7 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
    discharged_to_concept_id        integer,
    discharged_to_source_value      varchar(50),
    preceding_visit_occurrence_id  bigint
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.EPISODE (
 	episode_id 					bigint 		NOT NULL,
@@ -472,10 +472,10 @@ CREATE TABLE IF NOT EXISTS {sc}.EPISODE (
 	episode_type_concept_id 	integer 	NOT NULL,
 	episode_source_value 		varchar(50),
 	episode_source_concept_id 	integer 
-);
+)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.EPISODE_EVENT (
 	episode_id 							bigint 		NOT NULL,
 	event_id 							bigint 		NOT NULL,
 	episode_event_field_concept_id 		integer 	NOT NULL 
-);
+)TABLESPACE {tablespace};

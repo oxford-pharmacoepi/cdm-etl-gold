@@ -91,7 +91,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                 case 17:
                     return _enumerator.Current.UnitSourceValue;
                 case 18:
-                    return _enumerator.Current.UnitSourceConceptId;
+                    //return _enumerator.Current.UnitSourceConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.UnitSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.UnitSourceConceptId;
                 case 19:
                     return _enumerator.Current.ValueSourceValue;
                 case 20:
