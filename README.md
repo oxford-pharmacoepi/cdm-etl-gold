@@ -5,6 +5,7 @@ The program is used to convert CPRD GOLD into OMOP CDM.
 v.3.1
 =============
 Fixed Security issues: 
+testing
 
 v.3.0
 =============
