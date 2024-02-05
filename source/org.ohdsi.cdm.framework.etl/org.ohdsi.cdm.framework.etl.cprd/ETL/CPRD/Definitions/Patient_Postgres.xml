@@ -23,7 +23,7 @@
 		else null
 		end as gender,
 		MOD(a.patid, 100000)  CARE_SITE_ID,
-		MAX(a.frd, b.uts) as observation_period_start_date,
+		GREATEST(a.frd, b.uts) as observation_period_start_date,
 		LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) as observation_period_end_date,
 		deathdate,
 		toreason,
