@@ -918,7 +918,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             Logger.Write(null, LogMessageTypes.Info,
                    $"==================== Mapping ALL Patients ended ====================");
 
-            Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
+            Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Person and Observational Period started ====================");
             var timer = new Stopwatch();
             timer.Start();
 
