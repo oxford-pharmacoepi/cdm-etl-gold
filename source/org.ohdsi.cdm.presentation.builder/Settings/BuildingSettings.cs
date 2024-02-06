@@ -198,8 +198,6 @@ namespace org.ohdsi.cdm.presentation.builder
                 BatchScript = File.ReadAllText(Path.Combine(VendorFolder, batch));
             }
 
-            Debug.WriteLine("BatchScript=" + BatchScript);
-
             var folder = Path.Combine(VendorFolder, "Definitions");
             if (Directory.Exists(folder))
             {

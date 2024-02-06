@@ -818,11 +818,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             }
             Console.WriteLine("Excluding invalid patients ended");
 
-            Debug.WriteLine($"personList.Count={data.personList.Count}");
-            Debug.WriteLine($"ObservationPeriodList.Count={data.ObservationPeriodList.Count}");
-            Debug.WriteLine($"metadataList.Count={data.metadataList.Count}");
-            //Debug.WriteLine($"deathList.Count={deathList.Count}");
-
             //timer.Stop();
 
             //Logger.Write(null, LogMessageTypes.Info,

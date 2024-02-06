@@ -60,24 +60,14 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                     return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
                 case 11:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
-                    {
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitOccurrenceId.Value);
                         return _enumerator.Current.VisitOccurrenceId.Value;
-                    }
-
-                    return null;
+                    else
+                        return null;
                 case 12:
                     if (_enumerator.Current.VisitDetailId.HasValue)
-                    {
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitDetailId.Value);
                         return _enumerator.Current.VisitDetailId;
-                    }
-
-                    return null;
+                    else
+                        return null;
                 case 13:
                     return _enumerator.Current.SourceValue;
                 case 14:
