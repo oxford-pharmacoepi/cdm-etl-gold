@@ -596,6 +596,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             foreach (var entity in entities)
             {
                 var entityDomain = GetDomain2(domain, entity.Domain);
+                entityDomain = "ZZZZZ00".Equals(entity.SourceValue) ? null : entityDomain;      //new added since 202401 to eliminate mapping this read code
 
                 switch (entityDomain)
                 {
