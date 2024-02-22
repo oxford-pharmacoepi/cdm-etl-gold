@@ -50,7 +50,6 @@ JOIN {sc}.CONCEPT_ANCESTOR CA
 	ON CA.ancestor_concept_id = C.concept_id
 	and (c.vocabulary_id) in ('RxNorm', 'RxNorm Extension')
 	and (c.concept_class_id) = 'Ingredient'
-    -- and ((c.vocabulary_id in ('RxNorm', 'RxNorm Extension') and c.concept_class_id = 'Ingredient') or (c.vocabulary_id = 'CVX' and c.standard_concept='S'))
 	and (invalid_reason is null or invalid_reason = '')
     and lower(C.concept_name) not like '%vaccine%' --Not add vaccine in drug_era (since cdm_gold_202307) 
 JOIN {sc}.CONCEPT A
