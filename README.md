@@ -44,5 +44,5 @@ Clone from https://github.com/OHDSI/ETL-CDMBuilder
 Backlogs
 =============
 - [x] Support CDM v.5.4
-- [ ] Map Ethnicities
-testing
+- [ ] Map Ethnicities(link to HES data)
+- [ ] Populate Specimen 
