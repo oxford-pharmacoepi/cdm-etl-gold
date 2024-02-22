@@ -89,9 +89,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                 case 19:
                     return _enumerator.Current.ValueSourceValue;
                 case 20:
-                    return _enumerator.Current.MeasurementEventId;
+                    //return _enumerator.Current.MeasurementEventId;
+                    return null;
                 case 21:
-                    return _enumerator.Current.MeasEventFieldConceptId;
+                    //return _enumerator.Current.MeasEventFieldConceptId;
+                    return null;
 
                 default:
                     throw new NotImplementedException();

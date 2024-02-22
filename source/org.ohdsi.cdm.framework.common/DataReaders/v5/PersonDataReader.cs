@@ -62,13 +62,17 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
                 case 13:
                     return _personEnumerator.Current.GenderSourceConceptId;
                 case 14:
-                    return _personEnumerator.Current.RaceSourceValue;
+                    //return _personEnumerator.Current.RaceSourceValue;
+                    return null;
                 case 15:
-                    return _personEnumerator.Current.RaceSourceConceptId;
+                    //return _personEnumerator.Current.RaceSourceConceptId;
+                    return null;
                 case 16:
-                    return _personEnumerator.Current.EthnicitySourceValue;
+                    //return _personEnumerator.Current.EthnicitySourceValue;
+                    return null;
                 case 17:
-                    return _personEnumerator.Current.EthnicitySourceConceptId;
+                    //return _personEnumerator.Current.EthnicitySourceConceptId;
+                    return null;
 
                 default:
                     throw new NotImplementedException();
