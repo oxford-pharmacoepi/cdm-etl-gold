@@ -18,7 +18,9 @@ namespace org.ohdsi.cdm.framework.etl.cprd
     /// </summary>
     public class CprdPersonBuilder : PersonBuilder
     {
-        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0900", "65F0A00", "65F0B00" };
+        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0300", "65F0400", "65F0500", "65F0600", "65F0700", "65F0800", "65F0900", "65F0900", "65F0A00", "65F0B00" };
+
+
         public override string GetFolder()
         {
             return "ETL\\CPRD";

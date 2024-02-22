@@ -13,7 +13,10 @@
 				i.eventdate,
 				i.patid,
 				i.staffid,
-				i.immstype,
+				CASE 
+					WHEN m.readcode IN ('65F0100','65F0200','65F0300','65F0400','65F0500','65F0600','65F0700','65F0800','65F0900','65F0A00','65F0B00') then i.immstype
+					ELSE 0
+				END AS immstype,
 				m.readcode,
 				concat(i.patid,to_char(i.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 				-- nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
