@@ -725,16 +725,14 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                             //Debug.WriteLine($"Before: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
 
                             int new_concept_id = UpdateConceptIdByCov19VaxBrandName(entity);
-
+                            drg.ConceptId = new_concept_id;
+                            //entity.Ingredients[0] = new_concept_id;
                             //Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
                         }
-                        
-
 
                         DrugForEra.Add(drg);
                         ChunkData.AddData(drg);
                         break;
-
                 }
 
             }
