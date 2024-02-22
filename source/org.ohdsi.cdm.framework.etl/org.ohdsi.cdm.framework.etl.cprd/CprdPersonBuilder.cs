@@ -559,8 +559,13 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             if (conceptDomain.StartsWith("Drug", StringComparison.OrdinalIgnoreCase))
                 return "Drug";
 
+            //There is no specified domain that the Concepts in this table must adhere to.
+            //The only rule is that records with Concepts in the Condition, Procedure, Drug, Measurement, or Device domains MUST go to the corresponding table.
+            if (entityDomain.StartsWith("Observation", StringComparison.OrdinalIgnoreCase))
+                return "Observation";
 
-            return entityDomain;
+            //return entityDomain;
+            return null;
         }
 
         private int? GetValueAsConceptId(IEntity e, string value)
