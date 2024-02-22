@@ -28,7 +28,8 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
                 settings.ConversionSettings.SourceEngine
             }), settings.ConversionSettings.SourceSchema,
                 ChunkSize,
-                settings.ConversionSettings.VocabularySchema
+                settings.ConversionSettings.VocabularySchema,
+                ""
             );
         }
 

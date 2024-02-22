@@ -44,7 +44,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             query = query.Replace("{sc}", _schemaName);
             query = query.Replace("{CHUNK_SIZE}", _chunkSize.ToString());
             query = query.Replace("{des}", _destinationSchemaName);
-            //query = query.Replace("{TARGET_SCHEMA}", _destinationSchemaName);
+            query = query.Replace("{tablespace}", _tablespace);
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString)) {
 
@@ -85,7 +85,10 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         {
             var query = File.ReadAllText(Path.Combine(_folder, "CreateIndexesChunkTable.sql"));
             query = query.Replace("{sc}", _schemaName);
-            
+            query = query.Replace("{tablespace}", _tablespace);
+
+            Debug.WriteLine("query=" + query);
+
             if (string.IsNullOrEmpty(query.Trim())) return;
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))

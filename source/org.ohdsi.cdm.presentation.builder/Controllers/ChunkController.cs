@@ -25,7 +25,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             }), 
             Settings.Current.Building.SourceSchema, 
             Settings.Current.Building.ChunkSize,
-            Settings.Current.Building.CdmSchema
+            Settings.Current.Building.CdmSchema,
+            Settings.Current.Tablespace
             );
         }
 
