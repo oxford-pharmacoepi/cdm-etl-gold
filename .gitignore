@@ -353,3 +353,9 @@ MigrationBackup/
 # Testing only
 reference/
 source/data patching/
+
+
+executable/
+man/
+release_notes/
+CDMv4/
