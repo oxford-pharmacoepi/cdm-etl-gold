@@ -1,4 +1,0 @@
-staffid	gender	role
-1001		2
-1002		68
-1003		0

@@ -1,8 +1,0 @@
-.Rproj.user
-.Rhistory
-*.RData
-.Ruserdata
-*errorReport.txt
-*.Rprofile
-/inst/sql/sql_server/insert.sql
-/inst/sql/sql_server/test.sql

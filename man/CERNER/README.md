@@ -1,3 +1,0 @@
-# CERNER ReadMe
-
-Initial Commit
