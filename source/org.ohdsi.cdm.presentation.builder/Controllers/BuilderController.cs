@@ -765,27 +765,32 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             foreach (var p in data.personList)
             {
-
                 bool validPerson = true;
-
+                /*
                 if (p.YearOfBirth > DateTime.Now.Year)
                 {
                     data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Implausible year of birth - post earliest observation period" });
                     validPerson = false;
                 }
-
-                if (!(p.StartDate < p.EndDate))
+                */
+                if (p.StartDate == p.EndDate)
+                {
+                    data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Invalid observation time - No observation period" });
+                    validPerson = false;
+                }
+                else if (!(p.StartDate < p.EndDate))
                 {
                     data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Invalid observation time" });
                     validPerson = false;
                 }
-
+                /*
                 // Delete any individual that has an OBSERVATION_PERIOD that is >= 2 years prior to the YEAR_OF_BIRTH
                 if (p.YearOfBirth - p.StartDate.Year >= 2)
                 {
                     data.metadataList.Add(new Metadata { PersonId = p.PersonId, Name = "Implausible year of birth - post earliest observation period" });
                     validPerson = false;
                 }
+                */
 
                 if (validPerson)
                 {
@@ -817,11 +822,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 data.personList.Remove(xPerson);
             }
             Console.WriteLine("Excluding invalid patients ended");
-
-            Debug.WriteLine($"personList.Count={data.personList.Count}");
-            Debug.WriteLine($"ObservationPeriodList.Count={data.ObservationPeriodList.Count}");
-            Debug.WriteLine($"metadataList.Count={data.metadataList.Count}");
-            //Debug.WriteLine($"deathList.Count={deathList.Count}");
 
             //timer.Stop();
 
@@ -923,7 +923,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             Logger.Write(null, LogMessageTypes.Info,
                    $"==================== Mapping ALL Patients ended ====================");
 
-            Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Observational Period started ====================");
+            Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Person and Observational Period started ====================");
             var timer = new Stopwatch();
             timer.Start();
 

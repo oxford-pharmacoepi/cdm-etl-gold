@@ -82,16 +82,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                 case 15:
                     return _enumerator.Current.DischargeToSourceValue;
                 case 16:
-                    if (_enumerator.Current.PrecedingVisitOccurrenceId.HasValue)
-                    {
-                        /*
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.PrecedingVisitOccurrenceId.Value);
-                        */
-                        return _enumerator.Current.PrecedingVisitOccurrenceId;
-                    }
-
                     return _enumerator.Current.PrecedingVisitOccurrenceId;
 
                 default:

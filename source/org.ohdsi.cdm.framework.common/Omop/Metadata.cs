@@ -16,6 +16,8 @@ namespace org.ohdsi.cdm.framework.common.Omop
         ImplausibleYOBPostEarliestOP,
         [Description("Invalid observation time")]
         InvalidObservationTime,
+        [Description("Invalid observation time - No observation period")]
+        NoObservationTime,
         [Description("Missing insurance coverage")]
         MissingInsuranceCoverage,
         [Description("Multiple years of birth")]

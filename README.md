@@ -3,6 +3,16 @@ You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
 
+v.4.0
+=============
+* Enhancing COVID-19 brand name mapping (+)
+    - Readcode and brand name about COVID-19 vaccination: https://help.cegedim-healthcare.co.uk/Coronavirus_guidance/Content/Coronavirus_Guidance/Vaccinations.htm
+    - P.S. COVID Medicago (Previously COVID-19 – Medicago) not found in GOLD
+* update procedure_type_concept_id (+)
+* left empty the non-required concept_id fields empty if there is no source value to map to a concept id (+)
+* fixed non-condition concepts in condition_occurrence (+)
+* not map read code = ZZZZZ00 (+)
+
 v.3.0
 =============
 * Support CDM v.5.4 (+)
@@ -15,6 +25,7 @@ v.3.0
 v.2.0
 =============
 * Expand COVID-19 Vaccination brand infomation (+)
+    - https://cprd.com/sites/default/files/2022-03/SARS-CoV-2%20counts%20Feb2022.pdf
 * Only map events within observation period (+)
     - For Death, the observation period = observation_start_date to observation_end_date + 3 months)
 * Data Cleaning function (-)
@@ -35,3 +46,4 @@ Backlogs
 =============
 - [x] Support CDM v.5.4
 - [ ] Map Ethnicities
+testing

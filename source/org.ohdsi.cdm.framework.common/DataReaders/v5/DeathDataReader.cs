@@ -39,14 +39,11 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5
                 case 2:
                     return _enumerator.Current.TypeConceptId;
                 case 3:
-                    //return _enumerator.Current.CauseConceptId;
-                    //return _enumerator.Current.CauseConceptId.HasValue ? _enumerator.Current.CauseConceptId : 0;
-                    return null;
+                    return _enumerator.Current.CauseConceptId;
                 case 4:
                     return _enumerator.Current.CauseSource;
                 case 5:
-                    //return _enumerator.Current.SourceConceptId;
-                    return null;
+                   return _enumerator.Current.SourceConceptId;
                 default:
                     throw new NotImplementedException();
             }

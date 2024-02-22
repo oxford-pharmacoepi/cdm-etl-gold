@@ -70,6 +70,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
+    <ProjectReference Include="..\org.ohdsi.cdm.framework.etl.cprd\org.ohdsi.cdm.framework.etl.cprd.csproj" />
   </ItemGroup>
 
 </Project>

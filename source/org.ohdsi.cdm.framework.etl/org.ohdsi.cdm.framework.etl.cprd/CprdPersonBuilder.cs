@@ -18,7 +18,9 @@ namespace org.ohdsi.cdm.framework.etl.cprd
     /// </summary>
     public class CprdPersonBuilder : PersonBuilder
     {
-        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0900", "65F0A00", "65F0B00" };
+        string[] covid19_vax_read_code = { "65F0100", "65F0200", "65F0300", "65F0400", "65F0500", "65F0600", "65F0700", "65F0800", "65F0900", "65F0900", "65F0A00", "65F0B00" };
+
+
         public override string GetFolder()
         {
             return "ETL\\CPRD";
@@ -65,7 +67,8 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     op.StartDate.Year <= DateTime.Now.Year).ToArray();
 
             if (op.Length == 0)
-                return Attrition.InvalidObservationTime;
+                return Attrition.NoObservationTime;
+                //return Attrition.InvalidObservationTime;
 
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, op).ToArray();
@@ -206,7 +209,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitOccurrences.Values.ToArray(),
                 visitDetails.Values.ToArray(), null,
                 Clean(deviceExposure, person).ToArray(), null, false);
-
+/*
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
                 ChunkData.ConditionOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
@@ -218,7 +221,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
                 ChunkData.ConditionEra.Add(r);
             }
-
+*/
 
             return Attrition.None;
         }
@@ -237,8 +240,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             var person = result.Key;
             if (person == null)
                 return result.Value;
-
-            //Debug.WriteLine($"person.PersonId={person.PersonId}");
 
             //var observationPeriods = data.ObservationPeriods.ToArray();
             var observationPeriods = data.ObservationPeriods.Where(op => op.PersonId == person.PersonId).ToArray();
@@ -391,7 +392,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 visitDetails.Values.ToArray(), null,
                 Clean(deviceExposure, person).ToArray(), null, withinTheObservationPeriod);
             
-            
+            /*
             var pg = new PregnancyAlgorithm();
             foreach (var r in pg.GetPregnancyEpisodes(Vocabulary, person, observationPeriods,
                 ChunkData.ConditionOccurrences.Where(e => e.PersonId == person.PersonId).ToArray(),
@@ -403,7 +404,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
                 ChunkData.ConditionEra.Add(r);
             }
-            
+            */
 
             return Attrition.None;
         }
@@ -558,8 +559,13 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             if (conceptDomain.StartsWith("Drug", StringComparison.OrdinalIgnoreCase))
                 return "Drug";
 
+            //There is no specified domain that the Concepts in this table must adhere to.
+            //The only rule is that records with Concepts in the Condition, Procedure, Drug, Measurement, or Device domains MUST go to the corresponding table.
+            if (entityDomain.StartsWith("Observation", StringComparison.OrdinalIgnoreCase))
+                return "Observation";
 
-            return entityDomain;
+            //return entityDomain;
+            return null;
         }
 
         private int? GetValueAsConceptId(IEntity e, string value)
@@ -590,6 +596,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             foreach (var entity in entities)
             {
                 var entityDomain = GetDomain2(domain, entity.Domain);
+                entityDomain = "ZZZZZ00".Equals(entity.SourceValue) ? null : entityDomain;      //new added since 202401 to eliminate mapping this read code
 
                 switch (entityDomain)
                 {
@@ -726,16 +733,14 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                             //Debug.WriteLine($"Before: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
 
                             int new_concept_id = UpdateConceptIdByCov19VaxBrandName(entity);
-
+                            drg.ConceptId = new_concept_id;
+                            //entity.Ingredients[0] = new_concept_id;
                             //Debug.WriteLine($"After: ConceptId={drg.ConceptId}, ConceptIdKey={drg.ConceptIdKey}, PersonId={drg.PersonId}");
                         }
-                        
-
 
                         DrugForEra.Add(drg);
                         ChunkData.AddData(drg);
                         break;
-
                 }
 
             }

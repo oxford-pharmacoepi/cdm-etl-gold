@@ -74,16 +74,9 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                         return _enumerator.Current.DischargeToConceptId;
                 case 12:
                     if (_enumerator.Current.PrecedingVisitDetailId.HasValue)
-                    {
- 
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.PrecedingVisitDetailId.Value);
-
                         return _enumerator.Current.PrecedingVisitDetailId.Value;
-                    }
-
-                    return null;
+                    else
+                        return null;
 
                 //return _enumerator.Current.PrecedingVisitDetailId.HasValue
                 //    ? _offset.GetId(_enumerator.Current.PersonId,
@@ -104,29 +97,15 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
 
                 case 17:
                     if (_enumerator.Current.VisitDetailParentId.HasValue)
-                    {
-                        /*
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitDetailParentId.Value);
-                        */
                         return _enumerator.Current.VisitDetailParentId.Value;
-                    }
-                    return null;
+                    else
+                        return null;
 
                 case 18:
                     if (_enumerator.Current.VisitOccurrenceId.HasValue)
-                    {
-                        /*
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitOccurrenceId.Value);
-                        */
                         return _enumerator.Current.VisitOccurrenceId.Value;
-                    }
-
-                    return null;
-
+                    else
+                        return null;
 
                 default:
                     throw new NotImplementedException();
