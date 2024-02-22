@@ -10,7 +10,7 @@ v.4.0
     - P.S. COVID Medicago (Previously COVID-19 – Medicago) not found in GOLD
 * update procedure_type_concept_id (+)
 * left empty the non-required concept_id fields empty if there is no source value to map to a concept id (+)
-* fixed non-condition concepts in condition_occurrence (+)
+* Bug fixed non-condition concepts in condition_occurrence
 * not map read code = ZZZZZ00 (+)
 
 v.3.0
