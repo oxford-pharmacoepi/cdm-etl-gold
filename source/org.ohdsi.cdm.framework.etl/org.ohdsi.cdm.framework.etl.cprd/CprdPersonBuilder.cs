@@ -65,7 +65,8 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                     op.StartDate.Year <= DateTime.Now.Year).ToArray();
 
             if (op.Length == 0)
-                return Attrition.InvalidObservationTime;
+                return Attrition.NoObservationTime;
+                //return Attrition.InvalidObservationTime;
 
             var observationPeriods =
                 BuildObservationPeriods(person.ObservationPeriodGap, op).ToArray();
