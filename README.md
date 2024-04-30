@@ -12,6 +12,8 @@ v.4.0
 * left empty the non-required concept_id fields empty if there is no source value to map to a concept id (+)
 * Bug fixed non-condition concepts in condition_occurrence
 * not map read code = ZZZZZ00 (+)
+* build PK, indexes and FKs in Era Tables (+)
+* Applied to **GOLD 202401 release**
 
 v.3.0
 =============
