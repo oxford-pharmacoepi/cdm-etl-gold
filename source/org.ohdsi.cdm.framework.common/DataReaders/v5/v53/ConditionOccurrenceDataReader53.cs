@@ -76,7 +76,8 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
                     return null;
                 case 11:
-                    return _enumerator.Current.StatusConceptId;
+                    //return _enumerator.Current.StatusConceptId;
+                    return null;
                 case 12:
                     return _enumerator.Current.SourceValue;
                 case 13:
