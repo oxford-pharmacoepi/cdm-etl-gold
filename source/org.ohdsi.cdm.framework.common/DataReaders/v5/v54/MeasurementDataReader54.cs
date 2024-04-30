@@ -56,7 +56,10 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
                 case 8:
                     return _enumerator.Current.ValueAsConceptId;
                 case 9:
-                    return _enumerator.Current.UnitConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.UnitSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.UnitConceptId;
                 case 10:
                     return _enumerator.Current.RangeLow;
                 case 11:
