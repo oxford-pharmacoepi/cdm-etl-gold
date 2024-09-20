@@ -1,5 +1,4 @@
 -- CDM v5.4.1
-
 CREATE TABLE IF NOT EXISTS {sc}.care_site
 (
    care_site_id                   integer         NOT NULL,
@@ -10,11 +9,6 @@ CREATE TABLE IF NOT EXISTS {sc}.care_site
    place_of_service_source_value  varchar(50)
 )TABLESPACE {tablespace};
 
-CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
-(
-   domain_id    varchar(20),
-   description  varchar(4000)
-)TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
@@ -43,22 +37,22 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_era
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
 (
-   condition_occurrence_id        BIGSERIAL     NOT NULL,
-   person_id                      bigint        NOT NULL,
-   condition_concept_id           integer       NOT NULL,
-   condition_start_date           date          NOT NULL,
-   condition_start_datetime       timestamp,
-   condition_end_date             date,
-   condition_end_datetime         timestamp,
-   condition_type_concept_id      integer       NOT NULL,
-   stop_reason                    varchar(20),
-   provider_id                    bigint,
-   visit_occurrence_id            bigint,
-   visit_detail_id                bigint,
-   condition_status_concept_id    integer,
-   condition_source_value         varchar(250),
-   condition_source_concept_id    integer,
-   condition_status_source_value  varchar(50)
+   condition_occurrence_id        	BIGSERIAL     NOT NULL,
+   person_id                      	bigint        NOT NULL,
+   condition_concept_id           	integer       NOT NULL,
+   condition_start_date           	date          NOT NULL,
+   condition_start_datetime       	timestamp,
+   condition_end_date             	date,
+   condition_end_datetime         	timestamp,
+   condition_type_concept_id      	integer       NOT NULL,
+   condition_status_concept_id		integer,
+   stop_reason                    	varchar(20),
+   provider_id                    	bigint,
+   visit_occurrence_id            	bigint,
+   visit_detail_id                	bigint,
+   condition_source_value         	varchar(250),
+   condition_source_concept_id    	integer,
+   condition_status_source_value  	varchar(50)
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cost
@@ -170,7 +164,6 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    dose_unit_source_value        varchar(50)
 )TABLESPACE {tablespace};
 
-
 CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
 (
    domain_concept_id_1      integer   NOT NULL,
@@ -225,7 +218,7 @@ CREATE TABLE IF NOT EXISTS {sc}.measurement
 
 CREATE TABLE IF NOT EXISTS {sc}.metadata
 (
-   metadata_id 					SERIAL  		NOT NULL,
+   metadata_id 					integer  		NOT NULL,
    metadata_concept_id       	integer        	NOT NULL,
    metadata_type_concept_id  	integer        	NOT NULL,
    name                      	varchar(250)   	NOT NULL,
@@ -258,7 +251,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note
    visit_occurrence_id    			bigint,
    visit_detail_id        			bigint,
    note_source_value      			varchar(50),
-   note_event_id 					bigint,			--integer in 5.4.1 but not works for GOLD
+   note_event_id 					integer,		
    note_event_field_concept_id 		integer
 )TABLESPACE {tablespace};
 
@@ -305,7 +298,6 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
    obs_event_field_concept_id 	  integer
 )TABLESPACE {tablespace};
 
-
 CREATE TABLE IF NOT EXISTS {sc}.observation_period
 (
    observation_period_id          BIGSERIAL NOT NULL,
@@ -317,7 +309,7 @@ CREATE TABLE IF NOT EXISTS {sc}.observation_period
 
 CREATE TABLE IF NOT EXISTS {sc}.payer_plan_period
 (
-   payer_plan_period_id           bigint        NOT NULL,
+   payer_plan_period_id           integer       NOT NULL,
    person_id                      bigint        NOT NULL,
    payer_plan_period_start_date   date          NOT NULL,
    payer_plan_period_end_date     date          NOT NULL,
@@ -397,7 +389,7 @@ CREATE TABLE IF NOT EXISTS {sc}.provider
 
 CREATE TABLE IF NOT EXISTS {sc}.specimen
 (
-   specimen_id                  int     	  NOT NULL,
+   specimen_id                  BIGSERIAL     NOT NULL,
    person_id                    bigint        NOT NULL,
    specimen_concept_id          integer       NOT NULL,
    specimen_type_concept_id     integer       NOT NULL,
@@ -426,13 +418,13 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
    visit_detail_type_concept_id    integer       NOT NULL,
    provider_id                     bigint,
    care_site_id                    integer,
-   admitted_from_concept_id		   integer,
-   discharged_to_concept_id        integer,
-   preceding_visit_detail_id       bigint,
    visit_detail_source_value       varchar(50),
    visit_detail_source_concept_id  integer,
+   admitted_from_concept_id		   integer,
    admitted_from_source_value      varchar(50),
    discharged_to_source_value      varchar(50),
+   discharged_to_concept_id        integer,
+   preceding_visit_detail_id       bigint,
    parent_visit_detail_id          bigint,
    visit_occurrence_id             bigint        NOT NULL
 )TABLESPACE {tablespace};
@@ -459,7 +451,7 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.EPISODE (
-	episode_id 					bigint 		NOT NULL,
+	episode_id 					integer 	NOT NULL,
 	person_id 					bigint 		NOT NULL,
 	episode_concept_id 			integer 	NOT NULL,
 	episode_start_date 			date 		NOT NULL,
@@ -475,25 +467,7 @@ CREATE TABLE IF NOT EXISTS {sc}.EPISODE (
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.EPISODE_EVENT (
-	episode_id 							bigint 		NOT NULL,
-	event_id 							bigint 		NOT NULL,
+	episode_id 							integer 	NOT NULL,
+	event_id 							integer 	NOT NULL,
 	episode_event_field_concept_id 		integer 	NOT NULL 
 )TABLESPACE {tablespace};
-
-
-CREATE TABLE IF NOT EXISTS results.COHORT (
-			cohort_definition_id integer NOT NULL,
-			subject_id integer NOT NULL,
-			cohort_start_date date NOT NULL,
-			cohort_end_date date NOT NULL
-)TABLESPACE tablespace_e;
-
-CREATE TABLE IF NOT EXISTS results.COHORT_DEFINITION (
-			cohort_definition_id integer NOT NULL,
-			cohort_definition_name varchar(255) NOT NULL,
-			cohort_definition_description TEXT NULL,
-			definition_type_concept_id integer NOT NULL,
-			cohort_definition_syntax TEXT NULL,
-			subject_concept_id integer NOT NULL,
-			cohort_initiation_date date NULL 
-)TABLESPACE tablespace_e;
