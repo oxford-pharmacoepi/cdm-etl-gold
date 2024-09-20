@@ -2,6 +2,16 @@ The .Net CDM Builder was initially developed by Janssen Research & Development a
 You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
+v.5.0.1
+* align CDM DDL v5.3 and 5.4 with 4b_OMOPCDM_postgresql_5_3_ddl.sql and 4b_OMOPCDM_postgresql_5_4_ddl.sql
+
+v.5.0
+=============
+* Populate Specimen
+* Support protocol, _p in database name
+* Added source release date in configuration for protocol, _p (also used in observation_period)
+* Upgraded from netcoreapp3.1 to net6.0
+* Applied to **GOLD 202407 release**
 
 v.4.0
 =============
@@ -13,7 +23,7 @@ v.4.0
 * Bug fixed non-condition concepts in condition_occurrence
 * not map read code = ZZZZZ00 (+)
 * build PK, indexes and FKs in Era Tables (+)
-* Applied to **GOLD 202401 release**
+* Applied to **GOLD 202401 release** and **cdm_gold_p22_001867**
 
 v.3.0
 =============
@@ -47,4 +57,5 @@ Backlogs
 =============
 - [x] Support CDM v.5.4
 - [ ] Map Ethnicities(link to HES data)
-- [ ] Populate Specimen 
+- [x] Populate Specimen 
+- [ ] Upgrade to net8.0
