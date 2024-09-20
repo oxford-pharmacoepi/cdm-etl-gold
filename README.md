@@ -3,6 +3,7 @@ You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
 v.5.0.1
+=============
 * align CDM DDL v5.3 and 5.4 with 4b_OMOPCDM_postgresql_5_3_ddl.sql and 4b_OMOPCDM_postgresql_5_4_ddl.sql
 
 v.5.0
