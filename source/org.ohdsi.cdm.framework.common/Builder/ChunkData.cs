@@ -34,10 +34,12 @@ namespace org.ohdsi.cdm.framework.common.Builder
         public Dictionary<long, Metadata> Metadata { get; private set; }
 
         public List<FactRelationship> FactRelationships { get; private set; }
+        public List<Specimen> Specimen { get; private set; }
 
         // CDM v54 props
         public List<Episode> Episodes { get; private set; }
         public List<EpisodeEvent> EpisodeEvents { get; private set; }
+
 
         public ChunkData(int chunkId, int subChunkId, int chunkSize)
         //public ChunkData(int chunkId, int subChunkId)
@@ -87,6 +89,7 @@ namespace org.ohdsi.cdm.framework.common.Builder
             Cost = new List<Cost>();
             Note = new List<Note>();
             FactRelationships = new List<FactRelationship>();
+            Specimen = new List<Specimen>();
         }
 
         public void Clean()
@@ -111,6 +114,7 @@ namespace org.ohdsi.cdm.framework.common.Builder
             Cost = null;
             Note = null;
             FactRelationships = null;
+            Specimen = null;
         }
 
         public bool AddCostData(Cost cost)
@@ -222,6 +226,12 @@ namespace org.ohdsi.cdm.framework.common.Builder
                 case EntityType.Note:
                     {
                         Note.Add((Note)data);
+                        break;
+                    }
+
+                case EntityType.Specimen:
+                    {
+                        Specimen.Add((Specimen)data);
                         break;
                     }
             }

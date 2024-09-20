@@ -21,7 +21,8 @@
         ConditionEra,
         DrugEra,
         Note,
-        Episode,        //New added in CDM v5.4
-        EpisodeEvent    //New added in CDM v5.4
+        Episode,            //New added in CDM v5.4
+        EpisodeEvent,       //New added in CDM v5.4
+        Specimen            //New added since 202407
     }
 }
