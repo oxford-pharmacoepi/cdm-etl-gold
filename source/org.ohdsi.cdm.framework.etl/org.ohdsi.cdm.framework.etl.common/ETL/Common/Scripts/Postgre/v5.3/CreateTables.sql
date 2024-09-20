@@ -1,12 +1,3 @@
-CREATE TABLE IF NOT EXISTS {sc}.attribute_definition
-(
-   attribute_definition_id    integer        NOT NULL,
-   attribute_name             varchar(255)   NOT NULL,
-   attribute_description      text,
-   attribute_type_concept_id  integer        NOT NULL,
-   attribute_syntax           text
-)TABLESPACE {tablespace};
-
 CREATE TABLE IF NOT EXISTS {sc}.care_site
 (
    care_site_id                   integer         NOT NULL,
@@ -15,12 +6,6 @@ CREATE TABLE IF NOT EXISTS {sc}.care_site
    location_id                    integer,
    care_site_source_value         varchar(50),
    place_of_service_source_value  varchar(50)
-)TABLESPACE {tablespace};
-
-CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
-(
-   domain_id    varchar(20),
-   description  varchar(4000)
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cdm_source
@@ -35,36 +20,6 @@ CREATE TABLE IF NOT EXISTS {sc}.cdm_source
    cdm_release_date                date,
    cdm_version                     varchar(10),
    vocabulary_version              varchar(20)
-)TABLESPACE {tablespace};
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort
-(
-   cohort_definition_id  integer   NOT NULL,
-   subject_id            integer   NOT NULL,
-   cohort_start_date     date      NOT NULL,
-   cohort_end_date       date      NOT NULL
-)TABLESPACE {tablespace};
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort_attribute
-(
-   cohort_definition_id     integer   NOT NULL,
-   subject_id               integer   NOT NULL,
-   cohort_start_date        date      NOT NULL,
-   cohort_end_date          date      NOT NULL,
-   attribute_definition_id  integer   NOT NULL,
-   value_as_number          numeric,
-   value_as_concept_id      integer
-)TABLESPACE {tablespace};
-
-CREATE TABLE IF NOT EXISTS {sc}.cohort_definition
-(
-   cohort_definition_id           integer        NOT NULL,
-   cohort_definition_name         varchar(255)   NOT NULL,
-   cohort_definition_description  text,
-   definition_type_concept_id     integer        NOT NULL,
-   cohort_definition_syntax       text,
-   subject_concept_id             integer        NOT NULL,
-   cohort_initiation_date         date
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.condition_era
@@ -87,15 +42,14 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
    condition_end_date             date,
    condition_end_datetime         timestamp,
    condition_type_concept_id      integer       NOT NULL,
+   condition_status_concept_id    integer,
    stop_reason                    varchar(20),
    provider_id                    bigint,
    visit_occurrence_id            bigint,
-   visit_detail_id                bigint,
-   condition_status_concept_id    integer,
+   visit_detail_id                bigint, 
    condition_source_value         varchar(250),
    condition_source_concept_id    integer,
-   condition_status_source_value  varchar(50)
-  
+   condition_status_source_value  varchar(50)  
 )TABLESPACE {tablespace};
 
 CREATE TABLE IF NOT EXISTS {sc}.cost
@@ -154,7 +108,6 @@ CREATE TABLE IF NOT EXISTS {sc}.device_exposure
    device_source_concept_id        integer
 )TABLESPACE {tablespace};
 
-
 CREATE TABLE IF NOT EXISTS {sc}.dose_era
 (
    dose_era_id          BIGSERIAL    	NOT NULL,
@@ -203,7 +156,6 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    route_source_value            varchar(100),	-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
    dose_unit_source_value        varchar(50)
 )TABLESPACE {tablespace};
-
 
 CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
 (
@@ -443,13 +395,13 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
    visit_detail_type_concept_id    integer       NOT NULL,
    provider_id                     bigint,
    care_site_id                    integer,
-   admitting_source_concept_id     integer,
-   discharge_to_concept_id         integer,
-   preceding_visit_detail_id       bigint,
    visit_detail_source_value       varchar(50),
    visit_detail_source_concept_id  integer,
    admitting_source_value          varchar(50),
+   admitting_source_concept_id     integer,
    discharge_to_source_value       varchar(50),
+   discharge_to_concept_id         integer,
+   preceding_visit_detail_id       bigint,
    visit_detail_parent_id          bigint,
    visit_occurrence_id             bigint        NOT NULL
 )TABLESPACE {tablespace};
@@ -474,4 +426,3 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
    discharge_to_source_value      varchar(50),
    preceding_visit_occurrence_id  bigint
 )TABLESPACE {tablespace};
-
