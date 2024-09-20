@@ -13,6 +13,7 @@ using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime;
 using Thrift.Protocol;
 
 namespace org.ohdsi.cdm.framework.desktop.DbLayer
@@ -25,8 +26,9 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         private readonly int _chunkSize;
         private readonly string _destinationSchemaName;
         private readonly string _tablespace;
+        private readonly string _sourceReleaseDate;
 
-        public DbSource(string connectionString, string folder, string schemaName, int chuckSize, string destinationSchemaName, string tablespace)
+        public DbSource(string connectionString, string folder, string schemaName, int chuckSize, string destinationSchemaName, string tablespace, string sourceReleaseDate)
         {
             _connectionString = connectionString;
             _folder = folder;
@@ -34,6 +36,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             _chunkSize = chuckSize;
             _destinationSchemaName = destinationSchemaName;
             _tablespace = tablespace;
+            _sourceReleaseDate = sourceReleaseDate;
         }
 
         public int CreateChunkTable()
@@ -243,6 +246,8 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             {
                 query = query.Replace("{sc}", _destinationSchemaName);
                 query = query.Replace("{tablespace}", _tablespace);
+                query = query.Replace("{SOURCE_RELEASE_DATE}", _sourceReleaseDate);
+
                 Debug.WriteLine($"query={query}");
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))

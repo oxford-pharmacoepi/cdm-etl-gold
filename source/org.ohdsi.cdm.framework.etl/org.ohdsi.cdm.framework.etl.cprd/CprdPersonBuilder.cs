@@ -559,9 +559,12 @@ namespace org.ohdsi.cdm.framework.etl.cprd
             if (conceptDomain.StartsWith("Drug", StringComparison.OrdinalIgnoreCase))
                 return "Drug";
 
+            if (conceptDomain.StartsWith("Specimen", StringComparison.OrdinalIgnoreCase))
+                return "Specimen";
+
             //There is no specified domain that the Concepts in this table must adhere to.
             //The only rule is that records with Concepts in the Condition, Procedure, Drug, Measurement, or Device domains MUST go to the corresponding table.
-            if (entityDomain.StartsWith("Observation", StringComparison.OrdinalIgnoreCase))
+            if (entityDomain.StartsWith("Observation", StringComparison.OrdinalIgnoreCase)) //****entityDomain***
                 return "Observation";
 
             //return entityDomain;
@@ -741,6 +744,16 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                         DrugForEra.Add(drg);
                         ChunkData.AddData(drg);
                         break;
+
+                    case "Specimen":
+                        var spacimen = entity as Specimen ?? new Specimen(entity)
+                        {
+                            Id = Offset.GetKeyOffset(entity.PersonId).NoteId
+                        };
+                        spacimen.TypeConceptId = 32817; //32817 EHR
+                        ChunkData.AddData(spacimen);
+                        break;
+
                 }
 
             }

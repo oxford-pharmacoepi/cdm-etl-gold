@@ -53,25 +53,46 @@ namespace org.ohdsi.cdm.presentation.builder.Base
 
                 if (result.Value != null)
                 {
-                    Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);
+                    try
+                    {
+                        Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);
+                    }
+                    catch (System.InvalidOperationException)
+                    {
+                        Debug.WriteLine($"Fail to write log: {result.Key}");
+                    }
+
                     throw result.Value;
                 }
 
-                Logger.Write(_chunkId, LogMessageTypes.Info,
-                   $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+                try
+                {
+                    Logger.Write(_chunkId, LogMessageTypes.Info,
+                       $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+                }
+                catch (InvalidOperationException) {
+                    Debug.WriteLine("Fail to write log");
+                }
 
                 part.Build(Settings.Current.WithinTheObservationPeriod);
-                Logger.Write(_chunkId, LogMessageTypes.Info,
-                   $"ChunkId={_chunkId} was built - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+
+                try
+                {
+                    Logger.Write(_chunkId, LogMessageTypes.Info,
+                       $"ChunkId={_chunkId} was built - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+                }
+                catch (InvalidOperationException) {
+                    Debug.WriteLine("Fail to write log");
+                }
 
                 return part;
-            }
-            catch (Exception e)
-            {
-                Logger.WriteError(_chunkId, e);
+                }
+                catch (Exception e)
+                {
+                    Logger.WriteError(_chunkId, e);
 
-                throw;
-            }
+                    throw;
+                }
         }
         #endregion
     }

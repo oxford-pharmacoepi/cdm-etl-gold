@@ -503,6 +503,17 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                             break;
                         }
 
+                    case "SPECIMEN":
+                        {
+                            foreach (var list in SplitList(chunk.Specimen))
+                            {
+                                //5.3 and 5.4 are same
+                                //if (CdmVersion == CdmVersions.V54)  
+                                    yield return new SpecimenDataReader54(list, _offsetManager);
+                            }
+                            break;
+                        }
+                                
                     default:
                         throw new Exception("CreateDataReader, unsupported table name: " + table);
                 }
@@ -559,6 +570,8 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 //Write(chunk, "FACT_RELATIONSHIP");
 
                 //Task.WaitAll(tasks.ToArray());
+
+                Write(chunk, "SPECIMEN");
 
                 //Update Chunk completed = 1
                 UpdateChunkStatus(chunk.ChunkId);

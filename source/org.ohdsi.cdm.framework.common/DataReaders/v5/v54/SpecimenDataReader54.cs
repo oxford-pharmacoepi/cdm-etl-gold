@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
+namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v54
 {
-    public class MeasurementDataReader53 : IDataReader
+    public class SpecimenDataReader54 : IDataReader
     {
-        private readonly IEnumerator<Measurement> _enumerator;
+        private readonly IEnumerator<Specimen> _enumerator;
         private readonly KeyMasterOffsetManager _offset;
 
         // A custom DataReader is implemented to prevent the need for the HashSet to be transformed to a DataTable for loading by SqlBulkCopy
-        public MeasurementDataReader53(List<Measurement> batch, KeyMasterOffsetManager o)
+        public SpecimenDataReader54(List<Specimen> batch, KeyMasterOffsetManager o)
         {
             _enumerator = batch?.GetEnumerator();
             _offset = o;
@@ -25,8 +25,7 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
         public int FieldCount
         {
-            //get { return 20; }
-            get { return 19; }
+            get { return 14; }
         }
 
         // is this called only because the datatype specific methods are not implemented?  
@@ -41,59 +40,35 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 1:
                     return _enumerator.Current.ConceptId;
                 case 2:
-                    return _enumerator.Current.StartDate;
+                    return _enumerator.Current.TypeConceptId;
                 case 3:
                     return _enumerator.Current.StartDate;
                 case 4:
-                    return _enumerator.Current.Time;
+                    return _enumerator.Current.StartDate;
                 case 5:
-                    return _enumerator.Current.TypeConceptId;
+                    return _enumerator.Current.Quantity;
                 case 6:
-                    return _enumerator.Current.OperatorConceptId;
-                case 7:
-                    return _enumerator.Current.ValueAsNumber;
-                case 8:
-                    return _enumerator.Current.ValueAsConceptId;
-                case 9:
                     if (String.IsNullOrEmpty(_enumerator.Current.UnitSourceValue))
                         return null;
                     else
                         return _enumerator.Current.UnitConceptId;
+                case 7:
+                    return null;
+                case 8:
+                    return null;
+                case 9:
+                    return _enumerator.Current.SpecimenSourceId;
                 case 10:
-                    return _enumerator.Current.RangeLow;
+                    if (String.IsNullOrEmpty(_enumerator.Current.SpecimenSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.SpecimenSourceValue;
                 case 11:
-                    return _enumerator.Current.RangeHigh;
-                case 12:
-                    return _enumerator.Current.ProviderId == 0 ? null : _enumerator.Current.ProviderId;
-                case 13:
-                    if (_enumerator.Current.VisitOccurrenceId.HasValue)
-                    {
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitOccurrenceIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitOccurrenceId.Value);
-                        return _enumerator.Current.VisitOccurrenceId.Value;
-                    }
-
-                    return null;
-
-                case 14:
-                    if (_enumerator.Current.VisitDetailId.HasValue)
-                    {
-                        if (_offset.GetKeyOffset(_enumerator.Current.PersonId).VisitDetailIdChanged)
-                            return _offset.GetId(_enumerator.Current.PersonId,
-                                _enumerator.Current.VisitDetailId.Value);
-                        return _enumerator.Current.VisitDetailId;
-                    }
-
-                    return null;
-                case 15:
-                    return _enumerator.Current.SourceValue;
-                case 16:
-                    return _enumerator.Current.SourceConceptId;
-                case 17:
                     return _enumerator.Current.UnitSourceValue;
-                case 18:
-                    return _enumerator.Current.ValueSourceValue;
+                case 12:
+                    return null;
+                case 13:
+                    return null;
 
                 default:
                     throw new NotImplementedException();
@@ -104,26 +79,21 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
         {
             switch (i)
             {
-                //case 0: return "measurement_id";
+                //case 0: return "specimen_id";
                 case 0: return "person_id";
-                case 1: return "measurement_concept_id";
-                case 2: return "measurement_date";
-                case 3: return "measurement_datetime";
-                case 4: return "measurement_time";
-                case 5: return "measurement_type_concept_id";
-                case 6: return "operator_concept_id";
-                case 7: return "value_as_number";
-                case 8: return "value_as_concept_id";
-                case 9: return "unit_concept_id";
-                case 10: return "range_low";
-                case 11: return "range_high";
-                case 12: return "provider_id";
-                case 13: return "visit_occurrence_id";
-                case 14: return "visit_detail_id";
-                case 15: return "measurement_source_value";
-                case 16: return "measurement_source_concept_id";
-                case 17: return "unit_source_value";
-                case 18: return "value_source_value";
+                case 1: return "specimen_concept_id";
+                case 2: return "specimen_type_concept_id";
+                case 3: return "specimen_date";
+                case 4: return "specimen_datetime";
+                case 5: return "quantity";
+                case 6: return "unit_concept_id";
+                case 7: return "anatomic_site_concept_id";
+                case 8: return "disease_status_concept_id";
+                case 9: return "specimen_source_id";                //This is the identifier for the specimen from the source system.
+                case 10: return "specimen_source_value";
+                case 11: return "unit_source_value";
+                case 12: return "anatomic_site_source_value";
+                case 13: return "disease_status_source_value";
 
                 default:
                     throw new NotImplementedException();
@@ -228,38 +198,28 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 1:
                     return typeof(int);
                 case 2:
-                    return typeof(DateTime);
+                    return typeof(int);
                 case 3:
                     return typeof(DateTime);
                 case 4:
-                    return typeof(string);
+                    return typeof(DateTime);
                 case 5:
-                    return typeof(int?);
-                case 6:
-                    return typeof(int);
-                case 7:
                     return typeof(decimal?);
+                case 6:
+                    return typeof(int?);
+                case 7:
+                    return typeof(int?);
                 case 8:
                     return typeof(int);
                 case 9:
-                    return typeof(int);
+                    return typeof(string);
                 case 10:
-                    return typeof(decimal?);
+                    return typeof(string);
                 case 11:
-                    return typeof(decimal?);
+                    return typeof(string);
                 case 12:
-                    return typeof(long?);
+                    return typeof(string);
                 case 13:
-                    return typeof(long?);
-                case 14:
-                    return typeof(long?);
-                case 15:
-                    return typeof(string);
-                case 16:
-                    return typeof(int);
-                case 17:
-                    return typeof(string);
-                case 18:
                     return typeof(string);
 
                 default:

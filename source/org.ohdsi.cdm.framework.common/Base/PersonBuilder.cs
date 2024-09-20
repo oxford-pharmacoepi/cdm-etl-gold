@@ -616,7 +616,8 @@ namespace org.ohdsi.cdm.framework.common.Base
             Dictionary<long, VisitOccurrence> visitOccurrences, ObservationPeriod[] observationPeriods, bool withinTheObservationPeriod)
         {
             //return BuildEntities(drugExposures, visitOccurrences, observationPeriods, false);
-            return BuildEntities(drugExposures, visitOccurrences, observationPeriods, withinTheObservationPeriod);
+            //excluded unmapped drug
+            return BuildEntities(drugExposures.Where(d => d.ConceptId != 0), visitOccurrences, observationPeriods, withinTheObservationPeriod);
         }
 
         /// <summary>

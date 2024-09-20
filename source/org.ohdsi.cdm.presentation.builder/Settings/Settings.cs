@@ -20,6 +20,8 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public string Tablespace = ConfigurationManager.AppSettings["Tablespace"];
 
+        public string SourceReleaseDate = ConfigurationManager.AppSettings["SourceReleaseDate"];
+
         public string CdmVersion = ConfigurationManager.AppSettings["CDM"];
         public string CdmMainVersion
         {
