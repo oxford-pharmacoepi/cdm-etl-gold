@@ -16,7 +16,7 @@
 			concat(c.patid,to_char(c.eventdate,'YYYYMMDD'), coalesce(con.constype, 99)) as temp_visit_occurrence_id,
 			-- nextval('{sc}.visit_detail_id_seq') as visit_occurrence_id,
 			MOD(c.patid, 100000) as care_site_id,
-			m.readcode,
+			m.readcode, m.desc,
 			constype.text as description,
 			con.constype
 	from ch
@@ -38,6 +38,7 @@
       <EndDate>eventdate</EndDate>
       <ProviderId>staffid</ProviderId>
 	  <!-- VisitDetailId>visit_occurrence_id</VisitDetailId> -->
+	  <Desc>desc</Desc>
       <Concepts>
         <Concept>
           <ConceptIdMappers>
