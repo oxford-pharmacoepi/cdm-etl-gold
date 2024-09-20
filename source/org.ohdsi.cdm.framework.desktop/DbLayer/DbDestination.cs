@@ -16,12 +16,14 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         private readonly string _connectionString;
         private readonly string _schemaName;
         private readonly string _tablespace;
+        private readonly string _sourceReleaseDate;
 
-        public DbDestination(string connectionString, string schemaName, string tablespace)
+        public DbDestination(string connectionString, string schemaName, string tablespace, string sourceReleaseDate)
         {
             _connectionString = connectionString;
             _schemaName = schemaName;
             _tablespace = tablespace;
+            _sourceReleaseDate = sourceReleaseDate;
         }
 
         public void CreateIndexes(string query)
@@ -164,6 +166,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             {
                 query = query.Replace("{sc}", _schemaName);
                 query = query.Replace("{tablespace}", _tablespace);
+                query = query.Replace("{SOURCE_RELEASE_DATE}", _sourceReleaseDate);
 
                 foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
                 {

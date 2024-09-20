@@ -24,7 +24,12 @@
 		end as gender,
 		MOD(a.patid, 100000)  CARE_SITE_ID,
 		GREATEST(a.frd, b.uts) as observation_period_start_date,
-		LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) as observation_period_end_date,
+		CASE
+			WHEN LEFT(current_database(),10) = 'cdm_gold_p' THEN
+				LEAST(a.tod, b.lcd, a.deathdate, to_date('{SOURCE_RELEASE_DATE}', 'YYYY-MM-DD'))
+			ELSE
+				LEAST(a.tod, b.lcd, a.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD'))
+		END as observation_period_end_date,
 		deathdate,
 		toreason,
 		CASE

@@ -29,7 +29,8 @@ namespace org.ohdsi.cdm.presentation.builderwebapi.Controllers
             }), settings.ConversionSettings.SourceSchema,
                 ChunkSize,
                 settings.ConversionSettings.VocabularySchema,
-                ""
+                "",
+                "NA"
             );
         }
 
