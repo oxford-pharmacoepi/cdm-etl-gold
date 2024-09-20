@@ -36,8 +36,6 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
 
             switch (i)
             {
-                //case 0:
-                //    return _offset.GetId(_enumerator.Current.PersonId, _enumerator.Current.Id);
                 case 0:
                     return _enumerator.Current.PersonId;
                 case 1:
@@ -57,7 +55,10 @@ namespace org.ohdsi.cdm.framework.common.DataReaders.v5.v53
                 case 8:
                     return _enumerator.Current.ValueAsConceptId;
                 case 9:
-                    return _enumerator.Current.UnitConceptId;
+                    if (String.IsNullOrEmpty(_enumerator.Current.UnitSourceValue))
+                        return null;
+                    else
+                        return _enumerator.Current.UnitConceptId;
                 case 10:
                     return _enumerator.Current.RangeLow;
                 case 11:
