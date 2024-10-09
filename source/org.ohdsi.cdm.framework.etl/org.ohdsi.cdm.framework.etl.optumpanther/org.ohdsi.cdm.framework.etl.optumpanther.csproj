@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-     <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="ETL\OPTUMPANTHER\Batch.sql" />
     <None Remove="ETL\OPTUMPANTHER\CdmSource.sql" />
@@ -50,7 +48,6 @@
     <None Remove="ETL\OPTUMPANTHER\Lookups\Specialty.sql" />
     <None Remove="ETL\OPTUMPANTHER\Lookups\Visits.sql" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="ETL\OPTUMPANTHER\Batch.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -185,18 +182,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
   </ItemGroup>
-
 </Project>

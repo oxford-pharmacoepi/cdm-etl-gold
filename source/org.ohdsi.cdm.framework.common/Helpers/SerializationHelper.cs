@@ -9,7 +9,9 @@ namespace org.ohdsi.cdm.framework.common.Helpers
         public static object ByteArrayToObject(byte[] byteArray)
         {
             var memoryStream = new MemoryStream(byteArray);
+            #pragma warning disable SYSLIB0011
             var binaryFormatter = new BinaryFormatter();
+            #pragma warning disable SYSLIB0011
             memoryStream.Position = 0;
             return binaryFormatter.Deserialize(memoryStream);
         }

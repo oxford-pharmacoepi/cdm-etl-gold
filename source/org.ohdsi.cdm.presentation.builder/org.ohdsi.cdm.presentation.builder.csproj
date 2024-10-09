@@ -1,30 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-	<DisableWinExeOutputInference>true</DisableWinExeOutputInference>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\download.ico" />
     <None Remove="Resources\splash.png" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
     <ProjectReference Include="..\org.ohdsi.cdm.framework.desktop\org.ohdsi.cdm.framework.desktop.csproj" />
@@ -43,19 +38,16 @@
     <ProjectReference Include="..\org.ohdsi.cdm.framework.etl\org.ohdsi.cdm.framework.etl.seer\org.ohdsi.cdm.framework.etl.seer.csproj" />
     <ProjectReference Include="..\org.ohdsi.cdm.framework.etl\org.ohdsi.cdm.framework.etl.symphonyemr\org.ohdsi.cdm.framework.etl.symphonyemr.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\download.ico" />
     <Resource Include="Resources\splash.png" />
   </ItemGroup>
-
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="App.xaml.cs">
       <SubType>Code</SubType>
@@ -71,7 +63,6 @@
       <AutoGen>True</AutoGen>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Resources\Resources.resx">
       <SubType>Designer</SubType>
@@ -79,18 +70,15 @@
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="App.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-
 </Project>

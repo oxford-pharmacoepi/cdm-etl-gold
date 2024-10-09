@@ -1,25 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>01ae609d-a4b7-4dbb-b041-01244dae996e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
     <ProjectReference Include="..\org.ohdsi.cdm.framework.desktop\org.ohdsi.cdm.framework.desktop.csproj" />
     <ProjectReference Include="..\org.ohdsi.cdm.framework.etl\org.ohdsi.cdm.framework.etl.common\org.ohdsi.cdm.framework.etl.common.csproj" />
   </ItemGroup>
-
-
 </Project>

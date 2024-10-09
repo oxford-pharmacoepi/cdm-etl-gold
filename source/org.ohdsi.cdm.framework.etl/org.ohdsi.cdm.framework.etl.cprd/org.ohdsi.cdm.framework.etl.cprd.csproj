@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-     <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Batch.sql" />
     <None Remove="CdmSource.sql" />
@@ -18,18 +16,17 @@
     <None Remove="ETL\CPRD\Definitions\Referral_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Test_Postgres.xml" />
     <None Remove="ETL\CPRD\Definitions\Therapy_Postgres.xml" />
-	<None Remove="ETL\CPRD\Definitions\Death_Postgres.xml" />
+    <None Remove="ETL\CPRD\Definitions\Death_Postgres.xml" />
     <None Remove="ETL\CPRD\Lookups\Additional.sql" />
     <None Remove="ETL\CPRD\Lookups\Drug.sql" />
     <None Remove="ETL\CPRD\Lookups\Read_Code.sql" />
     <None Remove="ETL\CPRD\Lookups\Specialty.sql" />
     <None Remove="ETL\CPRD\Lookups\Test_Ent.sql" />
     <None Remove="ETL\CPRD\Lookups\Units.sql" />
-	<None Remove="ETL\CPRD\Lookups\Route.sql" />
-	<None Remove="ETL\CPRD\Lookups\Country.sql" />
+    <None Remove="ETL\CPRD\Lookups\Route.sql" />
+    <None Remove="ETL\CPRD\Lookups\Country.sql" />
     <None Remove="ETL\CPRD\Lookups\ValueAsConceptId.sql" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="ETL\CPRD\Batch.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -70,9 +67,9 @@
     <Content Include="ETL\CPRD\Definitions\Therapy_Postgres.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-	<Content Include="ETL\CPRD\Definitions\Death_Postgres.xml">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
+    <Content Include="ETL\CPRD\Definitions\Death_Postgres.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ETL\CPRD\Lookups\Additional.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -91,31 +88,27 @@
     <Content Include="ETL\CPRD\Lookups\Units.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-	<Content Include="ETL\CPRD\Lookups\Routes.sql">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
-	<Content Include="ETL\CPRD\Lookups\Country.sql">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Content>
+    <Content Include="ETL\CPRD\Lookups\Routes.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Lookups\Country.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="ETL\CPRD\Lookups\ValueAsConceptId.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\org.ohdsi.cdm.framework.common\org.ohdsi.cdm.framework.common.csproj" />
   </ItemGroup>
-
 </Project>
