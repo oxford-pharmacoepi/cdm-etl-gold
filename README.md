@@ -6,6 +6,7 @@ The program is used to convert CPRD GOLD into OMOP CDM.
 v.5.0.1
 =============
 * align CDM DDL v5.3 and 5.4 with 4b_OMOPCDM_postgresql_5_3_ddl.sql and 4b_OMOPCDM_postgresql_5_4_ddl.sql
+* Upgraded from net6.0 to net8.0
 
 v.5.0
 =============
