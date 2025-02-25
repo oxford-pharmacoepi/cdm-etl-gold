@@ -2,6 +2,7 @@
 using org.ohdsi.cdm.framework.common.Builder;
 using org.ohdsi.cdm.framework.common.Enums;
 using org.ohdsi.cdm.framework.common.Helpers;
+using org.ohdsi.cdm.framework.common.Lookups;
 using org.ohdsi.cdm.framework.common.Omop;
 using org.ohdsi.cdm.framework.common.PregnancyAlgorithm;
 using System;
@@ -633,7 +634,11 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                                 && result[0].SourceConceptId > 0
                                 /*&& result[0].Domain == "Measurement"*/)
                             {
-                                mes.SourceConceptId = result[0].SourceConceptId;
+                                LookupValue sourceConcept = null;
+                                sourceConcept = result.Find(r => (mes.SourceValue.Equals(r.SourceCode, StringComparison.Ordinal)));
+                                if (sourceConcept != null)
+                                    mes.SourceConceptId = sourceConcept.SourceConceptId;
+                                //mes.SourceConceptId = result[0].SourceConceptId;
                             }
                         }
 
