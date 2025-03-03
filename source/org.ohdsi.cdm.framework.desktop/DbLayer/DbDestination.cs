@@ -15,13 +15,15 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
     {
         private readonly string _connectionString;
         private readonly string _schemaName;
+        private string _vocab_schema; 
         private readonly string _tablespace;
         private readonly string _sourceReleaseDate;
 
-        public DbDestination(string connectionString, string schemaName, string tablespace, string sourceReleaseDate)
+        public DbDestination(string connectionString, string schemaName, string vocab_schema, string tablespace, string sourceReleaseDate)
         {
             _connectionString = connectionString;
             _schemaName = schemaName;
+            _vocab_schema = vocab_schema;
             _tablespace = tablespace;
             _sourceReleaseDate = sourceReleaseDate;
         }
@@ -165,6 +167,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
                 query = query.Replace("{sc}", _schemaName);
+                query = query.Replace("{vocab_schema}", _vocab_schema);
                 query = query.Replace("{tablespace}", _tablespace);
                 query = query.Replace("{SOURCE_RELEASE_DATE}", _sourceReleaseDate);
 
