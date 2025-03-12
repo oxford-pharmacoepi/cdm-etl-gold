@@ -5,7 +5,8 @@ The program is used to convert CPRD GOLD into OMOP CDM.
 
 Current Software version: Microsoft Visual Studio Community 2022 (64-bit) Version 17.13.1
 
-Set up in local
+Set up .NET project in local
+=============
 1. Download [Visual Studio Setup](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) i.e., VisualStudioSetup.exe
 2. Download and install Visual Studio Installer by executing VisualStudioSetup.exe
 3. install Visual Studio Community 2022 over Visual Studio Installer *Since v17.13.1 is not available, please install v.17.13.3
@@ -25,23 +26,32 @@ Please add workloads before install
 ![image](https://github.com/user-attachments/assets/372adb85-1a75-4d1d-808c-842ba642b817)
 
 How to run
-- by executable application
-- 1. Update App.config and save
-  2. org.ohdsi.cdm.presentation.builder.exe (Will generate the exe with the lastest code after the current mapping in GOLD 202501)
+=============
+After setting up an .Net project
+1. Update and save org.ohdsi.cdm.presentation.builder/App.config to set up the chunk and cdm information
 
-- in debug mode
-- 1. Update App.config and save
-  2. Build project
-  3. Start the mapping in debug mode
+![image](https://github.com/user-attachments/assets/ff7a96e0-ee7f-4747-9ea6-8f94be06721a)
+
+2. Build Solution
+
+![image](https://github.com/user-attachments/assets/906d098f-e00e-488b-9399-f0c1b10b03ba)
+
+3. Start Debugging
+
+![image](https://github.com/user-attachments/assets/fa027f04-af05-46b7-998e-c3e3c6323a26)
+
+4. input database information under the setting tab in the pop-up Building Manager Window
+*If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
+5. click building tag and the start button to start the mapping. And corresponding log will be shown.
+
+![image](https://github.com/user-attachments/assets/cd0b5fd0-2832-4c51-b15e-c446a2d1a815)
+
+Example:
+![image](https://github.com/user-attachments/assets/8714720d-35f8-4707-b901-030c741d0345)
 
 
-10. start debug
-
-
-
-
-
-
+Tag log
+=============
 
 v.5.1.0
 =============
