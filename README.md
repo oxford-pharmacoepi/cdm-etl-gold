@@ -16,7 +16,7 @@ Please add workloads before install
 4. Download cdm_etl_gold repository to your local device
 5. Lauch Visual Studio Community 2022 and load the cdm_etl_gold project
 ![image](https://github.com/user-attachments/assets/e845ddad-edfb-4a1f-8823-805a2ed8b598)
-6.If there are any missing components required by the project, install them
+6. If there are any missing components required by the project, install them
 
 ![image](https://github.com/user-attachments/assets/f8264a40-13c4-4ddc-99d0-058b837a14d3)
 
