@@ -3,6 +3,14 @@ You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
 
+Current Software version: Microsoft Visual Studio Community 2022 (64-bit) Version 17.13.1
+
+Set up
+1. Download [Visual Studio Setup](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) i.e., VisualStudioSetup.exe
+2. Download and install Visual Studio Installer by executing VisualStudioSetup.exe
+3. install Visual Studio Community 2022 over Visual Studio Installer
+4. 
+
 v.5.1.0
 =============
 * Upgraded Npgsql from v8.0.3 to v9.0.2
