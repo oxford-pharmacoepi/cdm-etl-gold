@@ -355,7 +355,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create Destination Started ====================");
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, "NA");
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, "NA");
 
                 dbDestination.CreateDatabase(Settings.Current.CreateCdmDatabaseScript);
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmTablesScript);
@@ -374,7 +374,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
                 dbDestination.ExecuteQuery(Settings.Current.PopulateCdmSourceScript.Replace("{CdmVersion}", Settings.Current.CdmVersion));
 
 
@@ -421,7 +421,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var timer = new Stopwatch();
                 timer.Start();
 
-                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+                var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmEraFksScript);
 
@@ -433,42 +433,42 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void CreateTablesStep()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.CreateCdmTablesScript);
         }
 
         public void DropDestination()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.DropTablesScript);
         }
 
         public void TruncateLookup()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateLookupScript);
         }
 
         public void TruncateTables()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateTablesScript);
         }
 
         public void TruncateWithoutLookupTables()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.TruncateWithoutLookupTablesScript);
         }
 
         public void ResetVocabularyStep()
         {
-            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
+            var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
             dbDestination.ExecuteQuery(Settings.Current.DropVocabularyTablesScript);
         }
@@ -1113,7 +1113,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void Build(IVocabulary vocabulary)
         {
-            var saveQueue = new BlockingCollection<DatabaseChunkPart>();
+            var saveQueue = new ConcurrentQueue<DatabaseChunkPart>();
 
             PerformAction(() =>
             {
@@ -1140,103 +1140,74 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 List<int> incompleteChunkIds = _chunkController.GetIncompleteChunkId();
                 incompleteChunkIds.Sort();
                 //CompleteChunksCount = Settings.Current.Building.ChunksCount - incompleteChunkIds.Count();
-                
+
                 var save = Task.Run(() =>
                 {
-                    while (!saveQueue.IsCompleted)
+                    while (true)
                     {
+                        if (saveQueue.IsEmpty && CurrentState != BuilderState.Running)
+                            break;
 
-                        DatabaseChunkPart data = null;
-                        try
-                        {
-                            data = saveQueue.Take();
-                        }
-                        catch (InvalidOperationException)
-                        {
+                        if(Settings.Current.Building.ChunksCount != 0 && Settings.Current.Building.ChunksCount == CompleteChunksCount)
+                            break;
 
-                        }
-
-                        
-                        if (data != null)
+                        if (saveQueue.TryDequeue(out DatabaseChunkPart data))
                         {
                             var timer = new Stopwatch();
                             timer.Start();
-                            
+
                             data.Save(Settings.Current.Building.Cdm,
                                 Settings.Current.Building.DestinationConnectionString,
                                 Settings.Current.Building.DestinationEngine,
                                 Settings.Current.Building.SourceSchema,
                                 Settings.Current.Building.CdmSchema);
-                            
+
                             CompleteChunksCount++;
 
                             timer.Stop();
-                            /*
                             Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
-                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
-                            */
-                    
-                                Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
-                                    $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds* 0.000016666666666666667:0.00} mins");
-                            }
-
-                            if (CurrentState != BuilderState.Running)
-                                break;
+                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins");
                         }
+                    }
 
+                    CurrentState = BuilderState.Stopped;
 
-                        CurrentState = BuilderState.Stopped;
-                    
                 });
 
 
-                Parallel.For(0, incompleteChunkIds.Count(),
-                        new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) => {
-                            
-                            var chunkId = incompleteChunkIds[i];
+            Parallel.For(0, incompleteChunkIds.Count(), new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) =>
+            {
+                var chunkId = incompleteChunkIds[i];
 
-                            Debug.WriteLine($"i={i} incompleteChunkIds.Count={incompleteChunkIds.Count} chunkId={chunkId}");
+                Debug.WriteLine($"i={i} incompleteChunkIds.Count={incompleteChunkIds.Count} chunkId={chunkId}");
 
-                            if (CurrentState != BuilderState.Running)
-                                state.Break();
+                if (CurrentState != BuilderState.Running)
+                    state.Break();
 
-                            if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
-                            {
-                                var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder, Settings.Current.Building.ChunkSize);
-                                //var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
+                if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
+                {
+                    var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder, Settings.Current.Building.ChunkSize);
 
-                                using (var connection =
-                                new OdbcConnection(Settings.Current.Building.SourceConnectionString))
-                                {
-                                    connection.Open();
-                                    
-                                    saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
-                                    Settings.Current.Building.SourceSchema,
-                                    Settings.Current.Building.CdmSchema,
-                                    Settings.Current.Building.SourceQueryDefinitions,
-                                    connection,
-                                    Settings.Current.Building.Vendor));
-                                    /*
-                                    saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
-                                      Settings.Current.Building.SourceSchema,
-                                      Settings.Current.Building.SourceQueryDefinitions,
-                                      connection,
-                                      Settings.Current.Building.Vendor));
-                                    */
-                                }
+                    using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+                    {
+                        connection.Open();
 
-                                Settings.Current.Save(false);
+                        saveQueue.Enqueue(chunk.Process(Settings.Current.Building.SourceEngine,
+                            Settings.Current.Building.SourceSchema,
+                            Settings.Current.Building.CdmSchema,
+                            Settings.Current.Building.SourceQueryDefinitions,
+                            connection,
+                            Settings.Current.Building.Vendor));
+                    }
 
-                                while (saveQueue.Count > 0)
-                                {
-                                    Thread.Sleep(1000);
-                                }
-                            }
-                            
+                    Settings.Current.Save(false);
 
-                        });
-
-                saveQueue.CompleteAdding();
+                    while (saveQueue.Count > 0)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            });
 
                 save.Wait();
             });

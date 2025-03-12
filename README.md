@@ -3,18 +3,27 @@ You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
 
+v.5.1.0
+=============
+* Upgraded Npgsql from v8.0.3 to v9.0.2
+* Bug fixed incorrect measurement_source_concept_id representing Read Code which is case sensitive
+* Bug fixed incorrectly loading the cdm schema as the vocab schema
+* Added mapping Specialty (+)
+* Applied to **GOLD 202501 release**
+
 v.5.0.1
 =============
-* align CDM DDL v5.3 and 5.4 with 4b_OMOPCDM_postgresql_5_3_ddl.sql and 4b_OMOPCDM_postgresql_5_4_ddl.sql
+* Align CDM DDL v5.3 and 5.4 with 4b_OMOPCDM_postgresql_5_3_ddl.sql and 4b_OMOPCDM_postgresql_5_4_ddl.sql
 * Upgraded from net6.0 to net8.0
 
 v.5.0
 =============
 * Populate Specimen
-* Support protocol, _p in database name
-* Added source release date in configuration for protocol, _p (also used in observation_period)
+* Support protocol, _p in database name (+)
+* Added source release date in configuration for protocol, _p (also used in observation_period) (+)
 * Upgraded from netcoreapp3.1 to net6.0
-* Applied to **GOLD 202407 release**
+* Applied to **GOLD 202407 release, cdm_gold_p22_001867**
+
 
 v.4.0
 =============
@@ -59,6 +68,7 @@ Clone from https://github.com/OHDSI/ETL-CDMBuilder
 Backlogs
 =============
 - [x] Support CDM v.5.4
-- [ ] Map Ethnicities(link to HES data)
 - [x] Populate Specimen 
-- [ ] Upgrade to net8.0
+- [x] Upgrade to net8.0
+- [ ] Map Ethnicities 
+- [ ] Map Townsend deprivation index to [715996](https://athena.ohdsi.org/search-terms/terms/715996) 
