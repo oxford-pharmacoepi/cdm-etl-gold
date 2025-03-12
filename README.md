@@ -16,7 +16,28 @@ Please add workloads before install
 5. Lauch Visual Studio Community 2022 and load the cdm_etl_gold project
 ![image](https://github.com/user-attachments/assets/e845ddad-edfb-4a1f-8823-805a2ed8b598)
 6.If there are any missing components required by the project, install them
+
 ![image](https://github.com/user-attachments/assets/f8264a40-13c4-4ddc-99d0-058b837a14d3)
+
+7. Configurate startup projects as builder
+
+![image](https://github.com/user-attachments/assets/7d8bb2e0-f981-43e1-ad0d-bc92e92c17ef)
+![image](https://github.com/user-attachments/assets/372adb85-1a75-4d1d-808c-842ba642b817)
+
+How to run
+- by executable application
+- 1. Update App.config and save
+  2. org.ohdsi.cdm.presentation.builder.exe (Will generate the exe with the lastest code after the current mapping in GOLD 202501)
+
+- in debug mode
+- 1. Update App.config and save
+  2. Build project
+  3. Start the mapping in debug mode
+
+
+10. start debug
+
+
 
 
 
