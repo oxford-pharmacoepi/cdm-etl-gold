@@ -5,11 +5,22 @@ The program is used to convert CPRD GOLD into OMOP CDM.
 
 Current Software version: Microsoft Visual Studio Community 2022 (64-bit) Version 17.13.1
 
-Set up
+Set up in local
 1. Download [Visual Studio Setup](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) i.e., VisualStudioSetup.exe
 2. Download and install Visual Studio Installer by executing VisualStudioSetup.exe
-3. install Visual Studio Community 2022 over Visual Studio Installer
-4. 
+3. install Visual Studio Community 2022 over Visual Studio Installer *Since v17.13.1 is not available, please install v.17.13.3
+![image](https://github.com/user-attachments/assets/fd811003-a8ac-4e8f-81ce-c484e30a8054)
+![image](https://github.com/user-attachments/assets/7f7e1a20-c26b-4a62-b8a7-9fe5eed012a7)
+Please add workloads before install
+4. Download cdm_etl_gold repository to your local device
+5. Lauch Visual Studio Community 2022 and load the cdm_etl_gold project
+![image](https://github.com/user-attachments/assets/e845ddad-edfb-4a1f-8823-805a2ed8b598)
+6.If there are any missing components required by the project, install them
+![image](https://github.com/user-attachments/assets/f8264a40-13c4-4ddc-99d0-058b837a14d3)
+
+
+
+
 
 v.5.1.0
 =============
