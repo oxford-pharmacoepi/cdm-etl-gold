@@ -19,7 +19,7 @@ Set up .NET project in local
 5. Download or clone ***cdm_etl_gold*** repository to your local device
 6. Lauch ***Visual Studio Community 2022*** and load the ***cdm_etl_gold*** project
 
-![image](https://github.com/user-attachments/assets/c33d70f9-80ae-46f3-b2c1-4ef57a0774d6)
+![image](https://github.com/user-attachments/assets/a5eb63bd-22a6-4550-ac90-edb4871a329e)
 
 7. Configurate startup projects as org.ohdsi.cdm.presentation.builder
 
