@@ -31,6 +31,12 @@ How to run
 After setting up an .Net project
 1. Update and save ***org.ohdsi.cdm.presentation.builder/App.config*** to configure the chunk and CDM settings.
 > [!NOTE]
+> - ChunkSize: Number of patients processed per chunk (ideally set to 1000).
+> - DegreeOfParallelism: Number of chunk processes running in parallel (ideally no more than 3).
+> - CDM: CDM version (either 5.3 or 5.4.x).
+> - Tablespace: Tablespace for CDM tables.
+> - SourceReleaseDate: Source data cut-off date.
+> 
 > Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
 
 ![image](https://github.com/user-attachments/assets/553512ef-362a-4e0e-90c9-96e3cb2e8115)
@@ -56,7 +62,7 @@ After setting up an .Net project
 > *If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
  
 > [!CAUTION]
-> *In general, the OMOPed records are stored in the public schema. You are kindly reminded ***NOT*** to set the CDM schema as public for those mapped or in mapping process databases ***during testing***.
+> *In general, the OMOPed records are stored in the public schema. You are kindly reminded ***NOT*** to set the CDM schema as public for those mapped databases ***during testing***.
 
 5. click building tag and the start button to start the mapping. And corresponding log will be shown.
 
