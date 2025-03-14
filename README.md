@@ -16,7 +16,7 @@ Set up .NET project in local
 
 ![image](https://github.com/user-attachments/assets/91b677af-4d7c-43b4-85ab-77c603aaedeb)
 
-5. Download ***cdm_etl_gold*** repository to your local device
+5. Download or clone ***cdm_etl_gold*** repository to your local device
 6. Lauch ***Visual Studio Community 2022*** and load the ***cdm_etl_gold*** project
 
 ![image](https://github.com/user-attachments/assets/c33d70f9-80ae-46f3-b2c1-4ef57a0774d6)
