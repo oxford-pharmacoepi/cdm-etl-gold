@@ -31,7 +31,7 @@ How to run
 After setting up an .Net project
 1. Update and save ***org.ohdsi.cdm.presentation.builder/App.config*** to configure the chunk and CDM settings.
 Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
-![image](https://github.com/user-attachments/assets/ff7a96e0-ee7f-4747-9ea6-8f94be06721a)
+![image](https://github.com/user-attachments/assets/553512ef-362a-4e0e-90c9-96e3cb2e8115)
 
 3. Build Solution
 
