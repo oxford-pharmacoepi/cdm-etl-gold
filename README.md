@@ -30,7 +30,9 @@ How to run
 =============
 After setting up an .Net project
 1. Update and save ***org.ohdsi.cdm.presentation.builder/App.config*** to configure the chunk and CDM settings.
-Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
+> [!NOTE]
+> Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
+
 ![image](https://github.com/user-attachments/assets/553512ef-362a-4e0e-90c9-96e3cb2e8115)
 
 3. Build Solution
@@ -42,10 +44,23 @@ Given that the ***SourceReleaseDate*** parameter is for protocol and it is not u
 ![image](https://github.com/user-attachments/assets/fa027f04-af05-46b7-998e-c3e3c6323a26)
 
 4. input database information under the setting tab in the pop-up Building Manager Window
-*If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
+
+> [!NOTE]
+> - server name: IP address of the server hosting the database
+> - DB name: database name
+> - schema name:
+>      - schema where includes source data for Source Settings
+>      - schema where the source data is mapped to for CDM Settings
+>      - schema where contains vocabulary for Vocabulary Settings
+>
+> *If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
+ 
+> [!CAUTION]
+> *In general, the OMOPed records are stored in the public schema. You are kindly reminded ***NOT*** to set the CDM schema as public for those mapped or in mapping process databases ***during testing***.
+
 5. click building tag and the start button to start the mapping. And corresponding log will be shown.
 
-![image](https://github.com/user-attachments/assets/cd0b5fd0-2832-4c51-b15e-c446a2d1a815)
+![image](https://github.com/user-attachments/assets/1bec990c-a64e-4d96-8b65-78d994c20841)
 
 Example:
 ![image](https://github.com/user-attachments/assets/8714720d-35f8-4707-b901-030c741d0345)
