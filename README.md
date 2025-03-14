@@ -3,6 +3,57 @@ You can find the original code in https://github.com/OHDSI/ETL-CDMBuilder
 
 The program is used to convert CPRD GOLD into OMOP CDM. 
 
+Current Software version: Microsoft Visual Studio Community 2022 (64-bit) Version 17.13.1
+
+Set up .NET project in local
+=============
+1. Download [Visual Studio Setup](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) i.e., VisualStudioSetup.exe
+2. Download and install ***Visual Studio Installer*** by executing VisualStudioSetup.exe
+3. Lauch ***Visual Studio Installer*** using admin role
+4. Install ***Visual Studio Community 2022*** and ***.NET Desktop Development*** over Visual Studio Installer *Since v17.13.1 is not available, please install v.17.13.3
+
+![image](https://github.com/user-attachments/assets/fd811003-a8ac-4e8f-81ce-c484e30a8054)
+
+![image](https://github.com/user-attachments/assets/91b677af-4d7c-43b4-85ab-77c603aaedeb)
+
+5. Download ***cdm_etl_gold*** repository to your local device
+6. Lauch ***Visual Studio Community 2022*** and load the ***cdm_etl_gold*** project
+
+![image](https://github.com/user-attachments/assets/c33d70f9-80ae-46f3-b2c1-4ef57a0774d6)
+
+7. Configurate startup projects as org.ohdsi.cdm.presentation.builder
+
+![image](https://github.com/user-attachments/assets/7d8bb2e0-f981-43e1-ad0d-bc92e92c17ef)
+![image](https://github.com/user-attachments/assets/372adb85-1a75-4d1d-808c-842ba642b817)
+
+How to run
+=============
+After setting up an .Net project
+1. Update and save ***org.ohdsi.cdm.presentation.builder/App.config*** to configure the chunk and CDM settings.
+Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
+![image](https://github.com/user-attachments/assets/553512ef-362a-4e0e-90c9-96e3cb2e8115)
+
+3. Build Solution
+
+![image](https://github.com/user-attachments/assets/906d098f-e00e-488b-9399-f0c1b10b03ba)
+
+3. Start Debugging
+
+![image](https://github.com/user-attachments/assets/fa027f04-af05-46b7-998e-c3e3c6323a26)
+
+4. input database information under the setting tab in the pop-up Building Manager Window
+*If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
+5. click building tag and the start button to start the mapping. And corresponding log will be shown.
+
+![image](https://github.com/user-attachments/assets/cd0b5fd0-2832-4c51-b15e-c446a2d1a815)
+
+Example:
+![image](https://github.com/user-attachments/assets/8714720d-35f8-4707-b901-030c741d0345)
+
+
+Tag log
+=============
+
 v.5.1.0
 =============
 * Upgraded Npgsql from v8.0.3 to v9.0.2
