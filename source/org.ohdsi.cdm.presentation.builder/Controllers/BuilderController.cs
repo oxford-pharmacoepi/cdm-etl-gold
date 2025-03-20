@@ -1008,7 +1008,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             //if(!qd.FileName.Contains("Patient")) return;
 
             sql = sql.Replace("{pagesize}", pagesize.ToString());
-           
+            sql = sql.Replace("{SOURCE_RELEASE_DATE}", Settings.Current.SourceReleaseDate);
+
             if (page == 0) {
                 sql = sql.Replace("offset {pagesize*page}", "");
             }
