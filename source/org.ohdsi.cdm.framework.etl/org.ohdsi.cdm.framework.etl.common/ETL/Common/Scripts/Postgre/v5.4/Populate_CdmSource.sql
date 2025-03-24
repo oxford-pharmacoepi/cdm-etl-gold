@@ -24,5 +24,5 @@ CASE
 END,
 NOW(),
 CONCAT(SPLIT_PART(LTRIM('{CdmVersion}', 'v'), '.', 1), '.', SPLIT_PART('{CdmVersion}', '.', 2)),
-(SELECT concept_id FROM CONCEPT WHERE VOCABULARY_ID = 'CDM' AND CONCEPT_CLASS_ID = 'CDM' AND concept_code = CONCAT('CDM ','{CdmVersion}')),
-(SELECT vocabulary_version FROM public.vocabulary WHERE vocabulary_id = 'None');
+(SELECT concept_id FROM {vocab_schema}.CONCEPT WHERE VOCABULARY_ID = 'CDM' AND CONCEPT_CLASS_ID = 'CDM' AND concept_code = CONCAT('CDM ','{CdmVersion}')),
+(SELECT vocabulary_version FROM {vocab_schema}.vocabulary WHERE vocabulary_id = 'None');
