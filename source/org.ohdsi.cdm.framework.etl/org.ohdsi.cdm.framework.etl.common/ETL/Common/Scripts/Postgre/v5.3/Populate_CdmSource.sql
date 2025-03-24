@@ -24,4 +24,4 @@ CASE
 END,
 NOW(),
 CONCAT('CDM ', '{CdmVersion}'),
-(SELECT vocabulary_version FROM public.vocabulary WHERE vocabulary_id = 'None');
+(SELECT vocabulary_version FROM {vocab_schema}.vocabulary WHERE vocabulary_id = 'None');

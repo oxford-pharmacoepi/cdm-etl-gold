@@ -36,8 +36,6 @@ After setting up an .Net project
 > - CDM: CDM version (either 5.3 or 5.4.x).
 > - Tablespace: Tablespace for CDM tables.
 > - SourceReleaseDate: Source data cut-off date.
-> 
-> Given that the ***SourceReleaseDate*** parameter is for protocol and it is not used in utilized in standard GOLD mapping.
 
 ![image](https://github.com/user-attachments/assets/553512ef-362a-4e0e-90c9-96e3cb2e8115)
 
