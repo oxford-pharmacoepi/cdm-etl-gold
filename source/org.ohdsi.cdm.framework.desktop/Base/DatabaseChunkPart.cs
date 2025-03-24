@@ -8,6 +8,7 @@ using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
@@ -58,7 +59,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             $"join {destinationSchemaName}.person p on p.person_id = ch.person_id " +
             $"join {destinationSchemaName}.observation_period op on op.person_id = p.person_id";
 
-            Debug.WriteLine($"sql={sql}");
+            //Debug.WriteLine($"sql={sql}");
 
             using var command = new OdbcCommand(sql, sourceConnection);
             using var reader = command.ExecuteReader();
@@ -104,13 +105,15 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                 );
             }
         }
+        private static readonly object _lockObject = new object();
 
-        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
+        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName, ConcurrentBag<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
         {
             var fileName = string.Empty;
             var query = string.Empty;
             var connectionString = string.Empty;
 
+            
             try
             {
                 var timer = new Stopwatch();
@@ -137,7 +140,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
                     foreach (var subQuery in q.Split(new[] { "GO" + "\r\n", "GO" + "\n" }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        Debug.WriteLine("subQuery=" + subQuery);
+                        //Debug.WriteLine("subQuery=" + subQuery);
 
                         using (var cdm = sourceEngine.GetCommand(subQuery, sourceConnection))
                         {
@@ -146,7 +149,10 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                             {
                                 while (reader.Read())
                                 {
-                                    PopulateData(qd, reader);
+                                    lock (_lockObject)
+                                    {
+                                        PopulateData(qd, reader);
+                                    }
                                 }
                             }
                         }
