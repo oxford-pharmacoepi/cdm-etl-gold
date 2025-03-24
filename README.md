@@ -73,8 +73,9 @@ Example:
 7. Build constrains in CDM tables by running etl_ndorms. 
 
 > [!CAUTION]
-> The program supports resuming only the Chunking process (conversion to CDM). If you encounter any issues beforehand, please manually delete all CDM tables EXCEPT for CDM vocabulary tables and restart the mapping from scratch.
-> To ensure the program exits properly, always close the pop-up Building Manager window by clicking the 'X' button in the upper right corner.
+> - The program supports resuming only the Chunking process (conversion to CDM). If you encounter any issues beforehand, please manually delete all CDM tables EXCEPT for CDM vocabulary tables and restart the mapping from scratch.
+>
+> - To ensure the program exits properly, always close the pop-up Building Manager window by clicking the 'X' button in the upper right corner.
 
 
 
