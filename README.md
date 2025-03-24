@@ -59,15 +59,23 @@ After setting up an .Net project
 >
 > *If you want to re-load the previous mapping profile(DB connection infomation), make sure there is ONLY ONE Settings.xml under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows ***including any sub-folders under source\org.ohdsi.cdm.presentation.builder\bin\Debug\net8.0-windows***
  
-> [!CAUTION]
-> *In general, the OMOPed records are stored in the public schema. You are kindly reminded ***NOT*** to set the CDM schema as public for those mapped databases ***during testing***.
-
 5. click building tag and the start button to start the mapping. And corresponding log will be shown.
 
 ![image](https://github.com/user-attachments/assets/1bec990c-a64e-4d96-8b65-78d994c20841)
 
 Example:
 ![image](https://github.com/user-attachments/assets/8714720d-35f8-4707-b901-030c741d0345)
+
+6. When you see ** ===== Data has been mapped ===== **, it indicates that the chunking process is complete. Close the the pop-up Building Manager Window.
+
+![image](https://github.com/user-attachments/assets/dc707cc2-ef84-4c29-9d57-1bec2d44635e)
+
+7. Build constrains in CDM tables by running etl_ndorms. 
+
+> [!CAUTION]
+> The program supports resuming only the Chunking process (conversion to CDM). If you encounter any issues beforehand, please manually delete all CDM tables EXCEPT for CDM vocabulary tables and restart the mapping from scratch.
+> To ensure the program exits properly, always close the pop-up Building Manager window by clicking the 'X' button in the upper right corner.
+
 
 
 Tag log
