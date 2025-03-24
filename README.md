@@ -74,10 +74,11 @@ Example:
 
 > [!CAUTION]
 > - The program supports resuming only the Chunking process (conversion to CDM). If you encounter any issues beforehand, please manually delete all CDM tables EXCEPT for CDM vocabulary tables and restart the mapping from scratch.
->
+> 
 > - To ensure the program exits properly, always close the pop-up Building Manager window by clicking the 'X' button in the upper right corner.
-
-
+>
+> - If the program hangs during the Chunking process, press the Stop button and the 'X' button in the pop-up Building Manager Window. Then, reload the mapping profile (Settings.xml) and rerun the program.
+>
 
 Tag log
 =============
