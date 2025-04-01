@@ -3,7 +3,6 @@ using org.ohdsi.cdm.framework.common.Definitions;
 using org.ohdsi.cdm.framework.desktop.Base;
 using org.ohdsi.cdm.framework.desktop.Databases;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
@@ -28,7 +27,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
         #endregion
 
         #region Methods
-        public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, ConcurrentBag<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection)
+        public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection)
         {
             try
             {

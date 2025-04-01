@@ -6,7 +6,6 @@ using org.ohdsi.cdm.framework.desktop.Databases;
 using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
@@ -35,7 +34,6 @@ namespace org.ohdsi.cdm.presentation.builder.Base
         #endregion
 
         #region Methods
-        object lockObj = new object();
         //public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
         public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, string destinationSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
         {
@@ -51,10 +49,9 @@ namespace org.ohdsi.cdm.presentation.builder.Base
 
                 part.loadPersonObservationPeriodByChunk(sourceConnection, sourceSchemaName, destinationSchemaName, _chunkId);
 
-                ConcurrentBag<QueryDefinition> _sourceQueryDefinitions = new ConcurrentBag<QueryDefinition>(sourceQueryDefinitions);
+                var result = part.Load(sourceEngine, sourceSchemaName, sourceQueryDefinitions, sourceConnection, vendor);
 
 
-                var result = part.Load(sourceEngine, sourceSchemaName, _sourceQueryDefinitions, sourceConnection, vendor);
 
                 if (result.Value != null)
                 {

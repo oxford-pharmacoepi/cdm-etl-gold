@@ -102,7 +102,7 @@ namespace org.ohdsi.cdm.framework.common.Base
                 if (LastSavedPersonId.HasValue && personId <= LastSavedPersonId) continue;
 
                 if (!queryDefinition.ProcessedPersonIds.ContainsKey(personId.Value))
-                    queryDefinition.ProcessedPersonIds.Add(personId.Value, 0);
+                    queryDefinition.ProcessedPersonIds.TryAdd(personId.Value, 0);               
 
                 try
                 {
