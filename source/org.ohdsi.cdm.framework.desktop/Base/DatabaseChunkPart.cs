@@ -8,7 +8,6 @@ using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using org.ohdsi.cdm.framework.desktop.Helpers;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
@@ -105,9 +104,8 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                 );
             }
         }
-        private static readonly object _lockObject = new object();
 
-        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName, ConcurrentBag<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
+        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
         {
             var fileName = string.Empty;
             var query = string.Empty;
@@ -148,11 +146,8 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                             using (var reader = sourceEngine.ReadChunkData(sourceConnection, cdm, qd, ChunkId, Prefix))
                             {
                                 while (reader.Read())
-                                {
-                                    lock (_lockObject)
-                                    {
-                                        PopulateData(qd, reader);
-                                    }
+                                {  
+                                    PopulateData(qd, reader);
                                 }
                             }
                         }

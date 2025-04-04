@@ -344,7 +344,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 timer.Stop();
 
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Data Cleaning Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Data Cleaning Ended ====================");
             });
         }
 
@@ -371,16 +371,11 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Logger.Write(null, LogMessageTypes.Info,
                    $"==================== Populate CDM SOURCE Started ====================");
 
-                var timer = new Stopwatch();
-                timer.Start();
-
                 var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString,Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
                 dbDestination.ExecuteQuery(Settings.Current.PopulateCdmSourceScript.Replace("{CdmVersion}", Settings.Current.CdmVersion));
 
-
-                timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Populate CDM SOURCE Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Populate CDM SOURCE Ended ====================");
             });
         }
 
@@ -389,9 +384,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             {
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create PK and Indexes in Visit and Era Tables Started ====================");
-
-                var timer = new Stopwatch();
-                timer.Start();
 
                 var dbDestination = new DbSource(   Settings.Current.Building.DestinationConnectionString,
                                                     "",
@@ -405,10 +397,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.PostCreateCdmPkIdx());
 
                 Parallel.ForEach(createCdmPkIdxActions, action => action());
-
-                timer.Stop();
+               
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create PK and Indexes in Visit and Era Tables Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Create PK and Indexes in Visit and Era Tables Ended ====================");
             });
         }
 
@@ -418,16 +409,12 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Create Fks in Era Tables Started ====================");
 
-                var timer = new Stopwatch();
-                timer.Start();
-
                 var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema, Settings.Current.Building.VocabSchema, Settings.Current.Tablespace, Settings.Current.SourceReleaseDate);
 
                 dbDestination.ExecuteQuery(Settings.Current.CreateCdmEraFksScript);
 
-                timer.Stop();
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Create PK and Indexes in Visit and Era Tables Ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Create PK and Indexes in Visit and Era Tables Ended ====================");
             });
         }
 
@@ -738,19 +725,15 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void CreatChunks()
         {
-            var timer = new Stopwatch();
-            timer.Start();
-
             Console.WriteLine("Creating chunks...");
             Logger.Write(null, LogMessageTypes.Info,
                 $"==================== Create Chunks started ====================");
 
             Settings.Current.Building.ChunksCount = _chunkController.CreateChunk();
             Console.WriteLine($"{Settings.Current.Building.ChunksCount} chunks have been created");
-            timer.Stop();
 
             Logger.Write(null, LogMessageTypes.Info,
-                $"==================== Create Chunks ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                $"==================== Create Chunks ended ====================");
 
         }
 
@@ -928,8 +911,6 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                    $"==================== Mapping ALL Patients ended ====================");
 
             Logger.Write(null, LogMessageTypes.Info, "==================== Add indexes to Person and Observational Period started ====================");
-            var timer = new Stopwatch();
-            timer.Start();
 
             //var dbDestination = new DbDestination(Settings.Current.Building.DestinationConnectionString, Settings.Current.Building.CdmSchema);
             var createCdmPkIdxActions = CreateCdmPkIdxActionList(dbDestination, Settings.Current.CreateCdmPkIdxForMappingScripts());
@@ -937,7 +918,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             Parallel.ForEach(createCdmPkIdxActions, action => action());
 
             Logger.Write(null, LogMessageTypes.Info, 
-                    $"==================== Add indexes to Person and Observational Period ended - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins ====================");
+                    $"==================== Add indexes to Person and Observational Period ended ====================");
         }
 
         public List<ObservationPeriod> loadDeathObservationPeriod(String connectionString, string sourceSchemaName, string destinationSchemaName, int page)
@@ -1135,9 +1116,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 */
                 //vocabulary.Fill(false, false);
                 
-                Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Conversion to CDM was started ====================");
-
+                
                 List<int> incompleteChunkIds = _chunkController.GetIncompleteChunkId();
                 incompleteChunkIds.Sort();
                 //CompleteChunksCount = Settings.Current.Building.ChunksCount - incompleteChunkIds.Count();
@@ -1166,8 +1145,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                             CompleteChunksCount++;
 
                             timer.Stop();
+                            TimeSpan elapsed = timer.Elapsed;
+
                             Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
-                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins");
+                                $"ChunkId={data.ChunkData.ChunkId} was saved - {elapsed.Minutes} min {elapsed.Seconds} sec");
                         }
                     }
 
@@ -1175,40 +1156,48 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
                 });
 
+                Logger.Write(null, LogMessageTypes.Info,
+                    $"==================== Conversion to CDM was started ====================");
 
-            Parallel.For(0, incompleteChunkIds.Count(), new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) =>
-            {
-                var chunkId = incompleteChunkIds[i];
 
-                Debug.WriteLine($"i={i} incompleteChunkIds.Count={incompleteChunkIds.Count} chunkId={chunkId}");
-
-                if (CurrentState != BuilderState.Running)
-                    state.Break();
-
-                if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
+                Parallel.For(0, incompleteChunkIds.Count(), new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (i, state) =>
                 {
-                    var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder, Settings.Current.Building.ChunkSize);
+                    var chunkId = incompleteChunkIds[i];
+                    var timer = new Stopwatch();
+                    timer.Start();
+                    
+                    Debug.WriteLine($"i={i} incompleteChunkIds.Count={incompleteChunkIds.Count} chunkId={chunkId}");
+                    Logger.Write(null, LogMessageTypes.Info, $"ChunkId={chunkId} started");
 
-                    using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+                    if (CurrentState != BuilderState.Running)
+                        state.Break();
+
+                    if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
                     {
-                        connection.Open();
+                        var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder, Settings.Current.Building.ChunkSize);
 
-                        saveQueue.Enqueue(chunk.Process(Settings.Current.Building.SourceEngine,
-                            Settings.Current.Building.SourceSchema,
-                            Settings.Current.Building.CdmSchema,
-                            Settings.Current.Building.SourceQueryDefinitions,
-                            connection,
-                            Settings.Current.Building.Vendor));
+                        using (var connection = new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+                        {
+                            
+                            connection.Open();
+
+                            saveQueue.Enqueue(chunk.Process(Settings.Current.Building.SourceEngine,
+                                Settings.Current.Building.SourceSchema,
+                                Settings.Current.Building.CdmSchema,
+                                Settings.Current.Building.SourceQueryDefinitions,
+                                connection,
+                                Settings.Current.Building.Vendor,
+                                timer));
+                        }
+
+                        Settings.Current.Save(false);
+
+                        while (saveQueue.Count > 0)
+                        {
+                            Thread.Sleep(1000);
+                        }
                     }
-
-                    Settings.Current.Save(false);
-
-                    while (saveQueue.Count > 0)
-                    {
-                        Thread.Sleep(1000);
-                    }
-                }
-            });
+                });
 
                 save.Wait();
             });

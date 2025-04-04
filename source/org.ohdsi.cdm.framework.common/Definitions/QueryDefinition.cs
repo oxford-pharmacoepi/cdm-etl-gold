@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -55,7 +56,7 @@ namespace org.ohdsi.cdm.framework.common.Definitions
         public long ProcessedRowCount => _processedRowCount;
 
         [XmlIgnore]
-        public Dictionary<long, long> ProcessedPersonIds { get; set; }
+        public ConcurrentDictionary<long, long> ProcessedPersonIds { get; set; }
 
 
         [XmlIgnore]
@@ -98,13 +99,13 @@ namespace org.ohdsi.cdm.framework.common.Definitions
 
         public QueryDefinition()
         {
-            ProcessedPersonIds = new Dictionary<long, long>();
+            ProcessedPersonIds = new ConcurrentDictionary<long, long>();
         }
 
         public void Clean()
         {
             _processedRowCount = 0;
-            ProcessedPersonIds = new Dictionary<long, long>();
+            ProcessedPersonIds = new ConcurrentDictionary<long, long>();
             Awaiting = false;
             DataProcessed = false;
         }
