@@ -7,8 +7,10 @@ using org.ohdsi.cdm.framework.desktop.DbLayer;
 using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Odbc;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace org.ohdsi.cdm.presentation.builder.Base
@@ -34,8 +36,9 @@ namespace org.ohdsi.cdm.presentation.builder.Base
         #endregion
 
         #region Methods
+
         //public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
-        public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, string destinationSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
+        public DatabaseChunkPart Process(IDatabaseEngine sourceEngine, string sourceSchemaName, string destinationSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor, Stopwatch timer)
         {
             try
             {
@@ -44,51 +47,35 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0, _chunkSize);
                 //var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0);
 
-                var timer = new Stopwatch();
-                timer.Start();
-
                 part.loadPersonObservationPeriodByChunk(sourceConnection, sourceSchemaName, destinationSchemaName, _chunkId);
 
                 var result = part.Load(sourceEngine, sourceSchemaName, sourceQueryDefinitions, sourceConnection, vendor);
 
+                timer.Stop();
 
+                TimeSpan elapsed = timer.Elapsed;
 
                 if (result.Value != null)
                 {
-                    try
-                    {
-                        Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);
-                    }
-                    catch (System.InvalidOperationException)
-                    {
-                        Debug.WriteLine($"Fail to write log: {result.Key}");
-                    }
-
+                    Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);
                     throw result.Value;
                 }
 
-                try
-                {
-                    Logger.Write(_chunkId, LogMessageTypes.Info,
-                       $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
-                }
-                catch (InvalidOperationException) {
-                    Debug.WriteLine("Fail to write log");
-                }
+                Logger.Write(_chunkId, LogMessageTypes.Info,
+                       $"ChunkId={_chunkId} was loaded -  {elapsed.Minutes} min {elapsed.Seconds} sec | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
 
+                timer.Restart();
                 part.Build(Settings.Current.WithinTheObservationPeriod);
+                
+                timer.Stop();
+                elapsed = timer.Elapsed;
 
-                try
-                {
-                    Logger.Write(_chunkId, LogMessageTypes.Info,
-                       $"ChunkId={_chunkId} was built - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
-                }
-                catch (InvalidOperationException) {
-                    Debug.WriteLine("Fail to write log");
-                }
+                Logger.Write(_chunkId, LogMessageTypes.Info,
+                       $"ChunkId={_chunkId} was built - {elapsed.Minutes} min {elapsed.Seconds} sec | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
+
 
                 return part;
-                }
+            }
 
             catch (Exception e)
             {

@@ -2,6 +2,7 @@
 using org.ohdsi.cdm.framework.desktop.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Packaging;
 using System.Net.Sockets;
@@ -50,21 +51,19 @@ namespace org.ohdsi.cdm.presentation.builder
             if (chunkFolder != null && !Directory.Exists(chunkFolder))
                 Directory.CreateDirectory(chunkFolder);
 
+            
             if (chunkFolder != null)
                 File.AppendAllText($@"{chunkFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
 
-            lock (_threadlock)
-            {
-                try
-                {
-                    File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
-                }
-                catch 
-                {
-                    Console.WriteLine($"Fail to write '{message}' to file log");
-                }
-            }
 
+            //File.AppendAllText($@"{buildingFolder}\log.txt", $@"{DateTime.Now:G}| {message}{Environment.NewLine}");
+
+            string logFilePath = Path.Combine(buildingFolder, "log.txt");
+            using (FileStream fs = new FileStream(logFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+            using (StreamWriter writer = new StreamWriter(fs, System.Text.Encoding.UTF8))
+            {
+                writer.WriteLine($"{DateTime.Now:G}| {message}");
+            }
         }
 
         public static IEnumerable<string> GetErrors()
@@ -76,10 +75,19 @@ namespace org.ohdsi.cdm.presentation.builder
 
             if (File.Exists($@"{folder}\log.txt"))
             {
-                lock (_threadlock)
+                List<string> lines = new List<string>();
+
+                using (FileStream fs = new FileStream($@"{folder}\log.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    return File.ReadAllLines($@"{folder}\log.txt");
+                    while (!sr.EndOfStream)
+                    {
+                        lines.Add(sr.ReadLine());
+                    }
                 }
+
+                return lines.ToArray();
+                //return File.ReadAllLines($@"{folder}\log.txt");
             }
 
             return new[] { "" };
@@ -94,10 +102,11 @@ namespace org.ohdsi.cdm.presentation.builder
 
             if (File.Exists($@"{folder}\log.txt"))
             {
-                lock (_threadlock)
+                using (FileStream fs = new FileStream($@"{folder}\log.txt", FileMode.Truncate, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    File.WriteAllText($@"{folder}\log.txt", "");
+                    // File is now empty
                 }
+                //File.WriteAllText($@"{folder}\log.txt", "");
             }
         }
 
