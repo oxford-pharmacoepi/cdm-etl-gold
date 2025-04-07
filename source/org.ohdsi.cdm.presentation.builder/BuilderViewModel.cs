@@ -1337,6 +1337,8 @@ namespace org.ohdsi.cdm.presentation.builder
                 Logger.Write(null, LogMessageTypes.Info,
                     $"==================== Data has been mapped. ====================");
 
+                WriteTotalProcessTime();
+
             }
             else
             {
@@ -1344,6 +1346,19 @@ namespace org.ohdsi.cdm.presentation.builder
                 _buildingController.Refresh();
                 _timer.Start();
             }
+        }
+
+        private void WriteTotalProcessTime()
+        {
+            var startTime = Settings.Current.Building.BuildingState.CreateDestinationDbStart;
+            var endTime = Settings.Current.Building.BuildingState.CdmFksForEraEnd;
+
+            Debug.WriteLine("startTime = " + startTime);
+            Debug.WriteLine("endTime = " + endTime);
+
+            TimeSpan diff = (TimeSpan)(endTime - startTime);
+
+            Logger.Write(null, LogMessageTypes.Info, $"Total processing time {diff.Days}d:{diff.Hours}h:{diff.Minutes}m:{diff.Seconds}s");
         }
 
     }
