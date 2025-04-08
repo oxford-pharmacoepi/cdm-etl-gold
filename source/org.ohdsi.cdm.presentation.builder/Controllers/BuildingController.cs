@@ -236,6 +236,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             var time = DateTime.Now;
             typeof(Building).GetProperty(fieldName).SetValue(Settings.Current.Building.BuildingState, time, null);
+            Settings.Current.Save(false);
             return time;
         }
 
