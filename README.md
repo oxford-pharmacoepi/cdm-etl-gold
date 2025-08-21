@@ -79,6 +79,8 @@ Example:
 >
 > - If the program hangs during the Chunking process, press the Stop button and the 'X' button in the pop-up Building Manager Window. Then, reload the mapping profile (Settings.xml) and rerun the program.
 >
+> - After building constraints in the CDM tables with etl_ndorms, skip 6_build_cdm_era_tbl.py and run 7_count_cdm_records.py directly, since ERA tables are already created in the CPRD GOLD ETL.
+>
 
 Tag log
 =============
