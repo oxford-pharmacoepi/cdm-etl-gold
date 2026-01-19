@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    visit_detail_id               bigint,
    drug_source_value             varchar(250),
    drug_source_concept_id        integer,
-   route_source_value            varchar(100),		-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
+   route_source_value            varchar(110),		-- updated since cdm_gold_202307 as the route in GOLD is longer than 50
    dose_unit_source_value        varchar(50)
 )TABLESPACE {tablespace};
 
