@@ -54,7 +54,7 @@ namespace org.ohdsi.cdm.framework.common.Helpers
 
                     foreach (var entity in ordered.Skip(1))
                     {
-                        var currentGap = entity.StartDate.Subtract(era.EndDate.Value).Days;
+                        var currentGap = entity.StartDate.Subtract(era.EndDate.Value).Days - 1;
 
                         if (currentGap > gap1)
                         {
