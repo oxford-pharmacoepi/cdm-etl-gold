@@ -140,7 +140,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
                                     _logHub.Clients.All.SendAsync("Log", string.Format("{0}| {1}", DateTime.Now, $"DONE - {timer.ElapsedMilliseconds} ms | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}")).Wait();
 
                                 }
-                                catch (Exception e)
+                                catch (Exception)
                                 {
                                     Console.WriteLine("Lookup error [file]: " + sqlFileDestination);
                                     Console.WriteLine("Lookup error [query]: " + sql);

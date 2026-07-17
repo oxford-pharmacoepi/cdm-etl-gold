@@ -139,7 +139,7 @@ namespace org.ohdsi.cdm.presentation.builder
                                     Logger.Write(null, LogMessageTypes.Info,
                                         $"DONE - {timer.ElapsedMilliseconds * 0.000016666666666666667:0.00} mins | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}");
                                 }
-                                catch (Exception e)
+                                catch (Exception)
                                 {
                                     Console.WriteLine("Lookup error [file]: " + sqlFileDestination);
                                     Console.WriteLine("Lookup error [query]: " + sql);

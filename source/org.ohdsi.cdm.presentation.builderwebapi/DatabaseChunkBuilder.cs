@@ -50,7 +50,7 @@ namespace org.ohdsi.cdm.presentation.builderwebapi
 
                 return part;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
