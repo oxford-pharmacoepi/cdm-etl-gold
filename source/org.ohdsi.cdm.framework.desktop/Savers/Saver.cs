@@ -577,7 +577,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 UpdateChunkStatus(chunk.ChunkId);
                 Commit();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //Logger.WriteError(chunk.ChunkId, e);
                 Rollback();
@@ -630,7 +630,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
                 Commit();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //Logger.WriteError(e);
                 Rollback();
@@ -717,7 +717,7 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
             {
                 Write(null, null, new ChunkDataReader(chunk), "_chunks");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Rollback();
                 throw;
